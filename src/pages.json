@@ -1,22 +1,52 @@
 {
   "easycom": {
-		"autoscan": true,
-		"custom": {
-			"^uni-(.*)": "@dcloudio/uni-ui/lib/uni-$1/uni-$1.vue"
-		}
-	},
-	"pages": [
-		{
-			"path": "pages/index/index",
-			"style": {
-				"navigationBarTitleText": "uni-app"
-			}
-		}
-	],
-	"globalStyle": {
-		"navigationBarTextStyle": "black",
-		"navigationBarTitleText": "uni-app",
-		"navigationBarBackgroundColor": "#F8F8F8",
-		"backgroundColor": "#F8F8F8"
-	}
+    "autoscan": true,
+    "custom": {
+      "^uni-(.*)": "@dcloudio/uni-ui/lib/uni-$1/uni-$1.vue",
+      "uni-(.*)": "@/components/uni-$1.vue"
+    }
+  },
+  "pages": [
+    {
+      "path": "pages/hot/index",
+      "style": {
+        "navigationBarTitleText": "热门活动"
+      }
+    },
+    {
+      "path": "pages/myCreated/index",
+      "style": {
+        "navigationBarTitleText": "我创建的"
+      }
+    }
+  ],
+  "globalStyle": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "uni-app",
+    "navigationBarBackgroundColor": "#F8F8F8",
+    "backgroundColor": "#F8F8F8"
+  },
+  "tabBar": {
+    "custom": true,
+    "color": "#000000",
+    "selectedColor": "#DC143C",
+    "backgroundColor": "#ffffff",
+    "list": [
+      {
+        "pagePath": "pages/hot/index",
+        "selectedIconPath": "static/tabbar_home_on.png",
+        "iconPath": "static/tabbar_home.png",
+        "text": "热门活动"
+      },
+      {
+        "pagePath": "pages/myCreated/index",
+        "selectedIconPath": "static/tabbar_cate_on.png",
+        "iconPath": "static/tabbar_cate.png",
+        "text": "我创建的"
+      }
+    ]
+  },
+  "usingComponents": {
+    "Scroll": "components/scroll/index"
+  }
 }
