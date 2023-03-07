@@ -9,6 +9,9 @@
   <uni-scroll :getData="getData" :height="height">
     <template v-slot="{ item }">
       <activity-card></activity-card>
+      <uni-card :title="item.name" sub-title="副标题" thumbnail="https://web-assets.dcloud.net.cn/unidoc/zh/unicloudlogo.png" @click="onClick">
+				<text class="uni-body">这是一个带头像和双标题的基础卡片，此示例展示了一个完整的卡片。</text>
+			</uni-card>
     </template>
   </uni-scroll>
 </template>
@@ -32,7 +35,7 @@ const getData = () => {
     setTimeout(() => {
       resolve({
         list: [
-          { name: '活动1活动1活动1活动1活动1活动1活动1活动1' },
+          { name: '活动1活动1活动1活动1活动1活动1活动1活动1活动1活动1活动1活动1活动1活动1活动1活动1活动1活动1活动1活动1活动1活动1活动1活动1活动1活动1活动1活动1活动1活动1活动1活动1' },
           { name: '活动2' },
           { name: '活动3' },
           { name: '活动4' },

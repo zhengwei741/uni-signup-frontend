@@ -80,6 +80,8 @@
           flex: 1;
           font-size: 15px;
           color: #3a3a3a;
+          display: flex;
+          align-items: center;
         }
         .uni-card__header-content-subtitle {
           flex: 1;

@@ -8,7 +8,7 @@
     @refresherrefresh="onRefresherRefresh"
     @scrolltolower="onScrolltoLower"
   >
-    <view v-for="item in scrollList">
+    <view v-for="(item, index) in scrollList" :key="index">
       <slot :item="item"></slot>
     </view>
   </scroll-view>
