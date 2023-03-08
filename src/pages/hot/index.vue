@@ -6,7 +6,14 @@
   >
   </uni-search-bar>
 
-  <uni-scroll :getData="getData" :height="height">
+  <uni-scroll
+    :list="activeList"
+    :getData="getData"
+    :height="height"
+    pullUp
+    @onPullUp="onPullUp"
+    @onDropDown="onDropDown"
+  >
     <template v-slot="{ item }">
       <view class="activity-card">
         <view class="uni-card uni-shadow uni-border">
@@ -14,22 +21,23 @@
             <view class="uni-card__header-box">
               <view class="uni-card__header-avatar">
                 <image
-                  src="https://web-assets.dcloud.net.cn/unidoc/zh/unicloudlogo.png"
+                  mode="aspectFill"
+                  :src="() => getImgSrc(item.logoImgName)"
                   class="uni-card__header-avatar-image"
                 ></image>
               </view>
               <view class="uni-card__header-content">
-                <text class="uni-card__header-content-title uni-ellipsis">{{
+                <text class="uni-card__header-content-title">{{
                   item.name
                 }}</text>
                 <view class="uni-card__header-content-subtitle">
-                  <uni-tag text="标签" type="primary" />
+                  <uni-tag :text="item.activityStatus" :inverted="true" type="primary" />
                 </view>
               </view>
             </view>
           </view>
           <view class="uni-card__content">
-            <text class="org-name">幕间咖啡</text>
+            <text class="org-name">{{ item.organizationName }}</text>
             <text class="org-link" @tap="onClick">Ta的主页</text>
           </view>
         </view>
@@ -39,36 +47,69 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import useSafeScrollHeight from '@/hooks/useSafeScrollHeight'
-import { login } from '@/apis'
+import { queryHotActivity } from '@/apis/activity'
+import type { IHotActivity } from '@/apis/activity'
+import { usePagination } from '@/hooks/usePagination'
 
 // height 56是searchBar高度
 const height = useSafeScrollHeight() - 56
 
 // search
-const searchValue = ref('')
+const searchValue = ref<string>('')
 const searchHandel = (value: string) => {
   console.log(value)
 }
-// data
+// usePagination
+const {
+  next
+} = usePagination({
+  page: 1,
+  pageSize: 10,
+  onChange: ({ pageNo, pageSize }) => {
+    queryHotActivity({ title: searchValue.value, pageNo, pageSize }).then(ret => {
+      activeList.value = ret.data.pageInfo.list
+    })
+  }
+})
+
+const onPullUp = (close: () => void) => {
+  queryHotActivity({ title: searchValue.value, pageNo: 1, pageSize: 10 }).then(ret => {
+    activeList.value = activeList.value.concat(ret.data.pageInfo.list)
+  }).finally(close)
+}
+const onDropDown = (close: () => void) => {
+  queryHotActivity({ title: searchValue.value, pageNo: 1, pageSize: 10 }).then(ret => {
+    activeList.value = ret.data.pageInfo.list
+  }).finally(close)
+}
+// list
+let activeList = ref<IHotActivity[]>([])
 const getData = () => {
+  queryHotActivity({
+    title: '',
+    pageNo: 1,
+    pageSize: 10
+  })
   return new Promise((resolve) => {
     setTimeout(() => {
       resolve({
-        list: [
-          {
-            name: '活动1活动1活动1活动1活动1活动1活动1活动1活动1活动1活动1活动1活动1活动1活动1活动1活动1活动1活动1活动1活动1活动1活动1活动1活动1活动1活动1活动1活动1活动1活动1活动1'
-          }
-        ]
+        list: []
       })
     }, 1000)
   })
 }
+const url = import.meta.env.VITE_APP_URL
+const getImgSrc = (logoImgName: string) => `${url}}${logoImgName}`
 // click
-const onClick = () => {
-  login()
-}
+const onClick = () => {}
+
+onMounted(() => {
+  queryHotActivity({ title: searchValue.value, pageNo: 1, pageSize: 10 }).then(ret => {
+    activeList.value = ret.data.pageInfo.list
+  })
+})
 </script>
 <style lang="scss" scoped>
 .activity-card {
@@ -94,7 +135,7 @@ const onClick = () => {
     border-bottom: 1px #ebeef5 solid;
     flex-direction: row;
     align-items: center;
-    padding: 10px;
+    padding: 10px 10px 10px 0;
     overflow: hidden;
     .uni-card__header-box {
       display: flex;
@@ -103,19 +144,18 @@ const onClick = () => {
       align-items: center;
       overflow: hidden;
       .uni-card__header-avatar {
-        width: 70px;
+        width: 105px;
         height: 70px;
         overflow: hidden;
         border-radius: 5px;
         margin-right: 10px;
         .uni-card__header-avatar-image {
           flex: 1;
-          width: 70px;
+          width: 105px;
           height: 70px;
         }
       }
       .uni-card__header-content {
-        height: 70px;
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -125,7 +165,7 @@ const onClick = () => {
           flex: 1;
           font-size: 15px;
           color: #3a3a3a;
-          line-height: 36px;
+          font-weight: bold;
         }
         .uni-card__header-content-subtitle {
           flex: 1;
@@ -147,6 +187,9 @@ const onClick = () => {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    background-color: #f2f2f2;
+    border-radius: 5px;
+    margin-bottom: 10px;
     .org-name {
       flex: 2;
     }

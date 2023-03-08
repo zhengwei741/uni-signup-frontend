@@ -5,7 +5,7 @@ const useSafeScrollHeight = () => {
     bottom = safeAreaInsets.bottom
   }
   // TODO tabbar 高度获取不到
-  return windowHeight - bottom - 50
+  return windowHeight - bottom - 48
 }
 
 export default useSafeScrollHeight

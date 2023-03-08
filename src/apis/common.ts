@@ -33,7 +33,6 @@ export const loginByCode = async (code: string): Promise<string> => {
 export const login = async () => {
   try {
     const code = await getCode()
-    debugger
     return await loginByCode(code)
   } catch (error) {
     console.log(error)
