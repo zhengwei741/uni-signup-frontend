@@ -1,20 +1,21 @@
 <template>
   <uni-search-bar
-    @confirm="searchHandel"
+    @blur="searchHandel"
+    @cancel="onCancelHandel"
     v-model="searchValue"
     placeholder="活动名称"
   >
   </uni-search-bar>
 
   <uni-scroll
+    v-if="activeList.length"
     :list="activeList"
-    :getData="getData"
-    :height="height"
+    :height="scrollHeight"
+    :isNoMore="isLastPage"
     pullUp
     @onPullUp="onPullUp"
-    @onDropDown="onDropDown"
   >
-    <template v-slot="{ item }">
+    <template #default="{ item }">
       <view class="activity-card">
         <view class="uni-card uni-shadow uni-border">
           <view class="uni-card__header">
@@ -22,28 +23,35 @@
               <view class="uni-card__header-avatar">
                 <image
                   mode="aspectFill"
-                  :src="() => getImgSrc(item.logoImgName)"
+                  :src="url + item.logoImgName"
+                  :lazy-load="true"
                   class="uni-card__header-avatar-image"
                 ></image>
               </view>
               <view class="uni-card__header-content">
                 <text class="uni-card__header-content-title">{{
-                  item.name
+                  item.organizationName
                 }}</text>
                 <view class="uni-card__header-content-subtitle">
-                  <uni-tag :text="item.activityStatus" :inverted="true" type="primary" />
+                  <uni-tag
+                    :text="item.activityStatus"
+                    :inverted="true"
+                    :type="getTagType(item.activityStatus)"
+                  />
                 </view>
               </view>
             </view>
           </view>
           <view class="uni-card__content">
             <text class="org-name">{{ item.organizationName }}</text>
-            <text class="org-link" @tap="onClick">Ta的主页</text>
+            <text class="org-link">Ta的主页</text>
           </view>
         </view>
       </view>
     </template>
   </uni-scroll>
+
+  <uni-empty v-else></uni-empty>
 </template>
 
 <script setup lang="ts">
@@ -54,61 +62,59 @@ import type { IHotActivity } from '@/apis/activity'
 import { usePagination } from '@/hooks/usePagination'
 
 // height 56是searchBar高度
-const height = useSafeScrollHeight() - 56
+const scrollHeight = useSafeScrollHeight() - 56
 
-// search
+// 搜索相关
 const searchValue = ref<string>('')
-const searchHandel = (value: string) => {
-  console.log(value)
+const searchHandel = (param: Record<string, string>) => {
+  const { value } = param
+  searchValue.value = value
+  refresh()
 }
-// usePagination
-const {
-  next
-} = usePagination({
-  page: 1,
-  pageSize: 10,
-  onChange: ({ pageNo, pageSize }) => {
-    queryHotActivity({ title: searchValue.value, pageNo, pageSize }).then(ret => {
-      activeList.value = ret.data.pageInfo.list
-    })
+const onCancelHandel = () => {
+  searchValue.value = ''
+  refresh()
+}
+
+// 分页相关
+const { next, refresh, isLastPage } = usePagination({
+  pageNo: 1,
+  pageSize: 30,
+  onChange({ pageNo, pageSize, type }) {
+    const _type = type === 'next' ? 'append' : 'init'
+    return getHotActivityList(_type, pageNo, pageSize)
   }
 })
-
-const onPullUp = (close: () => void) => {
-  queryHotActivity({ title: searchValue.value, pageNo: 1, pageSize: 10 }).then(ret => {
-    activeList.value = activeList.value.concat(ret.data.pageInfo.list)
-  }).finally(close)
-}
-const onDropDown = (close: () => void) => {
-  queryHotActivity({ title: searchValue.value, pageNo: 1, pageSize: 10 }).then(ret => {
-    activeList.value = ret.data.pageInfo.list
-  }).finally(close)
-}
-// list
+// 列表相关
 let activeList = ref<IHotActivity[]>([])
-const getData = () => {
+const url = `${import.meta.env.VITE_APP_URL}`.slice(0, -1)
+// 上拉加载
+const onPullUp = (close: () => void) => next(close)
+const getHotActivityList = (type: string = 'init', pageNo = 1, pageSize = 30) =>
   queryHotActivity({
-    title: '',
-    pageNo: 1,
-    pageSize: 10
+    title: searchValue.value,
+    pageNo,
+    pageSize
+  }).then((ret) => {
+    const pageInfo = ret.data.pageInfo
+    if (type === 'init') {
+      activeList.value = pageInfo.list
+    } else {
+      activeList.value = activeList.value.concat(pageInfo.list)
+    }
+    return {
+      total: pageInfo.total,
+      isLastPage: pageInfo.isLastPage,
+      isFristPage: pageInfo.isFirstPage
+    }
   })
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({
-        list: []
-      })
-    }, 1000)
-  })
+const getTagType = (status: string) => {
+  return status === '报名中' ? 'primary' : 'default'
 }
-const url = import.meta.env.VITE_APP_URL
-const getImgSrc = (logoImgName: string) => `${url}}${logoImgName}`
-// click
-const onClick = () => {}
 
+// 初始化
 onMounted(() => {
-  queryHotActivity({ title: searchValue.value, pageNo: 1, pageSize: 10 }).then(ret => {
-    activeList.value = ret.data.pageInfo.list
-  })
+  // refresh()
 })
 </script>
 <style lang="scss" scoped>

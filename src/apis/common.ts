@@ -1,5 +1,5 @@
 import { useCommonStore } from '@/store/common'
-import { request } from '@/utils/request'
+import { uuid } from '@/utils'
 
 // 获取临时登录凭证 code 使用 code 换取 openid 和 session_key 等信息
 export const getCode = (): Promise<string> => {
@@ -17,21 +17,38 @@ export const getCode = (): Promise<string> => {
   })
 }
 
+const baseUrl = `${import.meta.env.VITE_APP_BASE_URL}`
+
 export const loginByCode = async (code: string): Promise<string> => {
-  const { data } = await request<API.Result<{ token: string }>>({
-    url: '/wxBase/miniLogin',
-    method: 'POST',
-    data: { code }
+  return new Promise((resolve, reject) => {
+    uni.request({
+      url: `${baseUrl}/wxBase/miniLogin`,
+      method: 'POST',
+      data: { code },
+      header: {
+        'content-type': 'application/json',
+        requestId: uuid()
+      },
+      success: (ret) => {
+        // 存入缓存
+        const store = useCommonStore()
+        // @ts-ignore
+        const { token } = ret.data.data
+        store.setToken(token)
+        resolve(token)
+      },
+      fail: reject
+    })
   })
-  // 存入缓存
-  const store = useCommonStore()
-  store.setToken(data.token)
-  return data.token
 }
 
 // 登录
 export const login = async () => {
   try {
+    const { token } = useCommonStore()
+    if (token) {
+      return token
+    }
     const code = await getCode()
     return await loginByCode(code)
   } catch (error) {

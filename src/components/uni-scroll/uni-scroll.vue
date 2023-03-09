@@ -1,5 +1,6 @@
 <template>
   <scroll-view
+    class="uni-scroll"
     :scroll-y="true"
     :style="style"
     :refresher-enabled="enabled"
@@ -8,37 +9,54 @@
     @refresherrefresh="onRefresherRefresh"
     @scrolltolower="onScrolltoLower"
   >
-    <view v-for="(item, index) in scrollList" :key="index">
-      <slot :item="item"></slot>
+    <view>
+      <view
+        v-for="(item, index) in scrollList"
+        :key="item[props.idField] || index"
+      >
+        <slot :item="item" :index="index"></slot>
+      </view>
+      <uni-load-more iconType="circle" :status="status" />
     </view>
   </scroll-view>
 </template>
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, unref } from 'vue'
 
 export interface ScrollProps {
   height: Number
-  list: Array<unknown>
-  pullUp: Boolean // 是否开启上拉加载
-  dropDown: Boolean // 是否开启下拉刷新
+  list: Array<any>
+  pullUp: boolean // 是否开启上拉加载
+  dropDown: boolean // 是否开启下拉刷新
+  idField: string
+  isNoMore: boolean
 }
 // props
 const props = withDefaults(defineProps<ScrollProps>(), {
   height: () => 300,
   list: () => [],
   pullUp: () => false,
-  dropDown: () => false
+  dropDown: () => false,
+  idField: 'id'
 })
 
 // emits
 const emits = defineEmits<{
-  onPullUp: (close: () => void) => void,
-  onDropDown: (close: () => void) => void,
+  (e: 'onPullUp', close: () => void): void
+  (e: 'onDropDown', close: () => void): void
 }>()
+
 // 是否开启下拉刷新
 const enabled = computed(() => props.dropDown)
+// 加载提示状态
+const status = computed(() => {
+  if (unref(props.isNoMore)) {
+    return 'noMore'
+  }
+  return refresherTriggered.value ? 'more' : 'loading'
+})
 
-const scrollList = ref<unknown[]>(props.list)
+const scrollList = computed(() => props.list)
 // 是否正在刷新
 const refresherTriggered = ref(false)
 // 高度
@@ -54,10 +72,8 @@ const onScrolltoLower = () => {
 
   refresherTriggered.value = true
 
-  uni.showLoading({ title: '加载中' })
-  emits.onPullUp(() => {
+  emits('onPullUp', () => {
     refresherTriggered.value = false
-    uni.hideLoading()
   })
 }
 // 下拉
@@ -66,6 +82,6 @@ const onRefresherRefresh = () => {
 
   refresherTriggered.value = true
 
-  emits.onDropDown(() => refresherTriggered.value = false)
+  emits('onDropDown', () => (refresherTriggered.value = false))
 }
 </script>

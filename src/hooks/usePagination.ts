@@ -1,34 +1,87 @@
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+import type { Ref } from 'vue'
+
+type ChangeType = 'next' | 'prev' | 'refresh'
 
 export type UsePaginationOption = {
-  page: number,
-  pageSize: number,
-  onChange: (params: { pageNo: number, pageSize: number }) => void,
+  pageNo: number
+  pageSize: number
+  onChange: (params: {
+    pageNo: number
+    pageSize: number
+    type: ChangeType
+  }) => Promise<{
+    total: number
+    isLastPage: boolean
+    isFristPage: boolean
+  }>
 }
 
-export const usePagination = (options: UsePaginationOption): {
-  prev: () => void,
-  next: () => void,
-  reset: () => void
+export const usePagination = (
+  options: UsePaginationOption
+): {
+  prev: (callback?: () => void) => void
+  next: (callback?: () => void) => void
+  refresh: (callback?: () => void) => void
+  isLastPage: Ref<boolean>
+  isFristPage: Ref<boolean>
 } => {
-  const {
-    page,
-    pageSize,
-    onChange,
-  } = options
+  let { pageNo, pageSize, onChange } = options
 
-  const _page = ref(page)
-  const _pageSize = ref(pageSize)
+  const currentPageNo = ref(pageNo)
+  const currentPageSize = ref(pageSize)
+  const totalSize = ref(0)
+  // const isLastPage = computed(
+  //   () => totalSize.value <= currentPageNo.value * currentPageSize.value
+  // )
+  const isLastPage = ref(false)
+  const isFristPage = ref(true)
 
-  const prev = () => {}
+  const prev = async (callback?: () => void) => {
+    let _pageNo = currentPageNo.value - 1
+    if (_pageNo > 0) {
+      await execute(_pageNo, pageSize, 'prev')
+    }
+    callback && callback()
+  }
 
-  const next = () => {}
+  const next = async (callback?: () => void) => {
+    let _pageNo = currentPageNo.value + 1
+    if (!isLastPage.value) {
+      await execute(_pageNo, pageSize, 'next')
+    }
+    callback && callback()
+  }
 
-  const reset = () => {}
+  const originalPageNo = pageNo
+  const originalPageSize = pageSize
+  const refresh = async (callback?: () => void) => {
+    await execute(originalPageNo, originalPageSize, 'refresh')
+    callback && callback()
+  }
+
+  const execute = async (
+    pageNo: number,
+    pageSize: number,
+    type: ChangeType
+  ) => {
+    const {
+      total,
+      isFristPage: _isFristPage,
+      isLastPage: _isLastPage
+    } = await onChange({ pageNo, pageSize, type })
+    currentPageNo.value = pageNo
+    currentPageSize.value = pageSize
+    totalSize.value = total
+    isLastPage.value = _isLastPage
+    isFristPage.value = _isFristPage
+  }
 
   return {
     prev,
     next,
-    reset
+    refresh,
+    isLastPage,
+    isFristPage
   }
 }
