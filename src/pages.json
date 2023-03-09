@@ -8,15 +8,15 @@
   },
   "pages": [
     {
-      "path": "pages/myCreated/index",
-      "style": {
-        "navigationBarTitleText": "我创建的"
-      }
-    },
-    {
       "path": "pages/hot/index",
       "style": {
         "navigationBarTitleText": "热门活动"
+      }
+    },
+    {
+      "path": "pages/myCreated/index",
+      "style": {
+        "navigationBarTitleText": "我创建的"
       }
     },
     {
@@ -29,6 +29,12 @@
       "path": "pages/myFollow/index",
       "style": {
         "navigationBarTitleText": "我关注的"
+      }
+    },
+    {
+      "path": "pages/createActivity/index",
+      "style": {
+        "navigationBarTitleText": "创建活动"
       }
     }
   ],
@@ -55,19 +61,19 @@
         "selectedIconPath": "static/tabbar_cate_on.png",
         "iconPath": "static/tabbar_cate.png",
         "text": "我创建的"
-      },
-      {
-        "pagePath": "pages/myJoin/index",
-        "selectedIconPath": "static/tabbar_cart_on.png",
-        "iconPath": "static/tabbar_cart.png",
-        "text": "我参与的"
-      },
-      {
-        "pagePath": "pages/myFollow/index",
-        "selectedIconPath": "static/tabbar_my_on.png",
-        "iconPath": "static/tabbar_my.png",
-        "text": "我关注的"
       }
+      // {
+      //   "pagePath": "pages/myJoin/index",
+      //   "selectedIconPath": "static/tabbar_cart_on.png",
+      //   "iconPath": "static/tabbar_cart.png",
+      //   "text": "我参与的"
+      // },
+      // {
+      //   "pagePath": "pages/myFollow/index",
+      //   "selectedIconPath": "static/tabbar_my_on.png",
+      //   "iconPath": "static/tabbar_my.png",
+      //   "text": "我关注的"
+      // }
     ]
   },
   "usingComponents": {}

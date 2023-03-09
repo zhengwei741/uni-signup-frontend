@@ -6,6 +6,6 @@
 <style scoped lang="scss">
 .uni-container {
   width: 100%;
-  padding-bottom: calc(50px + env(safe-area-inset-bottom));
+  padding-bottom: env(safe-area-inset-bottom);
 }
 </style>

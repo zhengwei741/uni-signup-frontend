@@ -1,17 +1,10 @@
 import { request } from '@/utils/request'
+import type { IHotActivity } from '@/typings/activity'
 
 type QueryHotActivityParam = API.Pagination<{
   title: string
 }>
 
-export interface IHotActivity {
-  organizationName: string
-  logoImgName: string
-  activityStatus: string
-  creater: string
-  id: string,
-  title: string
-}
 /**
  * 分页查询热门活动
  * @param params 
@@ -20,6 +13,20 @@ export interface IHotActivity {
 export const queryHotActivity = (params: QueryHotActivityParam) => {
   return request<API.PaginationResult<IHotActivity>>({
     url: '/activity/mini/queryHotActivity',
+    method: 'POST',
+    data: params
+  })
+}
+
+/**
+ * 商家分页查询活动
+ * @param pageNo 
+ * @param pageSize 
+ * @returns 
+ */
+export const queryActivityByBiz = (params: API.Pagination<{}>) => {
+  return request<API.PaginationResult<IHotActivity>>({
+    url: '/api/activity/mini/queryActivityByBiz',
     method: 'POST',
     data: params
   })

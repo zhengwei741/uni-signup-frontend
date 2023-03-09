@@ -30,14 +30,10 @@
               </view>
               <view class="uni-card__header-content">
                 <text class="uni-card__header-content-title">{{
-                  item.organizationName
+                  item.title
                 }}</text>
                 <view class="uni-card__header-content-subtitle">
-                  <uni-tag
-                    :text="item.activityStatus"
-                    :inverted="true"
-                    :type="getTagType(item.activityStatus)"
-                  />
+                  <text :style="getStatusStyle(item.activityStatus)">{{ item.activityStatus }}</text>
                 </view>
               </view>
             </view>
@@ -58,11 +54,12 @@
 import { ref, onMounted } from 'vue'
 import useSafeScrollHeight from '@/hooks/useSafeScrollHeight'
 import { queryHotActivity } from '@/apis/activity'
-import type { IHotActivity } from '@/apis/activity'
+import type { IHotActivity } from '@/typings/activity'
 import { usePagination } from '@/hooks/usePagination'
+import { getStatusStyle } from '@/utils'
 
 // height 56是searchBar高度
-const scrollHeight = useSafeScrollHeight() - 56
+const scrollHeight = useSafeScrollHeight()
 
 // 搜索相关
 const searchValue = ref<string>('')
@@ -79,7 +76,7 @@ const onCancelHandel = () => {
 // 分页相关
 const { next, refresh, isLastPage } = usePagination({
   pageNo: 1,
-  pageSize: 30,
+  pageSize: 10,
   onChange({ pageNo, pageSize, type }) {
     const _type = type === 'next' ? 'append' : 'init'
     return getHotActivityList(_type, pageNo, pageSize)
@@ -87,7 +84,7 @@ const { next, refresh, isLastPage } = usePagination({
 })
 // 列表相关
 let activeList = ref<IHotActivity[]>([])
-const url = `${import.meta.env.VITE_APP_URL}`.slice(0, -1)
+const url = `${import.meta.env.VITE_APP_URL}`
 // 上拉加载
 const onPullUp = (close: () => void) => next(close)
 const getHotActivityList = (type: string = 'init', pageNo = 1, pageSize = 30) =>
@@ -108,13 +105,10 @@ const getHotActivityList = (type: string = 'init', pageNo = 1, pageSize = 30) =>
       isFristPage: pageInfo.isFirstPage
     }
   })
-const getTagType = (status: string) => {
-  return status === '报名中' ? 'primary' : 'default'
-}
 
 // 初始化
 onMounted(() => {
-  // refresh()
+  refresh()
 })
 </script>
 <style lang="scss" scoped>
@@ -138,7 +132,6 @@ onMounted(() => {
   }
   .uni-card__header {
     display: flex;
-    border-bottom: 1px #ebeef5 solid;
     flex-direction: row;
     align-items: center;
     padding: 10px 10px 10px 0;
@@ -193,7 +186,7 @@ onMounted(() => {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: #f2f2f2;
+    background-color: #e4fafc;
     border-radius: 5px;
     margin-bottom: 10px;
     .org-name {

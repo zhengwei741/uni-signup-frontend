@@ -1,7 +1,7 @@
 import { login } from '@/apis/common'
 import { useCommonStore } from '@/store/common'
 import { uuid } from './index'
-import { SUCCESS_CODE } from '@/const'
+import { SUCCESS_CODE, TIME_OUT_CODE } from '@/const'
 
 const baseUrl = `${import.meta.env.VITE_APP_BASE_URL}`
 
@@ -30,9 +30,22 @@ export const request: RequestMethod = (options: UniApp.RequestOptions) => {
       uni.request({
         ...options,
         success: (ret) => {
+          uni.switchTab({
+            url: '/pages/hot/index'
+          })
           // @ts-ignore
           const { code } = ret.data
           if (code !== SUCCESS_CODE) {
+            reject(ret.data)
+            return
+          }
+          // token超时
+          if (code === TIME_OUT_CODE) {
+            const { setToken } = useCommonStore()
+            setToken('')
+            uni.switchTab({
+              url: '/pages/hot/index'
+            })
             reject(ret.data)
             return
           }

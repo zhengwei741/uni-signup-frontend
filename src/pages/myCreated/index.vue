@@ -1,75 +1,109 @@
 <template>
-  <uni-container>
-    <image mode="aspectFit" :src="cover" style="width: 100%"></image>
+  <image mode="aspectFit" src="https://web-assets.dcloud.net.cn/unidoc/zh/shuijiao.jpg" style="width: 100%"></image>
 
-    <uni-grid :column="4" :show-border="false" :square="false">
-      <uni-grid-item>
-        <view class="grid-item-box">
-          <uni-icons
-            custom-prefix="iconfont"
-            type="icon-fabuhuodong"
-            :size="30"
-            color="#777"
-          ></uni-icons>
-          <text class="text">发布活动</text>
-        </view>
-      </uni-grid-item>
-      <uni-grid-item>
-        <view class="grid-item-box">
-          <uni-icons
-            custom-prefix="iconfont"
-            type="icon-fenxiang3"
-            :size="30"
-            color="#777"
-          ></uni-icons>
-          <text class="text">分享</text>
-        </view>
-      </uni-grid-item>
-      <uni-grid-item>
-        <view class="grid-item-box">
-          <uni-icons
-            custom-prefix="iconfont"
-            type="icon-renzheng"
-            :size="30"
-            color="#777"
-          ></uni-icons>
-          <text class="text">认证</text>
-        </view>
-      </uni-grid-item>
-      <uni-grid-item>
-        <view class="grid-item-box">
-          <uni-icons
-            custom-prefix="iconfont"
-            type="icon-jiaocheng"
-            :size="30"
-            color="#777"
-          ></uni-icons>
-          <text class="text">教程</text>
-        </view>
-      </uni-grid-item>
-    </uni-grid>
+  <uni-grid :column="4" :show-border="false" :square="false">
+  <uni-grid-item>
+  <view class="grid-item-box" @tap="goCreateActivity">
+    <uni-icons
+      custom-prefix="iconfont"
+      type="icon-fabuhuodong"
+      :size="25"
+      color="#777"
+    ></uni-icons>
+    <text class="text">发布活动</text>
+  </view>
+  </uni-grid-item>
+  <uni-grid-item>
+  <view class="grid-item-box">
+    <uni-icons
+      custom-prefix="iconfont"
+      type="icon-fenxiang3"
+      :size="25"
+      color="#777"
+    ></uni-icons>
+    <text class="text">分享</text>
+  </view>
+  </uni-grid-item>
+  <uni-grid-item>
+  <view class="grid-item-box">
+    <uni-icons
+      custom-prefix="iconfont"
+      type="icon-renzheng"
+      :size="25"
+      color="#777"
+    ></uni-icons>
+    <text class="text">认证</text>
+  </view>
+  </uni-grid-item>
+  <uni-grid-item>
+  <view class="grid-item-box">
+    <uni-icons
+      custom-prefix="iconfont"
+      type="icon-jiaocheng"
+      :size="25"
+      color="#777"
+    ></uni-icons>
+    <text class="text">教程</text>
+  </view>
+  </uni-grid-item>
+  </uni-grid>
 
-    <view class="activity-card">
-      <view class="activity-card__content">
-        <view :span="24">
-          <view
-            >七夕交友联谊活动火热报名中（欢迎有兴趣的朋友报名啊。。。）</view
-          >
+  <view class="activity-card" v-for="activity in activityList" :key="activity.id">
+    <view class="activity-card__content">
+      <view :span="24">
+        <view class="activity-card__content__title"
+          >{{ activity.title }}</view
+        >
+      </view>
+      <view class="activity-card__actions">
+        <view class="tag">
+          <text :style="getStatusStyle(activity.activityStatus)">{{ activity.activityStatus }}</text>
         </view>
-        <view class="activity-card__actions">
-          <view class="tag">
-            <uni-tag :inverted="true" text="报名中" type="primary" />
-          </view>
-          <view class="del-btn">
-            <button type="warn" size="mini">删除</button>
-          </view>
+        <view class="del-btn">
+          <button type="warn" size="mini">删除</button>
         </view>
       </view>
     </view>
-  </uni-container>
+  </view>
 </template>
 <script setup lang="ts">
-const cover = 'https://web-assets.dcloud.net.cn/unidoc/zh/shuijiao.jpg'
+import { ref } from 'vue'
+import type { IHotActivity } from '@/typings/activity'
+import { getStatusStyle } from '@/utils'
+
+const activityList = ref<IHotActivity[]>([
+  {
+    organizationName: '',
+    logoImgName: '',
+    activityStatus: '报名中',
+    creater: '',
+    id: '1',
+    title: '七夕交友联谊活动火热报名中（欢迎有兴趣的朋友报名啊。。。）',
+  },
+  {
+    organizationName: '',
+    logoImgName: '',
+    activityStatus: '报名中',
+    creater: '',
+    id: '2',
+    title: '七夕交友联谊活动火热报名中（欢迎有兴趣的朋友报名啊。。。）',
+  },
+  {
+    organizationName: '',
+    logoImgName: '',
+    activityStatus: '报名中',
+    creater: '',
+    id: '3',
+    title: '七夕交友联谊活动火热报名中（欢迎有兴趣的朋友报名啊。。。）',
+  }
+])
+
+const goCreateActivity = () => {
+  uni.navigateTo({
+    url: '../createActivity/index'
+  })
+}
+
 </script>
 <style scoped lang="scss">
 .grid-item-box {
@@ -86,13 +120,24 @@ const cover = 'https://web-assets.dcloud.net.cn/unidoc/zh/shuijiao.jpg'
 }
 .activity-card {
   padding: 0 10px;
-  box-shadow: 0px 0px 3px 1px rgba(0, 0, 0, 0.08);
+  position: relative;
+  box-shadow: 0 0px 6px 1px rgb(165 165 165 / 40%);
+  margin: 10px;
+  padding: 0 8px;
+  border-radius: 4px;
+  overflow: hidden;
+  font-family: Helvetica Neue, Helvetica, PingFang SC, Hiragino Sans GB, Microsoft YaHei, SimSun, sans-serif;
+  background-color: #fff;
+  flex: 1;
   margin-bottom: 5px;
   .activity-card__content {
     padding: 10px;
     font-size: 14px;
     color: #6a6a6a;
     line-height: 22px;
+    .activity-card__content__title{
+      font-weight: bold;
+    }
   }
   .activity-card__actions {
     display: flex;
