@@ -1,0 +1,14 @@
+button {
+  background-color: $uni-color-primary;
+  color: #fff;
+  border: 0;
+}
+button:active {
+  color: hsla(0, 0%, 100%, 0.6);
+  background-color: #0062cc;
+}
+button[disabled]:not([type]) {
+  background-color: #bddcff;
+  color: hsla(0, 0%, 100%, 0.6);
+  cursor: not-allowed;
+}
