@@ -1,5 +1,5 @@
 import { request } from '@/utils/request'
-import type { IHotActivity } from '@/typings/activity'
+import type { HotActivity } from '@/typings/activity'
 
 type QueryHotActivityParam = API.Pagination<{
   title: string
@@ -7,11 +7,11 @@ type QueryHotActivityParam = API.Pagination<{
 
 /**
  * 分页查询热门活动
- * @param params 
- * @returns 
+ * @param params
+ * @returns
  */
 export const queryHotActivity = (params: QueryHotActivityParam) => {
-  return request<API.PaginationResult<IHotActivity>>({
+  return request<API.PaginationResult<HotActivity>>({
     url: '/activity/mini/queryHotActivity',
     method: 'POST',
     data: params
@@ -20,13 +20,13 @@ export const queryHotActivity = (params: QueryHotActivityParam) => {
 
 /**
  * 商家分页查询活动
- * @param pageNo 
- * @param pageSize 
- * @returns 
+ * @param pageNo
+ * @param pageSize
+ * @returns
  */
 export const queryActivityByBiz = (params: API.Pagination<{}>) => {
-  return request<API.PaginationResult<IHotActivity>>({
-    url: '/api/activity/mini/queryActivityByBiz',
+  return request<API.PaginationResult<HotActivity>>({
+    url: '/activity/mini/queryActivityByBiz',
     method: 'POST',
     data: params
   })

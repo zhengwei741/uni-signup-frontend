@@ -1,16 +1,47 @@
-export interface IActivity {
-  name: string
-  id: Number
+/** 活动 */
+export interface Activity {
+  /**活动标题*/
+  title: string
+  /**活动开始时间*/
+  startTime: string
+  /**活动结束时间*/
+  endTime: string
+  /**活动介绍*/
+  description: string
+  /**活动编辑字段*/
+  fieldList: ActivityField[]
+  /**活动组别*/
+  groupList: ActivityGroup[]
+  /**显示报名人员*/
+  showFlag: string // 1 显示 0 不显示
 }
 
-/**
- * 热门活动
- */
-export interface IHotActivity {
+export interface ActivityField {
+  /** 字段ID */
+  id: string
+  /** 字段值 */
+  fieldValue: string
+  /** 字段名 */
+  fieldName: string
+  /** 是否必填 */
+  requiredFlag: '1' | '0'
+}
+
+export interface ActivityGroup {
+  /** 组别名称 */
+  groupName: string
+  /** 组别付费 */
+  money: number
+  /** 组别限制人数 */
+  peopleNumber: number
+}
+
+/** 热门活动 */
+export interface HotActivity {
   organizationName: string
   logoImgName: string
   activityStatus: string
   creater: string
-  id: string,
+  id: string
   title: string
 }

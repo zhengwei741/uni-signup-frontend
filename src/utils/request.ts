@@ -30,9 +30,6 @@ export const request: RequestMethod = (options: UniApp.RequestOptions) => {
       uni.request({
         ...options,
         success: (ret) => {
-          uni.switchTab({
-            url: '/pages/hot/index'
-          })
           // @ts-ignore
           const { code } = ret.data
           if (code !== SUCCESS_CODE) {

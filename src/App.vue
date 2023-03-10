@@ -11,7 +11,8 @@ onHide(() => {
   console.log('App Hide')
 })
 </script>
-<style>
+<style lang="scss">
+@import '@/global.scss';
 @import '@/static/iconfont.css';
 ::-webkit-scrollbar {
   display: none; /* Chrome Safari */

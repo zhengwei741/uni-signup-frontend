@@ -7,8 +7,12 @@
       "@/*": ["./src/*"]
     },
     "lib": ["esnext", "dom"],
-    "types": ["@dcloudio/types", "node"],
+    "types": ["@dcloudio/types", "node", "@uni-helper/uni-app-types"],
     "typeRoots": ["./typings"]
+  },
+  "vueCompilerOptions": {
+    "experimentalRuntimeMode": "runtime-uni-app",
+    "nativeTags": ["block", "component", "template", "slot"]
   },
   "include": [
     "src/**/*.ts",

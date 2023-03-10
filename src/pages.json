@@ -36,6 +36,12 @@
       "style": {
         "navigationBarTitleText": "创建活动"
       }
+    },
+    {
+      "path": "pages/activityGroup/index",
+      "style": {
+        "navigationBarTitleText": "编辑组别"
+      }
     }
   ],
   "globalStyle": {

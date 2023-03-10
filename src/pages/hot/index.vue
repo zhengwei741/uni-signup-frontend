@@ -33,7 +33,9 @@
                   item.title
                 }}</text>
                 <view class="uni-card__header-content-subtitle">
-                  <text :style="getStatusStyle(item.activityStatus)">{{ item.activityStatus }}</text>
+                  <text :style="getStatusStyle(item.activityStatus)">{{
+                    item.activityStatus
+                  }}</text>
                 </view>
               </view>
             </view>
@@ -54,12 +56,12 @@
 import { ref, onMounted } from 'vue'
 import useSafeScrollHeight from '@/hooks/useSafeScrollHeight'
 import { queryHotActivity } from '@/apis/activity'
-import type { IHotActivity } from '@/typings/activity'
+import type { HotActivity } from '@/typings/activity'
 import { usePagination } from '@/hooks/usePagination'
 import { getStatusStyle } from '@/utils'
 
 // height 56是searchBar高度
-const scrollHeight = useSafeScrollHeight()
+const scrollHeight = useSafeScrollHeight() - 56
 
 // 搜索相关
 const searchValue = ref<string>('')
@@ -83,7 +85,7 @@ const { next, refresh, isLastPage } = usePagination({
   }
 })
 // 列表相关
-let activeList = ref<IHotActivity[]>([])
+let activeList = ref<HotActivity[]>([])
 const url = `${import.meta.env.VITE_APP_URL}`
 // 上拉加载
 const onPullUp = (close: () => void) => next(close)
