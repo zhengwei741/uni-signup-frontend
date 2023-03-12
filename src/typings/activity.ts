@@ -18,9 +18,7 @@ export interface Activity {
 
 export interface ActivityField {
   /** 字段ID */
-  id: string
-  /** 字段值 */
-  fieldValue: string
+  id?: string
   /** 字段名 */
   fieldName: string
   /** 是否必填 */
@@ -28,12 +26,15 @@ export interface ActivityField {
 }
 
 export interface ActivityGroup {
+  id?: string
   /** 组别名称 */
   groupName: string
   /** 组别付费 */
   money: number
   /** 组别限制人数 */
   peopleNumber: number
+  /** 是否限制人数 */
+  limit?: boolean
 }
 
 /** 热门活动 */

@@ -23,7 +23,7 @@
               <view class="uni-card__header-avatar">
                 <image
                   mode="aspectFill"
-                  :src="url + item.logoImgName"
+                  :src="URL + item.logoImgName"
                   :lazy-load="true"
                   class="uni-card__header-avatar-image"
                 ></image>
@@ -40,7 +40,7 @@
               </view>
             </view>
           </view>
-          <view class="uni-card__content">
+          <view class="uni-card__content" @tap="gotoHonePage(item)">
             <text class="org-name">{{ item.organizationName }}</text>
             <text class="org-link">Ta的主页</text>
           </view>
@@ -59,6 +59,7 @@ import { queryHotActivity } from '@/apis/activity'
 import type { HotActivity } from '@/typings/activity'
 import { usePagination } from '@/hooks/usePagination'
 import { getStatusStyle } from '@/utils'
+import { URL } from "@/const";
 
 // height 56是searchBar高度
 const scrollHeight = useSafeScrollHeight() - 56
@@ -86,7 +87,6 @@ const { next, refresh, isLastPage } = usePagination({
 })
 // 列表相关
 let activeList = ref<HotActivity[]>([])
-const url = `${import.meta.env.VITE_APP_URL}`
 // 上拉加载
 const onPullUp = (close: () => void) => next(close)
 const getHotActivityList = (type: string = 'init', pageNo = 1, pageSize = 30) =>
@@ -107,6 +107,13 @@ const getHotActivityList = (type: string = 'init', pageNo = 1, pageSize = 30) =>
       isFristPage: pageInfo.isFirstPage
     }
   })
+
+// 跳转
+const gotoHonePage = (item: HotActivity) => {
+  uni.navigateTo({
+    url: `../bizHonePage/index?creater=${item.creater}`
+  })
+}
 
 // 初始化
 onMounted(() => {

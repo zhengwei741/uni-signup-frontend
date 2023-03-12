@@ -42,6 +42,12 @@
       "style": {
         "navigationBarTitleText": "编辑组别"
       }
+    },
+    {
+      "path": "pages/bizHonePage/index",
+      "style": {
+        "navigationBarTitleText": "Ta的主页"
+      }
     }
   ],
   "globalStyle": {

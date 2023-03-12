@@ -24,7 +24,7 @@
 import { ref, computed, unref } from 'vue'
 
 export interface ScrollProps {
-  height: Number
+  height: number
   list: Array<any>
   pullUp: boolean // 是否开启上拉加载
   dropDown: boolean // 是否开启下拉刷新
@@ -33,10 +33,10 @@ export interface ScrollProps {
 }
 // props
 const props = withDefaults(defineProps<ScrollProps>(), {
-  height: () => 300,
+  height: 300,
   list: () => [],
-  pullUp: () => false,
-  dropDown: () => false,
+  pullUp: false,
+  dropDown: false,
   idField: 'id'
 })
 

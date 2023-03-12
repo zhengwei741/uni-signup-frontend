@@ -1,5 +1,5 @@
 import { request } from '@/utils/request'
-import type { HotActivity } from '@/typings/activity'
+import type { HotActivity, Activity } from '@/typings/activity'
 
 type QueryHotActivityParam = API.Pagination<{
   title: string
@@ -29,5 +29,18 @@ export const queryActivityByBiz = (params: API.Pagination<{}>) => {
     url: '/activity/mini/queryActivityByBiz',
     method: 'POST',
     data: params
+  })
+}
+
+/**
+ * 新增活动
+ * @param activity
+ * @returns
+ */
+export const insertActivity = (activity: Activity) => {
+  return request<API.PaginationResult<HotActivity>>({
+    url: '/activity/mini/insertActivity',
+    method: 'POST',
+    data: activity
   })
 }

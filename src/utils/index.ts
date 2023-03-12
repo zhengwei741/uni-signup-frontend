@@ -18,3 +18,7 @@ export function getStatusStyle(status:string) {
     'font-size': '13px'
   }
 }
+
+export function getMockID() {
+  return `mock_${Math.random()}`
+}

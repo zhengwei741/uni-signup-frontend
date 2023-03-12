@@ -93,7 +93,12 @@ const activityList = ref<HotActivity[]>([])
 
 const goCreateActivity = () => {
   uni.navigateTo({
-    url: '../createActivity/index'
+    url: '../createActivity/index',
+    events: {
+      onGroupSaveSuccess() {
+        refresh()
+      }
+    }
   })
 }
 
