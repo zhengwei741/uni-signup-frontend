@@ -3,8 +3,9 @@
     <view class="warpper">
       <image
         mode="aspectFit"
-        :src="URL + bizInfo?.logoImgName"
-        style="width: 100%"
+        v-if="bizInfo?.logoImgName"
+        :src="URL + '/'+ bizInfo?.logoImgName"
+        style="width: 100%; background-color: #fff;"
       ></image>
 
       <view class="biz-info" id="biz-info">
@@ -38,7 +39,7 @@
         </view>
       </view>
       <uni-empty v-else></uni-empty>
-      <uni-load-more iconType="circle" :status="status" />
+      <uni-load-more v-if="list.length" iconType="circle" :status="status" />
     </view>
     <div class="actions" id="actions">
       <button type="mini" class="btn">首页</button>
@@ -94,8 +95,10 @@ onLoad((option) => {
 .warpper {
   position: relative;
   padding-bottom: 50px;
+  background-color: #f1f1f1;
 }
 .biz-info {
+  background-color: #fff;
   padding: 10px;
   height: 60px;
   > view {
@@ -125,6 +128,7 @@ onLoad((option) => {
     line-height: 22px;
     .activity-card__content__title {
       font-weight: bold;
+      color: #3a3a3a;
     }
   }
   .activity-card__actions {

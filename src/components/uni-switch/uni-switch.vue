@@ -1,6 +1,6 @@
 <template>
   <view>
-    <text v-if="props.activeText">{{ props.activeText }}</text>
+    <text v-if="props.activeText" style="font-weight: 500;">{{ props.activeText }}</text>
     <switch
       :checked="checked"
       :size="props.size"

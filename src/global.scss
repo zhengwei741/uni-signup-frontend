@@ -12,3 +12,22 @@ button[disabled]:not([type]) {
   color: hsla(0, 0%, 100%, 0.6);
   cursor: not-allowed;
 }
+
+.forms-cls{
+  .uni-forms{
+    text{
+      font-weight: bold;
+      color: #3a3a3a;
+    }
+    .is-required{
+      color: #dd524d;
+      font-weight: bold;
+    }
+    .uni-forms-item__error{
+      text{
+        color: #f56c6c !important;
+        font-weight: 200;
+      }
+    }
+  }
+}

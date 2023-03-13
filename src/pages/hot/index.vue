@@ -23,7 +23,7 @@
               <view class="uni-card__header-avatar">
                 <image
                   mode="aspectFill"
-                  :src="URL + item.logoImgName"
+                  :src="URL + '/' + item.logoImgName"
                   :lazy-load="true"
                   class="uni-card__header-avatar-image"
                 ></image>
@@ -111,7 +111,7 @@ const getHotActivityList = (type: string = 'init', pageNo = 1, pageSize = 30) =>
 // 跳转
 const gotoHonePage = (item: HotActivity) => {
   uni.navigateTo({
-    url: `../bizHonePage/index?creater=${item.creater}`
+    url: `../bizHomePage/index?creater=${item.creater}`
   })
 }
 

@@ -16,7 +16,7 @@
       >
         <slot :item="item" :index="index"></slot>
       </view>
-      <uni-load-more iconType="circle" :status="status" />
+      <uni-load-more v-if="scrollList.length" iconType="circle" :status="status" />
     </view>
   </scroll-view>
 </template>

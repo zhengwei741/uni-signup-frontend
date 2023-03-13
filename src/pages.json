@@ -34,7 +34,7 @@
     {
       "path": "pages/createActivity/index",
       "style": {
-        "navigationBarTitleText": "创建活动"
+        "navigationBarTitleText": "发布活动"
       }
     },
     {
@@ -44,9 +44,15 @@
       }
     },
     {
-      "path": "pages/bizHonePage/index",
+      "path": "pages/bizHomePage/index",
       "style": {
         "navigationBarTitleText": "Ta的主页"
+      }
+    },
+    {
+      "path": "pages/bizAuth/index",
+      "style": {
+        "navigationBarTitleText": "认证"
       }
     }
   ],
@@ -64,14 +70,14 @@
     "list": [
       {
         "pagePath": "pages/hot/index",
-        "selectedIconPath": "static/tabbar_home_on.png",
-        "iconPath": "static/tabbar_home.png",
+        "selectedIconPath": "static/hot_on.png",
+        "iconPath": "static/hot.png",
         "text": "热门活动"
       },
       {
         "pagePath": "pages/myCreated/index",
-        "selectedIconPath": "static/tabbar_cate_on.png",
-        "iconPath": "static/tabbar_cate.png",
+        "selectedIconPath": "static/myCreated_on.png",
+        "iconPath": "static/myCreated.png",
         "text": "我创建的"
       }
       // {

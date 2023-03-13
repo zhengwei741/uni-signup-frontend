@@ -28,8 +28,8 @@
         <text class="text">分享</text>
       </view>
     </uni-grid-item>
-    <uni-grid-item>
-      <view class="grid-item-box">
+    <uni-grid-item v-if="!organizationName">
+      <view class="grid-item-box" @tap="goBizAuth">
         <uni-icons
           custom-prefix="iconfont"
           type="icon-renzheng"
@@ -52,7 +52,7 @@
     </uni-grid-item>
   </uni-grid>
 
-  <view v-if="list.length">
+  <view v-if="list.length" style="background-color: #f1f1f1;padding-top: 1px;">
     <view class="activity-card" v-for="activity in list" :key="activity.id">
       <view class="activity-card__content">
         <view :span="24">
@@ -72,24 +72,39 @@
         </view>
       </view>
     </view>
-    <uni-load-more iconType="circle" :status="status" />
+    <uni-load-more v-if="list.length" iconType="circle" :status="status" />
   </view>
   <uni-empty v-else />
 </template>
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
 import { queryActivityByBiz } from '@/apis/activity'
+import { queryPersonalInfo } from '@/apis/user'
 import type { HotActivity } from '@/typings/activity'
 import { getStatusStyle } from '@/utils'
 import { usePageScroll } from '@/hooks/usePageScroll'
 import { onReachBottom } from '@dcloudio/uni-app'
 
+// 组织机构名称 是否认证过
+const organizationName = ref<string>('')
+
 const goCreateActivity = () => {
   uni.navigateTo({
     url: '../createActivity/index',
     events: {
-      onGroupSaveSuccess() {
+      onActiveSaveSuccess() {
         refresh()
+      }
+    }
+  })
+}
+
+const goBizAuth = () => {
+  uni.navigateTo({
+    url: '../bizAuth/index',
+    events: {
+      onBizAuthSuccess(orgName: string) {
+        organizationName.value = orgName
       }
     }
   })
@@ -112,7 +127,12 @@ const { refresh, next, status, list } = usePageScroll<HotActivity[]>({
 // 上拉加载
 onReachBottom(next)
 // 初始化
-onMounted(refresh)
+onMounted(() => {
+  refresh()
+  queryPersonalInfo().then(ret => {
+    organizationName.value = ret.data.organizationName
+  })
+})
 </script>
 <style scoped lang="scss">
 .grid-item-box {
@@ -124,7 +144,8 @@ onMounted(refresh)
   padding: 15px 0;
   .text {
     margin-top: 5px;
-    font-size: 12px;
+    font-size: 13px;
+    color: #3498db;
   }
 }
 .activity-card {
@@ -147,6 +168,7 @@ onMounted(refresh)
     line-height: 22px;
     .activity-card__content__title {
       font-weight: bold;
+      color: #3a3a3a;
     }
   }
   .activity-card__actions {

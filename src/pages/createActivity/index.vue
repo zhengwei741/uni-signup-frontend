@@ -1,6 +1,6 @@
 <template>
   <uni-container>
-    <view class="create-activity">
+    <view class="create-activity forms-cls">
       <uni-forms
         ref="activityForm"
         :modelValue="activityFormData"
@@ -68,10 +68,11 @@
           </view>
         </view>
 
-        <text style="margin-bottom: 20px">报名填写信息</text>
+        <text style="margin-bottom: 22px;font-weight: bold;color: #3a3a3a;display: block;font-size: 14px;">报名填写信息</text>
+
         <view class="uni-forms-item activity-field">
           <view class="label">
-            <text>组别</text>
+            <text style="font-weight: 500;">组别</text>
           </view>
           <view class="switch">
             <button size="mini" @click="goToActivityGroup">编辑</button>
@@ -79,12 +80,12 @@
         </view>
         <view class="uni-forms-item activity-field">
           <view class="label">
-            <text>昵称</text>
+            <text style="font-weight: 500;">昵称</text>
           </view>
         </view>
         <view class="uni-forms-item activity-field">
           <view class="label">
-            <text>手机号</text>
+            <text style="font-weight: 500;">手机号</text>
           </view>
         </view>
 
@@ -138,7 +139,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, computed, unref, getCurrentInstance, nextTick } from 'vue'
+import { reactive, ref, computed, unref, getCurrentInstance } from 'vue'
 import type { ComponentInternalInstance } from 'vue'
 import dayjs from 'dayjs'
 import type { Activity, ActivityField, ActivityGroup } from '@/typings/activity'
@@ -167,7 +168,7 @@ const activityFormData = reactive<Activity>({
   description: '',
   fieldList: activityFields,
   groupList: activityGroups,
-  showFlag: '0'
+  showFlag: '1'
 })
 const validateTime = (rule: any, value: string, data: Record<string, any>, callback: (msg: string) => void) => {
   const { startTime, endTime } = data
@@ -226,7 +227,7 @@ const publish = async () => {
       uni.navigateBack()
       // 通知上层页面刷新
       if (eventChannel.value) {
-        eventChannel.value.emit('onGroupSaveSuccess');
+        eventChannel.value.emit('onActiveSaveSuccess');
       }
     }, 300);
   } catch(e) {
