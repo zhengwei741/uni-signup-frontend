@@ -1,37 +1,32 @@
 <template>
-  <image
-    mode="aspectFit"
-    :src="URL + bizInfo?.logoImgName"
-    style="width: 100%"
-    ref="imageRef"
-  ></image>
+  <uni-container>
+    <view class="warpper">
+      <image
+        mode="aspectFit"
+        :src="URL + bizInfo?.logoImgName"
+        style="width: 100%"
+      ></image>
 
-  <view class="biz-info" id="biz-info">
-    <view>
-      <text class="f-b">发布人：</text>
-      <text>{{ bizInfo?.userName }}</text>
-    </view>
-    <view>
-      <text class="f-b">手机号：</text>
-      <text>{{ bizInfo?.mobile }}</text>
-    </view>
-  </view>
+      <view class="biz-info" id="biz-info">
+        <view>
+          <text class="f-b">发布人：</text>
+          <text>{{ bizInfo?.userName }}</text>
+        </view>
+        <view>
+          <text class="f-b">手机号：</text>
+          <text>{{ bizInfo?.mobile }}</text>
+        </view>
+      </view>
 
-  <uni-scroll
-    v-if="activeList.length"
-    :list="activeList"
-    :height="scrollHeight"
-    :isNoMore="isLastPage"
-    pullUp
-    @onPullUp="onPullUp"
-  >
-    <template #default="{ item }">
-      <view class="activity-card">
+      <view
+        class="activity-card"
+        v-if="list.length"
+        v-for="item of list"
+        :key="item.id"
+      >
         <view class="activity-card__content">
           <view :span="24">
-            <view class="activity-card__content__title">{{
-              item.title
-            }}</view>
+            <view class="activity-card__content__title">{{ item.title }}</view>
           </view>
           <view class="activity-card__actions">
             <view class="tag">
@@ -42,97 +37,71 @@
           </view>
         </view>
       </view>
-    </template>
-  </uni-scroll>
-  <uni-empty v-else></uni-empty>
-
-  <div class="actions" id="actions">
-    <button type="mini" class="btn">首页</button>
-    <button type="mini" class="btn">分享</button>
-  </div>
+      <uni-empty v-else></uni-empty>
+      <uni-load-more iconType="circle" :status="status" />
+    </view>
+    <div class="actions" id="actions">
+      <button type="mini" class="btn">首页</button>
+      <button type="mini" class="btn">分享</button>
+    </div>
+  </uni-container>
 </template>
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import { getStatusStyle } from '@/utils'
 import type { BizInfo } from '@/typings/user'
 import type { HotActivity } from '@/typings/activity'
 import { queryActivityByBiz } from '@/apis/activity'
 import { queryBizInfo } from '@/apis/user'
-import { usePagination } from '@/hooks/usePagination'
-import useSafeScrollHeight from '@/hooks/useSafeScrollHeight'
 import { URL } from '@/const'
+import { usePageScroll } from '@/hooks/usePageScroll'
+import { onReachBottom } from '@dcloudio/uni-app'
 
 const bizInfo = ref<BizInfo>()
-const activeList = ref<HotActivity[]>([])
-// 240是图片
-const scrollHeight = ref<number>(useSafeScrollHeight() - 240)
-// 分页相关
-const { next, refresh, isLastPage } = usePagination({
-  pageNo: 1,
-  pageSize: 10,
-  onChange({ pageNo, pageSize, type }) {
-    const _type = type === 'next' ? 'append' : 'init'
-    return getBizActivityList(_type, pageNo, pageSize)
+
+const { refresh, next, status, list } = usePageScroll<HotActivity[]>({
+  action({ pageNo, pageSize }) {
+    return queryActivityByBiz({ pageNo, pageSize }).then((ret) => {
+      const pageInfo = ret.data.pageInfo
+      return {
+        list: pageInfo.list,
+        total: pageInfo.total,
+        isLastPage: pageInfo.isLastPage,
+        isFristPage: pageInfo.isFirstPage
+      }
+    })
   }
 })
+
 // 上拉加载
-const onPullUp = (close: () => void) => next(close)
-const getBizActivityList = (type: string = 'init', pageNo = 1, pageSize = 30) =>
-  queryActivityByBiz({
-    pageNo,
-    pageSize
-  }).then((ret) => {
-    const pageInfo = ret.data.pageInfo
-    if (type === 'init') {
-      activeList.value = pageInfo.list
-    } else {
-      activeList.value = activeList.value.concat(pageInfo.list)
-    }
-    return {
-      total: pageInfo.total,
-      isLastPage: pageInfo.isLastPage,
-      isFristPage: pageInfo.isFirstPage
-    }
-  })
+onReachBottom(next)
 
 onLoad((option) => {
   if (option && option.creater) {
-    queryBizInfo(option.creater).then(ret => {
+    queryBizInfo(option.creater).then((ret) => {
       const { data } = ret
       bizInfo.value = data
+      uni.setNavigationBarTitle({
+        title: `${data.userName}的主页`
+      })
     })
     refresh()
   }
 })
-
-const getElRect = async (cls: string): Promise<UniApp.NodeInfo> => {
-  return new Promise((resolve) => {
-    uni.createSelectorQuery().select(cls).boundingClientRect((data) => {
-      resolve(data as UniApp.NodeInfo)
-    }).exec()
-  })
-}
-
-onMounted(async () => {
-  uni.showLoading({})
-  const info = await getElRect('#biz-info')
-  const actions = await getElRect('#actions')
-  if (info.height && actions.height) {
-    scrollHeight.value = scrollHeight.value - info.height - actions.height
-  }
-  uni.hideLoading()
-})
-
 </script>
 <style scoped lang="scss">
-.biz-info{
+.warpper {
+  position: relative;
+  padding-bottom: 50px;
+}
+.biz-info {
   padding: 10px;
   height: 60px;
-  >view {
+  > view {
     padding: 5px 0;
   }
-  .f-b{
+  .f-b {
     font-weight: bold;
   }
 }
@@ -174,13 +143,17 @@ onMounted(async () => {
     }
   }
 }
-.actions{
+.actions {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
   display: flex;
   padding: 5px;
   height: 40px;
   display: flex;
   align-items: center;
-  .btn{
+  background-color: #fff;
+  .btn {
     height: 30px;
     line-height: 30px;
     font-size: 12px;

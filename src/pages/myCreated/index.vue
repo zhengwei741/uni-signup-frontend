@@ -52,12 +52,8 @@
     </uni-grid-item>
   </uni-grid>
 
-  <view v-if="activityList.length">
-    <view
-      class="activity-card"
-      v-for="activity in activityList"
-      :key="activity.id"
-    >
+  <view v-if="list.length">
+    <view class="activity-card" v-for="activity in list" :key="activity.id">
       <view class="activity-card__content">
         <view :span="24">
           <view class="activity-card__content__title">{{
@@ -81,15 +77,12 @@
   <uni-empty v-else />
 </template>
 <script setup lang="ts">
-import { ref, onMounted, computed, unref } from 'vue'
+import { onMounted } from 'vue'
 import { queryActivityByBiz } from '@/apis/activity'
 import type { HotActivity } from '@/typings/activity'
 import { getStatusStyle } from '@/utils'
-import { usePagination } from '@/hooks/usePagination'
+import { usePageScroll } from '@/hooks/usePageScroll'
 import { onReachBottom } from '@dcloudio/uni-app'
-
-// 列表
-const activityList = ref<HotActivity[]>([])
 
 const goCreateActivity = () => {
   uni.navigateTo({
@@ -102,18 +95,12 @@ const goCreateActivity = () => {
   })
 }
 
-const { refresh, next, isLastPage } = usePagination({
-  pageNo: 1,
-  pageSize: 10,
-  onChange({ pageNo, pageSize, type }) {
+const { refresh, next, status, list } = usePageScroll<HotActivity[]>({
+  action({ pageNo, pageSize }) {
     return queryActivityByBiz({ pageNo, pageSize }).then((ret) => {
       const { pageInfo } = ret.data
-      if (type === 'next') {
-        activityList.value = activityList.value.concat(pageInfo.list)
-      } else {
-        activityList.value = pageInfo.list
-      }
       return {
+        list: pageInfo.list,
         total: pageInfo.total,
         isLastPage: pageInfo.isLastPage,
         isFristPage: pageInfo.isFirstPage
@@ -122,17 +109,8 @@ const { refresh, next, isLastPage } = usePagination({
   }
 })
 
-const status = computed(() => {
-  if (unref(isLastPage)) return 'noMore'
-  return loading.value ? 'more' : 'loading'
-})
-
-const loading = ref(false)
 // 上拉加载
-onReachBottom(() => {
-  loading.value = true
-  next(() => (loading.value = false))
-})
+onReachBottom(next)
 // 初始化
 onMounted(refresh)
 </script>

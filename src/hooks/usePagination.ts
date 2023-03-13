@@ -1,28 +1,32 @@
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import type { Ref } from 'vue'
 
-type ChangeType = 'next' | 'prev' | 'refresh'
+export type ChangeType = 'next' | 'prev' | 'refresh'
+
+export type OnChangeType = (params: {
+  pageNo: number
+  pageSize: number
+  type: ChangeType
+}) => Promise<{
+  total: number
+  isLastPage: boolean
+  isFristPage: boolean
+}>
 
 export type UsePaginationOption = {
   pageNo: number
   pageSize: number
-  onChange: (params: {
-    pageNo: number
-    pageSize: number
-    type: ChangeType
-  }) => Promise<{
-    total: number
-    isLastPage: boolean
-    isFristPage: boolean
-  }>
+  onChange: OnChangeType
 }
+
+export type CallBackType = (callback?: () => void) => void
 
 export const usePagination = (
   options: UsePaginationOption
 ): {
-  prev: (callback?: () => void) => void
-  next: (callback?: () => void) => void
-  refresh: (callback?: () => void) => void
+  prev: CallBackType
+  next: CallBackType
+  refresh: CallBackType
   isLastPage: Ref<boolean>
   isFristPage: Ref<boolean>
 } => {
