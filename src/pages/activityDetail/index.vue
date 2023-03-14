@@ -1,0 +1,3 @@
+<template>
+  activityDetail
+</template>

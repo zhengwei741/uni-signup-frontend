@@ -54,6 +54,12 @@
       "style": {
         "navigationBarTitleText": "认证"
       }
+    },
+    {
+      "path": "pages/activityDetail/index",
+      "style": {
+        "navigationBarTitleText": "活动详情"
+      }
     }
   ],
   "globalStyle": {
@@ -63,8 +69,8 @@
     "backgroundColor": "#F8F8F8"
   },
   "tabBar": {
-    "color": "#000000",
-    "selectedColor": "#DC143C",
+    "color": "#6a6a6a",
+    "selectedColor": "#0066FF",
     "backgroundColor": "#ffffff",
     "fontSize": "16px",
     "list": [

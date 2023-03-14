@@ -16,7 +16,7 @@
     @onPullUp="onPullUp"
   >
     <template #default="{ item }">
-      <view class="activity-card">
+      <view class="activity-card" @tap="gotoDetail">
         <view class="uni-card uni-shadow uni-border">
           <view class="uni-card__header">
             <view class="uni-card__header-box">
@@ -40,7 +40,7 @@
               </view>
             </view>
           </view>
-          <view class="uni-card__content" @tap="gotoHonePage(item)">
+          <view class="uni-card__content" @tap="gotoHomePage(item)">
             <text class="org-name">{{ item.organizationName }}</text>
             <text class="org-link">Ta的主页</text>
           </view>
@@ -109,9 +109,15 @@ const getHotActivityList = (type: string = 'init', pageNo = 1, pageSize = 30) =>
   })
 
 // 跳转
-const gotoHonePage = (item: HotActivity) => {
+const gotoHomePage = (item: HotActivity) => {
   uni.navigateTo({
     url: `../bizHomePage/index?creater=${item.creater}`
+  })
+}
+
+const gotoDetail = () => {
+  uni.navigateTo({
+    url: `../activityDetail/index`
   })
 }
 
