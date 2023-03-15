@@ -11,7 +11,7 @@
     {
       "path": "pages/activityDetail/index",
       "style": {
-        "navigationBarTitleText": "活动详情"
+        "navigationBarTitleText": "活动详情",
       }
     },
     {
@@ -67,7 +67,10 @@
     "navigationBarTextStyle": "black",
     "navigationBarTitleText": "uni-app",
     "navigationBarBackgroundColor": "#F8F8F8",
-    "backgroundColor": "#F8F8F8"
+    "backgroundColor": "#F8F8F8",
+    "usingComponents": {
+      "txv-video": "plugin://tencentvideo/video"
+    }
   },
   "tabBar": {
     "color": "#6a6a6a",
