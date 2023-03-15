@@ -7,18 +7,20 @@
         label-position="top"
         label-width="100"
         :rules="{
-          title: { rules: [
-            { required: true, errorMessage: '活动标题不能为空' },
-          ] },
-          startTime: { rules: [
-            { required: true, errorMessage: '开始时间不能为空' },
-            { validateFunction: validateTime }
-          ] },
+          title: {
+            rules: [{ required: true, errorMessage: '活动标题不能为空' }]
+          },
+          startTime: {
+            rules: [
+              { required: true, errorMessage: '开始时间不能为空' },
+              { validateFunction: validateTime }
+            ]
+          },
           endTime: {
             rules: [
               { required: true, errorMessage: '结束时间不能为空' },
               { validateFunction: validateTime }
-            ],
+            ]
           },
           description: {
             rules: [{ required: true, errorMessage: '结束时间不能为空' }]
@@ -68,11 +70,20 @@
           </view>
         </view>
 
-        <text style="margin-bottom: 22px;font-weight: bold;color: #3a3a3a;display: block;font-size: 14px;">报名填写信息</text>
+        <text
+          style="
+            margin-bottom: 22px;
+            font-weight: bold;
+            color: #3a3a3a;
+            display: block;
+            font-size: 14px;
+          "
+          >报名填写信息</text
+        >
 
         <view class="uni-forms-item activity-field">
           <view class="label">
-            <text style="font-weight: 500;">组别</text>
+            <text style="font-weight: 500">组别</text>
           </view>
           <view class="switch">
             <button size="mini" @click="goToActivityGroup">编辑</button>
@@ -80,12 +91,12 @@
         </view>
         <view class="uni-forms-item activity-field">
           <view class="label">
-            <text style="font-weight: 500;">昵称</text>
+            <text style="font-weight: 500">昵称</text>
           </view>
         </view>
         <view class="uni-forms-item activity-field">
           <view class="label">
-            <text style="font-weight: 500;">手机号</text>
+            <text style="font-weight: 500">手机号</text>
           </view>
         </view>
 
@@ -109,7 +120,11 @@
               activeValue="1"
               inactiValue="0"
             />
-            <button size="mini" type="warn" @click="() => activityFields.splice(index, 1)">
+            <button
+              size="mini"
+              type="warn"
+              @click="() => activityFields.splice(index, 1)"
+            >
               删除
             </button>
           </view>
@@ -170,7 +185,12 @@ const activityFormData = reactive<Activity>({
   groupList: activityGroups,
   showFlag: '1'
 })
-const validateTime = (rule: any, value: string, data: Record<string, any>, callback: (msg: string) => void) => {
+const validateTime = (
+  rule: any,
+  value: string,
+  data: Record<string, any>,
+  callback: (msg: string) => void
+) => {
   const { startTime, endTime } = data
   if (dayjs(startTime).diff(dayjs(endTime)) > 0) {
     callback('开始时间不能小于结束时间')
@@ -184,7 +204,7 @@ const goToActivityGroup = () => {
   uni.navigateTo({
     url: '../activityGroup/index',
     events: {
-      onGroupSave: function(data: ActivityGroup[] = []) {
+      onGroupSave: function (data: ActivityGroup[] = []) {
         // 不限制人数重置peopleNumber为0
         const saveData = data.map((group) => ({
           ...group,
@@ -193,9 +213,9 @@ const goToActivityGroup = () => {
         activityGroups = saveData
         // 重新获取引用
         activityFormData.groupList = activityGroups
-      },
+      }
     },
-    success: function(res) {
+    success: function (res) {
       // 通过eventChannel向被打开页面传送数据
       res.eventChannel.emit('onGroupOpen', unref(activityGroups))
     }
@@ -227,10 +247,10 @@ const publish = async () => {
       uni.navigateBack()
       // 通知上层页面刷新
       if (eventChannel.value) {
-        eventChannel.value.emit('onActiveSaveSuccess');
+        eventChannel.value.emit('onActiveSaveSuccess')
       }
-    }, 300);
-  } catch(e) {
+    }, 300)
+  } catch (e) {
     console.log(e)
   } finally {
     uni.hideLoading()

@@ -1,3 +1,3 @@
 <template>
-  activityDetail
+  <uni-editer></uni-editer>
 </template>
