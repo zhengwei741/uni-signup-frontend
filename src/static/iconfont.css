@@ -11,6 +11,50 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.icon-img:before {
+  content: '\e699';
+}
+
+.icon-7biaoqing-1:before {
+  content: '\e667';
+}
+
+.icon-biaoge:before {
+  content: '\e63e';
+}
+
+.icon-shanchu:before {
+  content: '\e718';
+}
+
+.icon-undo:before {
+  content: '\e787';
+}
+
+.icon-redo:before {
+  content: '\e788';
+}
+
+.icon-link:before {
+  content: '\e772';
+}
+
+.icon-zitibiaoti:before {
+  content: '\ec84';
+}
+
+.icon-text:before {
+  content: '\e734';
+}
+
+.icon-video:before {
+  content: '\e73b';
+}
+
+.icon-save:before {
+  content: '\e67c';
+}
+
 .icon-zanwushuju:before {
   content: '\e693';
 }

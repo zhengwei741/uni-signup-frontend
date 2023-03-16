@@ -25,5 +25,6 @@ const props = withDefaults(defineProps<UniEmptyProps>(), {
   justify-content: center;
   align-items: center;
   flex-direction: column;
+  background-color: #fff;
 }
 </style>
