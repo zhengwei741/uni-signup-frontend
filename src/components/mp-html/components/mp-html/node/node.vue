@@ -62,7 +62,7 @@
           </block>
         </view>
       </view>
-      
+      <txv-video v-else-if="n.name=='txv-video'" :vid="n.attrs.vid" :playerid="n.attrs.vid" :id="n.attrs.vid" :class="n.attrs.class" :style="n.attrs.style" controls :data-i="i" @play="play" @error="mediaError" />
       <!-- 富文本 -->
       <!-- #ifdef H5 || ((MP-WEIXIN || MP-QQ || APP-PLUS || MP-360) && VUE2) -->
       <rich-text v-else-if="!opts[5]&&!n.c&&!handler.isInline(n.name, n.attrs.style)" :id="n.attrs.id" :style="n.f" :user-select="opts[4]" :nodes="[n]" />
@@ -815,63 +815,7 @@ export default {
   }
 }
 </script>
-<style>/deep/ .hl-code,/deep/ .hl-pre{color:#ccc;background:0 0;font-family:Consolas,Monaco,'Andale Mono','Ubuntu Mono',monospace;font-size:1em;text-align:left;white-space:pre;word-spacing:normal;word-break:normal;word-wrap:normal;line-height:1.5;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-hyphens:none;-moz-hyphens:none;-ms-hyphens:none;hyphens:none}/deep/ .hl-pre{padding:1em;margin:.5em 0;overflow:auto}/deep/ .hl-pre{background:#2d2d2d}/deep/ .hl-block-comment,/deep/ .hl-cdata,/deep/ .hl-comment,/deep/ .hl-doctype,/deep/ .hl-prolog{color:#999}/deep/ .hl-punctuation{color:#ccc}/deep/ .hl-attr-name,/deep/ .hl-deleted,/deep/ .hl-namespace,/deep/ .hl-tag{color:#e2777a}/deep/ .hl-function-name{color:#6196cc}/deep/ .hl-boolean,/deep/ .hl-function,/deep/ .hl-number{color:#f08d49}/deep/ .hl-class-name,/deep/ .hl-constant,/deep/ .hl-property,/deep/ .hl-symbol{color:#f8c555}/deep/ .hl-atrule,/deep/ .hl-builtin,/deep/ .hl-important,/deep/ .hl-keyword,/deep/ .hl-selector{color:#cc99cd}/deep/ .hl-attr-value,/deep/ .hl-char,/deep/ .hl-regex,/deep/ .hl-string,/deep/ .hl-variable{color:#7ec699}/deep/ .hl-entity,/deep/ .hl-operator,/deep/ .hl-url{color:#67cdcc}/deep/ .hl-bold,/deep/ .hl-important{font-weight:700}/deep/ .hl-italic{font-style:italic}/deep/ .hl-entity{cursor:help}/deep/ .hl-inserted{color:green}/deep/ .md-p {
-  margin-block-start: 1em;
-  margin-block-end: 1em;
-}
-
-/deep/ .md-table,
-/deep/ .md-blockquote {
-  margin-bottom: 16px;
-}
-
-/deep/ .md-table {
-  box-sizing: border-box;
-  width: 100%;
-  overflow: auto;
-  border-spacing: 0;
-  border-collapse: collapse;
-}
-
-/deep/ .md-tr {
-  background-color: #fff;
-  border-top: 1px solid #c6cbd1;
-}
-
-.md-table .md-tr:nth-child(2n) {
-  background-color: #f6f8fa;
-}
-
-/deep/ .md-th,
-/deep/ .md-td {
-  padding: 6px 13px !important;
-  border: 1px solid #dfe2e5;
-}
-
-/deep/ .md-th {
-  font-weight: 600;
-}
-
-/deep/ .md-blockquote {
-  padding: 0 1em;
-  color: #6a737d;
-  border-left: 0.25em solid #dfe2e5;
-}
-
-/deep/ .md-code {
-  padding: 0.2em 0.4em;
-  font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace;
-  font-size: 85%;
-  background-color: rgba(27, 31, 35, 0.05);
-  border-radius: 3px;
-}
-
-/deep/ .md-pre .md-code {
-  padding: 0;
-  font-size: 100%;
-  background: transparent;
-  border: 0;
-}/* #ifndef H5 || MP-ALIPAY || APP-PLUS */
+<style>/* #ifndef H5 || MP-ALIPAY || APP-PLUS */
   /deep/ ._address,
   /deep/ ._article,
   /deep/ ._aside,

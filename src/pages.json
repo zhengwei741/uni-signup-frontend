@@ -11,7 +11,10 @@
     {
       "path": "pages/activityDetail/index",
       "style": {
-        "navigationBarTitleText": "活动详情",
+        "navigationBarTitleText": "活动详情"
+      },
+      "usingComponents": {
+        "txv-video": "plugin://tencentvideo/video"
       }
     },
     {

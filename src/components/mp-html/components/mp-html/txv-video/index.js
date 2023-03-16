@@ -38,5 +38,4 @@ TxvVideo.prototype.onLoad = function () {
 }
 // #endif
 
-// module.exports = TxvVideo
 export default TxvVideo
