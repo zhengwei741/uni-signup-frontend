@@ -27,6 +27,7 @@
 import mpHtml from '@/components/mp-html/components/mp-html/mp-html'
 import { getCurrentInstance, ref, onMounted } from 'vue'
 import type { ComponentInternalInstance } from 'vue'
+import { useUpdateImage } from '@/hooks/useUpdateImage'
 
 let html = `
   -----------
@@ -44,6 +45,8 @@ const tagStyle = {
 
 const instance = getCurrentInstance() as ComponentInternalInstance
 const articleRef = ref()
+
+const { updateImage } = useUpdateImage()
 
 type SrcType = 'img' | 'video' | 'audio' | 'link'
 onMounted(() => {
@@ -97,6 +100,24 @@ onMounted(() => {
           }
         })
       }
+      const title = {
+        video: '视频链接',
+        audio: '音频链接',
+        link: '链接地址'
+      }
+      uni.showModal({
+        editable: true,
+        // @ts-ignore
+        title: `请输入${title[type]}`,
+        content: value || '',
+        success: function (res) {
+          if (res.confirm) {
+            console.log('用户点击确定')
+          } else if (res.cancel) {
+            console.log('用户点击取消')
+          }
+        }
+      })
     })
   }
 })
