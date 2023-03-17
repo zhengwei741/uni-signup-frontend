@@ -29,17 +29,20 @@ export const usePageScroll: IusePageScroll = (options) => {
     pageNo: 1,
     pageSize: 10,
     onChange: ({ pageNo, pageSize, type }) => {
-      return action({ pageNo, pageSize }).then((ret) => {
-        const { list } = ret
-        if (type === 'next') {
-          interiorList.value = interiorList.value.concat(list)
-        } else {
-          interiorList.value = list
-        }
-        return {
-          ...ret
-        }
-      })
+      uni.showLoading({ title: '加载中' })
+      return action({ pageNo, pageSize })
+        .then((ret) => {
+          const { list } = ret
+          if (type === 'next') {
+            interiorList.value = interiorList.value.concat(list)
+          } else {
+            interiorList.value = list
+          }
+          return {
+            ...ret
+          }
+        })
+        .finally(uni.hideLoading)
     }
   })
 

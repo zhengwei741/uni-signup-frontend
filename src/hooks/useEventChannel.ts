@@ -6,10 +6,10 @@ export const useEventChannel = () => {
   const instance = getCurrentInstance() as ComponentInternalInstance
   let eventChannel = ref<any>()
   onLoad(async () => {
-    await nextTick();
+    await nextTick()
     if (instance && instance.proxy) {
       // @ts-ignore
-      eventChannel.value = instance.proxy.getOpenerEventChannel();
+      eventChannel.value = instance.proxy.getOpenerEventChannel()
     }
   })
 
@@ -17,4 +17,3 @@ export const useEventChannel = () => {
     eventChannel
   }
 }
-

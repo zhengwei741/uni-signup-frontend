@@ -4,8 +4,8 @@
       <image
         mode="aspectFit"
         v-if="bizInfo?.logoImgName"
-        :src="URL + '/'+ bizInfo?.logoImgName"
-        style="width: 100%; background-color: #fff;"
+        :src="URL + '/' + bizInfo?.logoImgName"
+        style="width: 100%; background-color: #fff"
       ></image>
 
       <view class="biz-info" id="biz-info">

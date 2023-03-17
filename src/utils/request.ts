@@ -16,10 +16,10 @@ uni.addInterceptor('request', {
     }
     const { token } = useCommonStore()
     args.header = {
-      ...args.header,
       'content-type': 'application/json',
       requestId: uuid(),
-      token
+      token,
+      ...args.header
     }
   }
 })

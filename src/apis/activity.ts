@@ -44,3 +44,18 @@ export const insertActivity = (activity: Activity) => {
     data: activity
   })
 }
+
+/**
+ * 根据活动id查询活动详情
+ * @param id
+ * @returns
+ */
+export const queryActivityDetail = (id: string) => {
+  return request<API.PaginationResult<HotActivity>>({
+    url: '/aciittvy/mini/queryActivityDetail',
+    method: 'POST',
+    data: {
+      id
+    }
+  })
+}

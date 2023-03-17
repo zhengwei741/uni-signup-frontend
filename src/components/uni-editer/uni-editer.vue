@@ -11,15 +11,16 @@
   </view>
   <mp-html
     ref="articleRef"
-    container-style="padding:20px"
-    :content="html"
+    container-style="padding:10px"
+    :content="props.modelValue"
     :editable="true"
-    domain="https://v.qq.com"
+    :domain="URL"
     lazy-load
     scroll-table
     selectable
     use-anchor
     :tag-style="tagStyle"
+    @remove="onRemove"
   />
 </template>
 <script setup lang="ts">
@@ -28,12 +29,21 @@ import mpHtml from '@/components/mp-html/components/mp-html/mp-html'
 import { getCurrentInstance, ref, onMounted } from 'vue'
 import type { ComponentInternalInstance } from 'vue'
 import { useUpdateImage } from '@/hooks/useUpdateImage'
+import { URL } from '@/const'
 
-let html = `
-  -----------
-  <iframe src="https://v.qq.com/txp/iframe/player.html?vid=o0024gd0w91" allowFullScreen="true"></iframe>
-  -----------
-`
+type EditerProps = {
+  modelValue: string
+}
+
+// props
+const props = withDefaults(defineProps<EditerProps>(), {
+  modelValue: ''
+})
+
+// emits
+const emits = defineEmits<{
+  (e: 'update:modelValue', value: string): void
+}>()
 
 const tagStyle = {
   table:
@@ -46,7 +56,7 @@ const tagStyle = {
 const instance = getCurrentInstance() as ComponentInternalInstance
 const articleRef = ref()
 
-const { updateImage } = useUpdateImage()
+const { updateImage } = useUpdateImage('/api/activity/mini/uploadImg')
 
 type SrcType = 'img' | 'video' | 'audio' | 'link'
 onMounted(() => {
@@ -54,34 +64,14 @@ onMounted(() => {
   // value 修改链接时，这里会传入旧值
   // type 为音视频时可以返回一个数组作为源地址
   // type 为 audio 时，可以返回一个 object，包含 author、name、poster、src 等字段
-  articleRef.value.getSrc = (type: SrcType, value: any) => {
+  articleRef.value.getSrc = (type: SrcType, value: string) => {
     return new Promise((resolve, reject) => {
       if (type === 'img') {
         uni.showActionSheet({
           itemList: ['本地选取', '远程连接'],
           success(res) {
             if (res.tapIndex === 0) {
-              uni.chooseImage({
-                count: 1,
-                success: (res) => {
-                  /* 实际使用时，这里需要上传到服务器后返回
-                    wx.showLoading({
-                      title: '上传中'
-                    })
-                    wx.uploadFile({
-                      url: 'xxx', // 接口地址
-                      filePath: res.tempFilePaths[0],
-                      name: 'xxx',
-                      success(res) {
-                        resolve(res.data.path) // 返回线上地址
-                      },
-                      fail: reject,
-                      complete: wx.hideLoading
-                    })*/
-                  resolve(res.tempFilePaths[0])
-                },
-                fail: reject
-              })
+              updateImage().then(resolve).catch(reject)
             } else {
               // 打开弹窗
               uni.showModal({
@@ -90,15 +80,16 @@ onMounted(() => {
                 content: '',
                 success: function (res) {
                   if (res.confirm) {
-                    console.log('用户点击确定')
+                    resolve(res.content)
                   } else if (res.cancel) {
-                    console.log('用户点击取消')
+                    reject()
                   }
                 }
               })
             }
           }
         })
+        return
       }
       const title = {
         video: '视频链接',
@@ -112,9 +103,9 @@ onMounted(() => {
         content: value || '',
         success: function (res) {
           if (res.confirm) {
-            console.log('用户点击确定')
+            resolve(res.content || '')
           } else if (res.cancel) {
-            console.log('用户点击取消')
+            reject()
           }
         }
       })
@@ -128,12 +119,18 @@ const edit = (e: any) => {
   refs['articleRef'][e.currentTarget.dataset.method]()
 }
 
+const getImageList = () =>
+  articleRef.value.nodes
+    .filter((node: any) => node.name === 'img')
+    .map((node: any) => node.attrs.src)
+
 const clear = () => {
   uni.showModal({
     title: '确认',
     content: '确定清空内容吗？',
     success: (res) => {
       if (res.confirm) {
+        const imageList = getImageList()
         articleRef.value.clear()
       }
     }
@@ -141,9 +138,22 @@ const clear = () => {
 }
 
 const save = () => {
-  debugger
-  console.log(articleRef.value.getContent())
+  const content = articleRef.value.getContent() || ''
+  content.replaceAll('video', 'iframe')
+  emits('update:modelValue', content)
 }
+
+const onRemove = (removeNode: { type: string; src: string }) => {
+  const { type, src } = removeNode
+  if (type === 'img') {
+    console.log(type)
+    console.log(src)
+  }
+}
+
+defineExpose({
+  save
+})
 </script>
 
 <style scoped lang="scss">

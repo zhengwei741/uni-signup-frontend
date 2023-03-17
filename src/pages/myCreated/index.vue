@@ -1,9 +1,7 @@
 <template>
-  <image
-    mode="aspectFit"
-    src="https://web-assets.dcloud.net.cn/unidoc/zh/shuijiao.jpg"
-    style="width: 100%"
-  ></image>
+  <uni-logoImage :src="logoImgName"></uni-logoImage>
+
+  <!-- https://web-assets.dcloud.net.cn/unidoc/zh/shuijiao.jpg -->
 
   <uni-grid :column="4" :show-border="false" :square="false">
     <uni-grid-item>
@@ -52,7 +50,7 @@
     </uni-grid-item>
   </uni-grid>
 
-  <view v-if="list.length" style="background-color: #f1f1f1;padding-top: 1px;">
+  <view v-if="list.length" style="background-color: #f1f1f1; padding-top: 1px">
     <view class="activity-card" v-for="activity in list" :key="activity.id">
       <view class="activity-card__content">
         <view :span="24">
@@ -87,6 +85,7 @@ import { onReachBottom } from '@dcloudio/uni-app'
 
 // 组织机构名称 是否认证过
 const organizationName = ref<string>('')
+const logoImgName = ref<string>('')
 
 const goCreateActivity = () => {
   uni.navigateTo({
@@ -129,8 +128,9 @@ onReachBottom(next)
 // 初始化
 onMounted(() => {
   refresh()
-  queryPersonalInfo().then(ret => {
+  queryPersonalInfo().then((ret) => {
     organizationName.value = ret.data.organizationName
+    logoImgName.value = ret.data.logoImgName
   })
 })
 </script>

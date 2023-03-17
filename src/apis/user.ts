@@ -18,15 +18,14 @@ export const queryBizInfo = (creater: string) => {
 
 /**
  * 查询登录者个人信息
- * @returns 
+ * @returns
  */
 export const queryPersonalInfo = () => {
   return request<API.Result<BizInfo>>({
     url: '/user/mini/queryPersonalInfo',
-    method: 'POST',
+    method: 'POST'
   })
 }
-
 
 /**
  * 商家用户上传Logo图片
@@ -43,9 +42,13 @@ export const uploadLogo = () => {
 
 /**
  * 商家用户认证
- * @returns 
+ * @returns
  */
-export const bizAuth = (params: { organizationName: string, userName: string, mobile: string }) => {
+export const bizAuth = (params: {
+  organizationName: string
+  userName: string
+  mobile: string
+}) => {
   return request({
     url: '/user/mini/bizAuth',
     method: 'POST',

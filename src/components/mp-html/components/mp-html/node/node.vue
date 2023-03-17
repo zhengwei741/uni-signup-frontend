@@ -1,80 +1,429 @@
 <template>
-  <view @tap="nodeTap" :id="attrs.id" :class="'_block _'+name+' '+attrs.class" :style="(ctrl.root?'border:1px solid black;padding:5px;display:block;':'')+attrs.style">
+  <view
+    @tap="nodeTap"
+    :id="attrs.id"
+    :class="'_block _' + name + ' ' + attrs.class"
+    :style="
+      (ctrl.root ? 'border:1px solid black;padding:5px;display:block;' : '') +
+      attrs.style
+    "
+  >
     <block v-for="(n, i) in childs" v-bind:key="i">
       <!-- 图片 -->
       <!-- 占位图 -->
-      <image v-if="n.name==='img'&&!n.t&&((opts[1]&&!ctrl[i])||ctrl[i]<0)" class="_img" :style="n.attrs.style" :src="ctrl[i]<0?opts[2]:opts[1]" mode="widthFix" />
+      <image
+        v-if="
+          n.name === 'img' && !n.t && ((opts[1] && !ctrl[i]) || ctrl[i] < 0)
+        "
+        class="_img"
+        :style="n.attrs.style"
+        :src="ctrl[i] < 0 ? opts[2] : opts[1]"
+        mode="widthFix"
+      />
       <!-- 显示图片 -->
       <!-- #ifdef H5 || (APP-PLUS && VUE2) -->
-      <img v-if="n.name==='img'" :id="n.attrs.id" :class="'_img '+n.attrs.class" :style="(ctrl['e'+i]?'border:1px dashed black;padding:3px;':'')+(ctrl[i]===-1?'display:none;':'')+n.attrs.style" :src="n.attrs.src||(ctrl.load?n.attrs['data-src']:'')" :data-i="i" @load="imgLoad" @error="mediaError" @tap.stop="imgTap" @longpress="imgLongTap" />
+      <img
+        v-if="n.name === 'img'"
+        :id="n.attrs.id"
+        :class="'_img ' + n.attrs.class"
+        :style="
+          (ctrl['e' + i] ? 'border:1px dashed black;padding:3px;' : '') +
+          (ctrl[i] === -1 ? 'display:none;' : '') +
+          n.attrs.style
+        "
+        :src="n.attrs.src || (ctrl.load ? n.attrs['data-src'] : '')"
+        :data-i="i"
+        @load="imgLoad"
+        @error="mediaError"
+        @tap.stop="imgTap"
+        @longpress="imgLongTap"
+      />
       <!-- #endif -->
       <!-- #ifndef H5 || (APP-PLUS && VUE2) -->
       <!-- 表格中的图片，使用 rich-text 防止大小不正确 -->
-      <rich-text v-if="n.name==='img'&&n.t" :style="'display:'+n.t" :nodes="'<img class=\'_img\' style=\''+n.attrs.style+'\' src=\''+n.attrs.src+'\'>'" :data-i="i" @tap.stop="imgTap" />
+      <rich-text
+        v-if="n.name === 'img' && n.t"
+        :style="'display:' + n.t"
+        :nodes="
+          '<img class=\'_img\' style=\'' +
+          n.attrs.style +
+          '\' src=\'' +
+          n.attrs.src +
+          '\'>'
+        "
+        :data-i="i"
+        @tap.stop="imgTap"
+      />
       <!-- #endif -->
       <!-- #ifndef H5 || APP-PLUS -->
-      <image v-else-if="n.name==='img'" :id="n.attrs.id||('n'+i)" :class="'_img '+n.attrs.class" :style="(ctrl['e'+i]?'border:1px dashed black;padding:3px;':'')+(ctrl[i]===-1?'display:none;':'')+'width:'+(ctrl[i]||1)+'px;height:'+(ctrl['h'+i]||1)+'px;'+n.attrs.style" :src="n.attrs.src" :mode="!n.h?'widthFix':(!n.w?'heightFix':'')" :lazy-load="opts[0]" :webp="n.webp" :show-menu-by-longpress="!opts[5]&&opts[3]&&!n.attrs.ignore" :image-menu-prevent="opts[5]||!opts[3]||n.attrs.ignore" :data-i="i" @load="imgLoad" @error="mediaError" @tap.stop="imgTap" @longpress="imgLongTap" />
+      <image
+        v-else-if="n.name === 'img'"
+        :id="n.attrs.id || 'n' + i"
+        :class="'_img ' + n.attrs.class"
+        :style="
+          (ctrl['e' + i] ? 'border:1px dashed black;padding:3px;' : '') +
+          (ctrl[i] === -1 ? 'display:none;' : '') +
+          'width:' +
+          (ctrl[i] || 1) +
+          'px;height:' +
+          (ctrl['h' + i] || 1) +
+          'px;' +
+          n.attrs.style
+        "
+        :src="n.attrs.src"
+        :mode="!n.h ? 'widthFix' : !n.w ? 'heightFix' : ''"
+        :lazy-load="opts[0]"
+        :webp="n.webp"
+        :show-menu-by-longpress="!opts[5] && opts[3] && !n.attrs.ignore"
+        :image-menu-prevent="opts[5] || !opts[3] || n.attrs.ignore"
+        :data-i="i"
+        @load="imgLoad"
+        @error="mediaError"
+        @tap.stop="imgTap"
+        @longpress="imgLongTap"
+      />
       <!-- #endif -->
       <!-- #ifdef APP-PLUS && VUE3 -->
-      <image v-else-if="n.name==='img'" :id="n.attrs.id" :class="'_img '+n.attrs.class" :style="(ctrl['e'+i]?'border:1px dashed black;padding:3px;':'')+(ctrl[i]===-1?'display:none;':'')+'width:'+(ctrl[i]||1)+'px;'+n.attrs.style" :src="n.attrs.src||(ctrl.load?n.attrs['data-src']:'')" :mode="!n.h?'widthFix':(!n.w?'heightFix':'')" :data-i="i" @load="imgLoad" @error="mediaError" @tap.stop="imgTap" @longpress="imgLongTap" />
+      <image
+        v-else-if="n.name === 'img'"
+        :id="n.attrs.id"
+        :class="'_img ' + n.attrs.class"
+        :style="
+          (ctrl['e' + i] ? 'border:1px dashed black;padding:3px;' : '') +
+          (ctrl[i] === -1 ? 'display:none;' : '') +
+          'width:' +
+          (ctrl[i] || 1) +
+          'px;' +
+          n.attrs.style
+        "
+        :src="n.attrs.src || (ctrl.load ? n.attrs['data-src'] : '')"
+        :mode="!n.h ? 'widthFix' : !n.w ? 'heightFix' : ''"
+        :data-i="i"
+        @load="imgLoad"
+        @error="mediaError"
+        @tap.stop="imgTap"
+        @longpress="imgLongTap"
+      />
       <!-- #endif -->
       <!-- 文本 -->
-      <text v-else-if="n.type==='text'&&!ctrl['e'+i]" :data-i="i" :user-select="opts[4]" :decode="!opts[5]" @tap="editStart">{{n.text}}
-        <text v-if="!n.text" style="color:gray">{{opts[6]||'请输入'}}</text>
+      <text
+        v-else-if="n.type === 'text' && !ctrl['e' + i]"
+        :data-i="i"
+        :user-select="opts[4]"
+        :decode="!opts[5]"
+        @tap="editStart"
+        >{{ n.text }}
+        <text v-if="!n.text" style="color: gray">{{
+          opts[6] || '请输入'
+        }}</text>
       </text>
-      <text v-else-if="n.type==='text'&&ctrl['e'+i]===1" :data-i="i" style="border:1px dashed black;min-width:50px;width:auto;padding:5px;display:block" @tap.stop="editStart">{{n.text}}
-        <text v-if="!n.text" style="color:gray">{{opts[6]||'请输入'}}</text>
+      <text
+        v-else-if="n.type === 'text' && ctrl['e' + i] === 1"
+        :data-i="i"
+        style="
+          border: 1px dashed black;
+          min-width: 50px;
+          width: auto;
+          padding: 5px;
+          display: block;
+        "
+        @tap.stop="editStart"
+        >{{ n.text }}
+        <text v-if="!n.text" style="color: gray">{{
+          opts[6] || '请输入'
+        }}</text>
       </text>
-      <textarea v-else-if="n.type==='text'" style="border:1px dashed black;min-width:50px;width:auto;padding:5px" auto-height maxlength="-1" :focus="ctrl['e'+i]===3" :value="n.text" :data-i="i" @input="editInput" @blur="editEnd" />
-      <text v-else-if="n.name==='br'">\n</text>
+      <textarea
+        v-else-if="n.type === 'text'"
+        style="
+          border: 1px dashed black;
+          min-width: 50px;
+          width: auto;
+          padding: 5px;
+        "
+        auto-height
+        maxlength="-1"
+        :focus="ctrl['e' + i] === 3"
+        :value="n.text"
+        :data-i="i"
+        @input="editInput"
+        @blur="editEnd"
+      />
+      <text v-else-if="n.name === 'br'">\n</text>
       <!-- 链接 -->
-      <view v-else-if="n.name==='a'" :id="n.attrs.id" :class="(n.attrs.href?'_a ':'')+n.attrs.class" hover-class="_hover" :style="'display:inline;'+n.attrs.style" :data-i="i" @tap.stop="linkTap">
-        <node name="span" :childs="n.children" :opts="[opts[0],opts[1],opts[2],opts[3],opts[4],opts[5],opts[6],opts[7]+'.'+i+'.children']" style="display:inherit" />
+      <view
+        v-else-if="n.name === 'a'"
+        :id="n.attrs.id"
+        :class="(n.attrs.href ? '_a ' : '') + n.attrs.class"
+        hover-class="_hover"
+        :style="'display:inline;' + n.attrs.style"
+        :data-i="i"
+        @tap.stop="linkTap"
+      >
+        <node
+          name="span"
+          :childs="n.children"
+          :opts="[
+            opts[0],
+            opts[1],
+            opts[2],
+            opts[3],
+            opts[4],
+            opts[5],
+            opts[6],
+            opts[7] + '.' + i + '.children'
+          ]"
+          style="display: inherit"
+        />
       </view>
       <!-- 视频 -->
       <!-- #ifdef APP-PLUS -->
-      <view v-else-if="n.html" :data-i="i" @tap="mediaTap" :id="n.attrs.id" :class="'_video '+n.attrs.class" :style="n.attrs.style" v-html="n.html" @vplay.stop="play" />
+      <view
+        v-else-if="n.html"
+        :data-i="i"
+        @tap="mediaTap"
+        :id="n.attrs.id"
+        :class="'_video ' + n.attrs.class"
+        :style="n.attrs.style"
+        v-html="n.html"
+        @vplay.stop="play"
+      />
       <!-- #endif -->
       <!-- #ifndef APP-PLUS -->
-      <video :show-center-play-btn="!opts[5]" @tap="mediaTap" v-else-if="n.name==='video'" :id="n.attrs.id" :class="n.attrs.class" :style="n.attrs.style" :autoplay="n.attrs.autoplay" :controls="n.attrs.controls" :loop="n.attrs.loop" :muted="n.attrs.muted" :object-fit="n.attrs['object-fit']" :poster="n.attrs.poster" :src="n.src[ctrl[i]||0]" :data-i="i" @play="play" @error="mediaError" />
+      <video
+        :show-center-play-btn="!opts[5]"
+        @tap="mediaTap"
+        v-else-if="n.name === 'video'"
+        :id="n.attrs.id"
+        :class="n.attrs.class"
+        :style="n.attrs.style"
+        :autoplay="n.attrs.autoplay"
+        :controls="n.attrs.controls"
+        :loop="n.attrs.loop"
+        :muted="n.attrs.muted"
+        :object-fit="n.attrs['object-fit']"
+        :poster="n.attrs.poster"
+        :src="n.src[ctrl[i] || 0]"
+        :data-i="i"
+        @play="play"
+        @error="mediaError"
+      />
       <!-- #endif -->
       <!-- #ifdef H5 || APP-PLUS -->
-      <iframe v-else-if="n.name==='iframe'" :style="n.attrs.style" :allowfullscreen="n.attrs.allowfullscreen" :frameborder="n.attrs.frameborder" :src="n.attrs.src" />
-      <embed v-else-if="n.name==='embed'" :style="n.attrs.style" :src="n.attrs.src" />
+      <iframe
+        v-else-if="n.name === 'iframe'"
+        :style="n.attrs.style"
+        :allowfullscreen="n.attrs.allowfullscreen"
+        :frameborder="n.attrs.frameborder"
+        :src="n.attrs.src"
+      />
+      <embed
+        v-else-if="n.name === 'embed'"
+        :style="n.attrs.style"
+        :src="n.attrs.src"
+      />
       <!-- #endif -->
       <!-- #ifndef MP-TOUTIAO || ((H5 || APP-PLUS) && VUE3) -->
       <!-- 音频 -->
-      <audio @tap="mediaTap" v-else-if="n.name==='audio'" :id="n.attrs.id" :class="n.attrs.class" :style="n.attrs.style" :author="n.attrs.author" :controls="n.attrs.controls" :loop="n.attrs.loop" :name="n.attrs.name" :poster="n.attrs.poster" :src="n.src[ctrl[i]||0]" :data-i="i" @play="play" @error="mediaError" />
+      <audio
+        @tap="mediaTap"
+        v-else-if="n.name === 'audio'"
+        :id="n.attrs.id"
+        :class="n.attrs.class"
+        :style="n.attrs.style"
+        :author="n.attrs.author"
+        :controls="n.attrs.controls"
+        :loop="n.attrs.loop"
+        :name="n.attrs.name"
+        :poster="n.attrs.poster"
+        :src="n.src[ctrl[i] || 0]"
+        :data-i="i"
+        @play="play"
+        @error="mediaError"
+      />
       <!-- #endif -->
-      <view v-else-if="(n.name==='table'&&(n.c||opts[5]))||n.name==='li'" :id="n.attrs.id" :class="'_'+n.name+' '+n.attrs.class" :style="n.attrs.style">
-        <node v-if="n.name==='li'" :childs="n.children" :opts="[opts[0],opts[1],opts[2],opts[3],opts[4],opts[5],opts[6],opts[7]+'.'+i+'.children']" />
-        <view v-else v-for="(tbody, x) in n.children" v-bind:key="x" :class="'_'+tbody.name+' '+tbody.attrs.class" :style="tbody.attrs.style">
-          <node v-if="tbody.name==='td'||tbody.name==='th'" :childs="tbody.children" :opts="[opts[0],opts[1],opts[2],opts[3],opts[4],opts[5],opts[6],opts[7]+'.'+i+'.children.'+x+'.children']" />
+      <view
+        v-else-if="(n.name === 'table' && (n.c || opts[5])) || n.name === 'li'"
+        :id="n.attrs.id"
+        :class="'_' + n.name + ' ' + n.attrs.class"
+        :style="n.attrs.style"
+      >
+        <node
+          v-if="n.name === 'li'"
+          :childs="n.children"
+          :opts="[
+            opts[0],
+            opts[1],
+            opts[2],
+            opts[3],
+            opts[4],
+            opts[5],
+            opts[6],
+            opts[7] + '.' + i + '.children'
+          ]"
+        />
+        <view
+          v-else
+          v-for="(tbody, x) in n.children"
+          v-bind:key="x"
+          :class="'_' + tbody.name + ' ' + tbody.attrs.class"
+          :style="tbody.attrs.style"
+        >
+          <node
+            v-if="tbody.name === 'td' || tbody.name === 'th'"
+            :childs="tbody.children"
+            :opts="[
+              opts[0],
+              opts[1],
+              opts[2],
+              opts[3],
+              opts[4],
+              opts[5],
+              opts[6],
+              opts[7] + '.' + i + '.children.' + x + '.children'
+            ]"
+          />
           <block v-else v-for="(tr, y) in tbody.children" v-bind:key="y">
-            <view v-if="tr.name==='td'||tr.name==='th'" :class="'_'+tr.name+' '+tr.attrs.class" :style="tr.attrs.style">
-              <node :childs="tr.children" :opts="[opts[0],opts[1],opts[2],opts[3],opts[4],opts[5],opts[6],opts[7]+'.'+i+'.children.'+x+'.children.'+y+'.children']" />
+            <view
+              v-if="tr.name === 'td' || tr.name === 'th'"
+              :class="'_' + tr.name + ' ' + tr.attrs.class"
+              :style="tr.attrs.style"
+            >
+              <node
+                :childs="tr.children"
+                :opts="[
+                  opts[0],
+                  opts[1],
+                  opts[2],
+                  opts[3],
+                  opts[4],
+                  opts[5],
+                  opts[6],
+                  opts[7] +
+                    '.' +
+                    i +
+                    '.children.' +
+                    x +
+                    '.children.' +
+                    y +
+                    '.children'
+                ]"
+              />
             </view>
-            <view v-else :class="'_'+tr.name+' '+tr.attrs.class" :style="tr.attrs.style">
-              <view v-for="(td, z) in tr.children" v-bind:key="z" :class="'_'+td.name+' '+td.attrs.class" :style="td.attrs.style">
-                <node :childs="td.children" :opts="[opts[0],opts[1],opts[2],opts[3],opts[4],opts[5],opts[6],opts[7]+'.'+i+'.children.'+x+'.children.'+y+'.children.'+z+'.children']" />
+            <view
+              v-else
+              :class="'_' + tr.name + ' ' + tr.attrs.class"
+              :style="tr.attrs.style"
+            >
+              <view
+                v-for="(td, z) in tr.children"
+                v-bind:key="z"
+                :class="'_' + td.name + ' ' + td.attrs.class"
+                :style="td.attrs.style"
+              >
+                <node
+                  :childs="td.children"
+                  :opts="[
+                    opts[0],
+                    opts[1],
+                    opts[2],
+                    opts[3],
+                    opts[4],
+                    opts[5],
+                    opts[6],
+                    opts[7] +
+                      '.' +
+                      i +
+                      '.children.' +
+                      x +
+                      '.children.' +
+                      y +
+                      '.children.' +
+                      z +
+                      '.children'
+                  ]"
+                />
               </view>
             </view>
           </block>
         </view>
       </view>
-      <txv-video v-else-if="n.name=='txv-video'" :vid="n.attrs.vid" :playerid="n.attrs.vid" :id="n.attrs.vid" :class="n.attrs.class" :style="n.attrs.style" controls :data-i="i" @play="play" @error="mediaError" />
+      <txv-video
+        v-else-if="n.name == 'txv-video'"
+        :vid="n.attrs.vid"
+        :playerid="n.attrs.vid"
+        :id="n.attrs.vid"
+        :class="n.attrs.class"
+        :style="n.attrs.style"
+        controls
+        :data-i="i"
+        @play="play"
+        @error="mediaError"
+      />
       <!-- 富文本 -->
       <!-- #ifdef H5 || ((MP-WEIXIN || MP-QQ || APP-PLUS || MP-360) && VUE2) -->
-      <rich-text v-else-if="!opts[5]&&!n.c&&!handler.isInline(n.name, n.attrs.style)" :id="n.attrs.id" :style="n.f" :user-select="opts[4]" :nodes="[n]" />
+      <rich-text
+        v-else-if="!opts[5] && !n.c && !handler.isInline(n.name, n.attrs.style)"
+        :id="n.attrs.id"
+        :style="n.f"
+        :user-select="opts[4]"
+        :nodes="[n]"
+      />
       <!-- #endif -->
       <!-- #ifndef H5 || ((MP-WEIXIN || MP-QQ || APP-PLUS || MP-360) && VUE2) -->
-      <rich-text v-else-if="!opts[5]&&!n.c" :id="n.attrs.id" :style="n.f+';display:inline'" :preview="false" :selectable="opts[4]" :user-select="opts[4]" :nodes="[n]" />
+      <rich-text
+        v-else-if="!opts[5] && !n.c"
+        :id="n.attrs.id"
+        :style="n.f + ';display:inline'"
+        :preview="false"
+        :selectable="opts[4]"
+        :user-select="opts[4]"
+        :nodes="[n]"
+      />
       <!-- #endif -->
       <!-- 继续递归 -->
-      <view v-else-if="n.c===2" :id="n.attrs.id" :class="'_block _'+n.name+' '+n.attrs.class" :style="n.f+';'+n.attrs.style">
-        <node v-for="(n2, j) in n.children" v-bind:key="j" :style="n2.f" :name="n2.name" :attrs="n2.attrs" :childs="n2.children" :opts="[opts[0],opts[1],opts[2],opts[3],opts[4],opts[5],opts[6],opts[7]+'.'+i+'.children.'+j+'.children']" />
+      <view
+        v-else-if="n.c === 2"
+        :id="n.attrs.id"
+        :class="'_block _' + n.name + ' ' + n.attrs.class"
+        :style="n.f + ';' + n.attrs.style"
+      >
+        <node
+          v-for="(n2, j) in n.children"
+          v-bind:key="j"
+          :style="n2.f"
+          :name="n2.name"
+          :attrs="n2.attrs"
+          :childs="n2.children"
+          :opts="[
+            opts[0],
+            opts[1],
+            opts[2],
+            opts[3],
+            opts[4],
+            opts[5],
+            opts[6],
+            opts[7] + '.' + i + '.children.' + j + '.children'
+          ]"
+        />
       </view>
-      <node v-else :style="n.f" :name="n.name" :attrs="n.attrs" :childs="n.children" :opts="[opts[0],opts[1],opts[2],opts[3],opts[4],opts[5],opts[6],opts[7]+'.'+i+'.children']" />
+      <node
+        v-else
+        :style="n.f"
+        :name="n.name"
+        :attrs="n.attrs"
+        :childs="n.children"
+        :opts="[
+          opts[0],
+          opts[1],
+          opts[2],
+          opts[3],
+          opts[4],
+          opts[5],
+          opts[6],
+          opts[7] + '.' + i + '.children'
+        ]"
+      />
     </block>
   </view>
 </template>
@@ -138,7 +487,7 @@ export default {
     addGlobalClass: false
     // #endif
   },
-  data () {
+  data() {
     return {
       ctrl: {},
       // #ifdef MP-WEIXIN
@@ -150,7 +499,7 @@ export default {
     name: String,
     attrs: {
       type: Object,
-      default () {
+      default() {
         return {}
       }
     },
@@ -158,27 +507,32 @@ export default {
     opts: Array
   },
   components: {
-
     // #ifndef (H5 || APP-PLUS) && VUE3
     node
     // #endif
   },
-  mounted () {
+  mounted() {
     this.$nextTick(() => {
-      for (this.root = this.$parent; this.root.$options.name !== 'mp-html'; this.root = this.root.$parent);
+      for (
+        this.root = this.$parent;
+        this.root.$options.name !== 'mp-html';
+        this.root = this.root.$parent
+      );
     })
     // #ifdef H5 || APP-PLUS
     if (this.opts[0]) {
       let i
-      for (i = this.childs.length; i--;) {
+      for (i = this.childs.length; i--; ) {
         if (this.childs[i].name === 'img') break
       }
       if (i !== -1) {
-        this.observer = uni.createIntersectionObserver(this).relativeToViewport({
-          top: 500,
-          bottom: 500
-        })
-        this.observer.observe('._img', res => {
+        this.observer = uni
+          .createIntersectionObserver(this)
+          .relativeToViewport({
+            top: 500,
+            bottom: 500
+          })
+        this.observer.observe('._img', (res) => {
           if (res.intersectionRatio) {
             this.$set(this.ctrl, 'load', 1)
             this.observer.disconnect()
@@ -188,17 +542,18 @@ export default {
     }
     // #endif
   },
-  beforeDestroy () {
-  if (this.root._edit === this) {
-    this.root._edit = undefined
-  }
+  beforeDestroy() {
+    if (this.root._edit === this) {
+      this.root._edit = undefined
+    }
     // #ifdef H5 || APP-PLUS
     if (this.observer) {
       this.observer.disconnect()
     }
     // #endif
   },
-  methods:{editStart (e) {
+  methods: {
+    editStart(e) {
       if (this.opts[5]) {
         const i = e.currentTarget.dataset.i
         if (!this.ctrl['e' + i]) {
@@ -221,27 +576,37 @@ export default {
           }, 50)
         }
       }
-    },editInput (e) {
+    },
+    editInput(e) {
       const i = e.target.dataset.i
       // 替换连续空格
-      const value = e.detail.value.replace(/ {2,}/, $ => {
+      const value = e.detail.value.replace(/ {2,}/, ($) => {
         let res = '\xa0'
         for (let i = 1; i < $.length; i++) {
           res += '\xa0'
         }
         return res
       })
-      this.root._editVal(`${this.opts[7]}.${i}.text`, this.childs[i].text, value) // 记录编辑历史
+      this.root._editVal(
+        `${this.opts[7]}.${i}.text`,
+        this.childs[i].text,
+        value
+      ) // 记录编辑历史
       this.cursor = e.detail.cursor
-    },editEnd (e) {
+    },
+    editEnd(e) {
       const i = e.target.dataset.i
       this.$set(this.ctrl, 'e' + i, 0)
       // 更新到视图
-      this.root._setData(`${this.opts[7]}.${i}.text`, e.detail.value.replace(/ {2}/g, '\xa0 '))
+      this.root._setData(
+        `${this.opts[7]}.${i}.text`,
+        e.detail.value.replace(/ {2}/g, '\xa0 ')
+      )
       if (e.detail.cursor !== undefined) {
         this.cursor = e.detail.cursor
       }
-    },insert (node) {
+    },
+    insert(node) {
       setTimeout(() => {
         const childs = this.childs.slice(0)
         if (!childs[this.i]) {
@@ -251,7 +616,10 @@ export default {
           const text = childs[this.i].text
           if (node.type === 'text') {
             if (this.cursor) {
-              childs[this.i].text = text.substring(0, this.cursor) + node.text + text.substring(this.cursor)
+              childs[this.i].text =
+                text.substring(0, this.cursor) +
+                node.text +
+                text.substring(this.cursor)
             } else {
               childs[this.i].text += node.text
             }
@@ -278,10 +646,15 @@ export default {
         this.root._editVal(this.opts[7], this.childs, childs, true)
         this.i = parseInt(this.i) + 1
       }, 200)
-    },remove (i) {
+    },
+    remove(i) {
       const arr = this.childs.slice(0)
       const delEle = arr.splice(i, 1)[0]
-      if (delEle.name === 'img' || delEle.name === 'video' || delEle.name === 'audio') {
+      if (
+        delEle.name === 'img' ||
+        delEle.name === 'video' ||
+        delEle.name === 'audio'
+      ) {
         let src = delEle.attrs.src
         if (delEle.src) {
           src = delEle.src.length === 1 ? delEle.src[0] : delEle.src
@@ -294,7 +667,8 @@ export default {
       this.root._edit = undefined
       this.root._maskTap()
       this.root._editVal(this.opts[7], this.childs, arr, true)
-    },nodeTap (e) {
+    },
+    nodeTap(e) {
       if (this.opts[5]) {
         if (this.root._lock) return
         this.root._lock = true
@@ -310,7 +684,9 @@ export default {
         } else {
           start = 6
         }
-        const i = parseInt(this.opts[7].substring(start, this.opts[7].lastIndexOf('.children')))
+        const i = parseInt(
+          this.opts[7].substring(start, this.opts[7].lastIndexOf('.children'))
+        )
         let parent = this.$parent
         while (parent && parent.$options.name !== 'node') {
           parent = parent.$parent
@@ -319,17 +695,25 @@ export default {
         // 显示实线框
         this.$set(this.ctrl, 'root', 1)
         this.root._mask.push(() => this.$set(this.ctrl, 'root', 0))
-        if (this.childs.length === 1 && this.childs[0].type === 'text' && !this.ctrl.e0) {
+        if (
+          this.childs.length === 1 &&
+          this.childs[0].type === 'text' &&
+          !this.ctrl.e0
+        ) {
           this.$set(this.ctrl, 'e0', 1)
           this.root._mask.push(() => this.$set(this.ctrl, 'e0', 0))
           this.i = 0
           this.cursor = this.childs[0].text.length
         }
-        const items = this.root._getItem(parent.childs[i], i !== 0, i !== parent.childs.length - 1)
+        const items = this.root._getItem(
+          parent.childs[i],
+          i !== 0,
+          i !== parent.childs.length - 1
+        )
         this.root._tooltip({
           top: getTop(e),
           items,
-          success: tapIndex => {
+          success: (tapIndex) => {
             if (items[tapIndex] === '大小') {
               // 改变字体大小
               const style = parent.childs[i].attrs.style || ''
@@ -344,21 +728,28 @@ export default {
                 max: 30,
                 value,
                 top: getTop(e),
-                changing: val => {
+                changing: (val) => {
                   if (Math.abs(val - value) > 2) {
                     // 字号变换超过 2 时更新到视图
                     parent.changeStyle('font-size', i, val + 'px', value + 'px')
                     value = e.detail.value
                   }
                 },
-                change: val => {
+                change: (val) => {
                   if (val !== value) {
                     parent.changeStyle('font-size', i, val + 'px', value + 'px')
                   }
-                  this.root._editVal(`${parent.opts[7]}.${i}.attrs.style`, style, parent.childs[i].attrs.style)
+                  this.root._editVal(
+                    `${parent.opts[7]}.${i}.attrs.style`,
+                    style,
+                    parent.childs[i].attrs.style
+                  )
                 }
               })
-            } else if (items[tapIndex] === '上移' || items[tapIndex] === '下移') {
+            } else if (
+              items[tapIndex] === '上移' ||
+              items[tapIndex] === '下移'
+            ) {
               const arr = parent.childs.slice(0)
               const item = arr[i]
               if (items[tapIndex] === '上移') {
@@ -400,12 +791,18 @@ export default {
                 // 没有则添加
                 newStyle = style + ';' + name + ':' + value
               }
-              this.root._editVal(`${parent.opts[7]}.${i}.attrs.style`, style, newStyle, true)
+              this.root._editVal(
+                `${parent.opts[7]}.${i}.attrs.style`,
+                style,
+                newStyle,
+                true
+              )
             }
           }
         })
       }
-    },mediaTap (e) {
+    },
+    mediaTap(e) {
       if (this.opts[5]) {
         const i = e.target.dataset.i
         const node = this.childs[i]
@@ -415,13 +812,21 @@ export default {
         this.root._tooltip({
           top: e.target.offsetTop - 30,
           items,
-          success: tapIndex => {
+          success: (tapIndex) => {
             switch (items[tapIndex]) {
               case '封面':
                 // 设置封面
-                this.root.getSrc('img', node.attrs.poster || '').then(url => {
-                  this.root._editVal(`${this.opts[7]}.${i}.attrs.poster`, node.attrs.poster, url instanceof Array ? url[0] : url, true)
-                }).catch(() => { })
+                this.root
+                  .getSrc('img', node.attrs.poster || '')
+                  .then((url) => {
+                    this.root._editVal(
+                      `${this.opts[7]}.${i}.attrs.poster`,
+                      node.attrs.poster,
+                      url instanceof Array ? url[0] : url,
+                      true
+                    )
+                  })
+                  .catch(() => {})
                 break
               case '删除':
                 this.remove(i)
@@ -429,7 +834,10 @@ export default {
               case '循环':
               case '不循环':
                 // 切换循环播放
-                this.root._setData(`${this.opts[7]}.${i}.attrs.loop`, !node.attrs.loop)
+                this.root._setData(
+                  `${this.opts[7]}.${i}.attrs.loop`,
+                  !node.attrs.loop
+                )
                 uni.showToast({
                   title: '成功'
                 })
@@ -437,7 +845,10 @@ export default {
               case '自动播放':
               case '不自动播放':
                 // 切换自动播放播放
-                this.root._setData(`${this.opts[7]}.${i}.attrs.autoplay`, !node.attrs.autoplay)
+                this.root._setData(
+                  `${this.opts[7]}.${i}.attrs.autoplay`,
+                  !node.attrs.autoplay
+                )
                 uni.showToast({
                   title: '成功'
                 })
@@ -451,11 +862,15 @@ export default {
           this.root._lock = false
         }, 50)
       }
-    },changeStyle (name, i, value, oldVal) {
+    },
+    changeStyle(name, i, value, oldVal) {
       let style = this.childs[i].attrs.style || ''
       if (style.includes(';' + name + ':' + oldVal)) {
         // style 中已经有
-        style = style.replace(';' + name + ':' + oldVal, ';' + name + ':' + value)
+        style = style.replace(
+          ';' + name + ':' + oldVal,
+          ';' + name + ':' + value
+        )
       } else {
         // 没有则新增
         style += ';' + name + ':' + value
@@ -463,19 +878,21 @@ export default {
       this.root._setData(`${this.opts[7]}.${i}.attrs.style`, style)
     },
     // #ifdef MP-WEIXIN
-    toJSON () { return this },
+    toJSON() {
+      return this
+    },
     // #endif
     /**
      * @description 播放视频事件
      * @param {Event} e
      */
-    play (e) {
+    play(e) {
       this.root.$emit('play')
       // #ifndef APP-PLUS
       if (this.root.pauseVideo) {
         let flag = false
         const id = e.target.id
-        for (let i = this.root._videos.length; i--;) {
+        for (let i = this.root._videos.length; i--; ) {
           if (this.root._videos[i].id === id) {
             flag = true
           } else {
@@ -484,9 +901,10 @@ export default {
         }
         // 将自己加入列表
         if (!flag) {
-          const ctx = uni.createVideoContext(id
+          const ctx = uni.createVideoContext(
+            id,
             // #ifndef MP-BAIDU
-            , this
+            this
             // #endif
           )
           ctx.id = id
@@ -503,33 +921,33 @@ export default {
      * @description 图片点击事件
      * @param {Event} e
      */
-    imgTap (e) {
+    imgTap(e) {
       if (!this.opts[5]) {
-      const node = this.childs[e.currentTarget.dataset.i]
-      if (node.a) {
-        this.linkTap(node.a)
-        return
-      }
-      if (node.attrs.ignore) return
-      // #ifdef H5 || APP-PLUS
-      node.attrs.src = node.attrs.src || node.attrs['data-src']
-      // #endif
-      this.root.$emit('imgtap', node.attrs)
-      // 自动预览图片
-      if (this.root.previewImg) {
-        uni.previewImage({
-          // #ifdef MP-WEIXIN
-          showmenu: this.root.showImgMenu,
-          // #endif
-          // #ifdef MP-ALIPAY
-          enablesavephoto: this.root.showImgMenu,
-          enableShowPhotoDownload: this.root.showImgMenu,
-          // #endif
-          current: parseInt(node.attrs.i),
-          urls: this.root.imgList
-        })
-      }
-    } else {
+        const node = this.childs[e.currentTarget.dataset.i]
+        if (node.a) {
+          this.linkTap(node.a)
+          return
+        }
+        if (node.attrs.ignore) return
+        // #ifdef H5 || APP-PLUS
+        node.attrs.src = node.attrs.src || node.attrs['data-src']
+        // #endif
+        this.root.$emit('imgtap', node.attrs)
+        // 自动预览图片
+        if (this.root.previewImg) {
+          uni.previewImage({
+            // #ifdef MP-WEIXIN
+            showmenu: this.root.showImgMenu,
+            // #endif
+            // #ifdef MP-ALIPAY
+            enablesavephoto: this.root.showImgMenu,
+            enableShowPhotoDownload: this.root.showImgMenu,
+            // #endif
+            current: parseInt(node.attrs.i),
+            urls: this.root.imgList
+          })
+        }
+      } else {
         const i = e.currentTarget.dataset.i
         const node = this.childs[i]
         const items = this.root._getItem(node)
@@ -541,12 +959,20 @@ export default {
         this.root._tooltip({
           top: getTop(e),
           items,
-          success: tapIndex => {
+          success: (tapIndex) => {
             if (items[tapIndex] === '换图') {
               // 换图
-              this.root.getSrc('img', node.attrs.src || '').then(url => {
-                this.root._editVal(this.opts[7] + '.' + i + '.attrs.src', node.attrs.src, url instanceof Array ? url[0] : url, true)
-              }).catch(() => { })
+              this.root
+                .getSrc('img', node.attrs.src || '')
+                .then((url) => {
+                  this.root._editVal(
+                    this.opts[7] + '.' + i + '.attrs.src',
+                    node.attrs.src,
+                    url instanceof Array ? url[0] : url,
+                    true
+                  )
+                })
+                .catch(() => {})
             } else if (items[tapIndex] === '宽度') {
               // 更改宽度
               const style = node.attrs.style || ''
@@ -561,55 +987,78 @@ export default {
                 max: 100,
                 value,
                 top: getTop(e),
-                changing: val => {
+                changing: (val) => {
                   // 变化超过 5% 更新时视图
                   if (Math.abs(val - value) > 5) {
                     this.changeStyle('max-width', i, val + '%', value + '%')
                     value = val
                   }
                 },
-                change: val => {
+                change: (val) => {
                   if (val !== value) {
                     this.changeStyle('max-width', i, val + '%', value + '%')
                     value = val
                   }
-                  this.root._editVal(this.opts[7] + '.' + i + '.attrs.style', style, this.childs[i].attrs.style)
+                  this.root._editVal(
+                    this.opts[7] + '.' + i + '.attrs.style',
+                    style,
+                    this.childs[i].attrs.style
+                  )
                 }
               })
             } else if (items[tapIndex] === '超链接') {
               // 将图片设置为链接
-              this.root.getSrc('link', node.a ? node.a.href : '').then(url => {
-                // 如果有 a 标签则替换 href
-                if (node.a) {
-                  this.root._editVal(this.opts[7] + '.' + i + '.a.href', node.a.href, url, true)
-                } else {
-                  const link = {
-                    name: 'a',
-                    attrs: {
-                      href: url
-                    },
-                    children: [node]
+              this.root
+                .getSrc('link', node.a ? node.a.href : '')
+                .then((url) => {
+                  // 如果有 a 标签则替换 href
+                  if (node.a) {
+                    this.root._editVal(
+                      this.opts[7] + '.' + i + '.a.href',
+                      node.a.href,
+                      url,
+                      true
+                    )
+                  } else {
+                    const link = {
+                      name: 'a',
+                      attrs: {
+                        href: url
+                      },
+                      children: [node]
+                    }
+                    node.a = link.attrs
+                    this.root._editVal(this.opts[7] + '.' + i, node, link, true)
                   }
-                  node.a = link.attrs
-                  this.root._editVal(this.opts[7] + '.' + i, node, link, true)
-                }
-                wx.showToast({
-                  title: '成功'
+                  wx.showToast({
+                    title: '成功'
+                  })
                 })
-              }).catch(() => { })
+                .catch(() => {})
             } else if (items[tapIndex] === '预览图') {
               // 设置预览图链接
-              this.root.getSrc('img', node.attrs['original-src'] || '').then(url => {
-                this.root._editVal(this.opts[7] + '.' + i + '.attrs.original-src', node.attrs['original-src'], url instanceof Array ? url[0] : url, true)
-                uni.showToast({
-                  title: '成功'
+              this.root
+                .getSrc('img', node.attrs['original-src'] || '')
+                .then((url) => {
+                  this.root._editVal(
+                    this.opts[7] + '.' + i + '.attrs.original-src',
+                    node.attrs['original-src'],
+                    url instanceof Array ? url[0] : url,
+                    true
+                  )
+                  uni.showToast({
+                    title: '成功'
+                  })
                 })
-              }).catch(() => { })
+                .catch(() => {})
             } else if (items[tapIndex] === '删除') {
               this.remove(i)
             } else {
               // 禁用 / 启用预览
-              this.root._setData(this.opts[7] + '.' + i + '.attrs.ignore', !node.attrs.ignore)
+              this.root._setData(
+                this.opts[7] + '.' + i + '.attrs.ignore',
+                !node.attrs.ignore
+              )
               uni.showToast({
                 title: '成功'
               })
@@ -625,17 +1074,17 @@ export default {
     /**
      * @description 图片长按
      */
-    imgLongTap (e) {
+    imgLongTap(e) {
       // #ifdef APP-PLUS
       const attrs = this.childs[e.currentTarget.dataset.i].attrs
       if (this.opts[3] && !attrs.ignore) {
         uni.showActionSheet({
           itemList: ['保存图片'],
           success: () => {
-            const save = path => {
+            const save = (path) => {
               uni.saveImageToPhotosAlbum({
                 filePath: path,
-                success () {
+                success() {
                   uni.showToast({
                     title: '保存成功'
                   })
@@ -645,7 +1094,7 @@ export default {
             if (this.root.imgList[attrs.i].startsWith('http')) {
               uni.downloadFile({
                 url: this.root.imgList[attrs.i],
-                success: res => save(res.tempFilePath)
+                success: (res) => save(res.tempFilePath)
               })
             } else {
               save(this.root.imgList[attrs.i])
@@ -664,10 +1113,15 @@ export default {
       // #ifdef MP-WEIXIN || MP-QQ
       if (this.opts[5])
         this.$nextTick(() => {
-          const id = this.childs[i].attrs.id || ('n' + i)
-          uni.createSelectorQuery().in(this).select('#' + id).boundingClientRect().exec(res => {
-            this.$set(this.ctrl, 'h'+i, res[0].height)
-          })
+          const id = this.childs[i].attrs.id || 'n' + i
+          uni
+            .createSelectorQuery()
+            .in(this)
+            .select('#' + id)
+            .boundingClientRect()
+            .exec((res) => {
+              this.$set(this.ctrl, 'h' + i, res[0].height)
+            })
         })
       // #endif
       const i = e.currentTarget.dataset.i
@@ -676,11 +1130,13 @@ export default {
         this.$set(this.ctrl, i, e.detail.width)
         if (this.opts[5]) {
           const path = this.opts[7] + '.' + i + '.attrs.'
-          if (e.detail.width < 150)
-            this.root._setData(path + 'ignore', 'T')
+          if (e.detail.width < 150) this.root._setData(path + 'ignore', 'T')
           this.root._setData(path + 'width', e.detail.width.toString())
         }
-      } else /* #endif */ if ((this.opts[1] && !this.ctrl[i]) || this.ctrl[i] === -1) {
+      } /* #endif */ else if (
+        (this.opts[1] && !this.ctrl[i]) ||
+        this.ctrl[i] === -1
+      ) {
         // 加载完毕，取消加载中占位图
         this.$set(this.ctrl, i, 1)
       }
@@ -690,16 +1146,19 @@ export default {
     /**
      * @description 检查是否所有图片加载完毕
      */
-    checkReady () {
+    checkReady() {
       if (!this.root.lazyLoad) {
         this.root._unloadimgs -= 1
         if (!this.root._unloadimgs) {
           setTimeout(() => {
-            this.root.getRect().then(rect => {
-              this.root.$emit('ready', rect)
-            }).catch(() => {
-              this.root.$emit('ready', {})
-            })
+            this.root
+              .getRect()
+              .then((rect) => {
+                this.root.$emit('ready', rect)
+              })
+              .catch(() => {
+                this.root.$emit('ready', {})
+              })
           }, 350)
         }
       }
@@ -709,65 +1168,81 @@ export default {
      * @description 链接点击事件
      * @param {Event} e
      */
-    linkTap (e) {
+    linkTap(e) {
       if (!this.opts[5]) {
-      const node = e.currentTarget ? this.childs[e.currentTarget.dataset.i] : {}
-      const attrs = node.attrs || e
-      const href = attrs.href
-      this.root.$emit('linktap', Object.assign({
-        innerText: this.root.getText(node.children || []) // 链接内的文本内容
-      }, attrs))
-      if (href) {
-        if (href[0] === '#') {
-          // 跳转锚点
-          this.root.navigateTo(href.substring(1)).catch(() => { })
-        } else if (href.split('?')[0].includes('://')) {
-          // 复制外部链接
-          if (this.root.copyLink) {
-            // #ifdef H5
-            window.open(href)
-            // #endif
-            // #ifdef MP
-            uni.setClipboardData({
-              data: href,
-              success: () =>
-                uni.showToast({
-                  title: '链接已复制'
-                })
-            })
-            // #endif
-            // #ifdef APP-PLUS
-            plus.runtime.openWeb(href)
-            // #endif
-          }
-        } else {
-          // 跳转页面
-          uni.navigateTo({
-            url: href,
-            fail () {
-              uni.switchTab({
-                url: href,
-                fail () { }
+        const node = e.currentTarget
+          ? this.childs[e.currentTarget.dataset.i]
+          : {}
+        const attrs = node.attrs || e
+        const href = attrs.href
+        this.root.$emit(
+          'linktap',
+          Object.assign(
+            {
+              innerText: this.root.getText(node.children || []) // 链接内的文本内容
+            },
+            attrs
+          )
+        )
+        if (href) {
+          if (href[0] === '#') {
+            // 跳转锚点
+            this.root.navigateTo(href.substring(1)).catch(() => {})
+          } else if (href.split('?')[0].includes('://')) {
+            // 复制外部链接
+            if (this.root.copyLink) {
+              // #ifdef H5
+              window.open(href)
+              // #endif
+              // #ifdef MP
+              uni.setClipboardData({
+                data: href,
+                success: () =>
+                  uni.showToast({
+                    title: '链接已复制'
+                  })
               })
+              // #endif
+              // #ifdef APP-PLUS
+              plus.runtime.openWeb(href)
+              // #endif
             }
-          })
+          } else {
+            // 跳转页面
+            uni.navigateTo({
+              url: href,
+              fail() {
+                uni.switchTab({
+                  url: href,
+                  fail() {}
+                })
+              }
+            })
+          }
         }
-      }
-    } else {
+      } else {
         const i = e.currentTarget.dataset.i
         const node = this.childs[i]
         const items = this.root._getItem(node)
         this.root._tooltip({
           top: getTop(e),
           items,
-          success: tapIndex => {
+          success: (tapIndex) => {
             if (items[tapIndex] === '更换链接') {
-              this.root.getSrc('link', node.attrs.href).then(url => {
-                this.root._editVal(this.opts[7] + '.' + i + '.attrs.href', node.attrs.href, url, true)
-                uni.showToast({
-                  title: '成功'
+              this.root
+                .getSrc('link', node.attrs.href)
+                .then((url) => {
+                  this.root._editVal(
+                    this.opts[7] + '.' + i + '.attrs.href',
+                    node.attrs.href,
+                    url,
+                    true
+                  )
+                  uni.showToast({
+                    title: '成功'
+                  })
                 })
-              }).catch(() => { })
+                .catch(() => {})
             } else {
               this.remove(i)
             }
@@ -779,7 +1254,7 @@ export default {
      * @description 错误事件
      * @param {Event} e
      */
-    mediaError (e) {
+    mediaError(e) {
       const i = e.currentTarget.dataset.i
       const node = this.childs[i]
       // 加载其他源
@@ -815,30 +1290,31 @@ export default {
   }
 }
 </script>
-<style>/* #ifndef H5 || MP-ALIPAY || APP-PLUS */
-  /deep/ ._address,
-  /deep/ ._article,
-  /deep/ ._aside,
-  /deep/ ._body,
-  /deep/ ._caption,
-  /deep/ ._center,
-  /deep/ ._cite,
-  /deep/ ._footer,
-  /deep/ ._header,
-  /deep/ ._html,
-  /deep/ ._nav,
-  /deep/ ._pre,
-  /deep/ ._section {
-    display: block;
-  }
-  
-  /* #endif */
-  /deep/ ._video {
-    width: 300px;
-    height: 225px;
-    display: inline-block;
-    background-color: black;
-  }
+<style>
+/* #ifndef H5 || MP-ALIPAY || APP-PLUS */
+/deep/ ._address,
+/deep/ ._article,
+/deep/ ._aside,
+/deep/ ._body,
+/deep/ ._caption,
+/deep/ ._center,
+/deep/ ._cite,
+/deep/ ._footer,
+/deep/ ._header,
+/deep/ ._html,
+/deep/ ._nav,
+/deep/ ._pre,
+/deep/ ._section {
+  display: block;
+}
+
+/* #endif */
+/deep/ ._video {
+  width: 300px;
+  height: 225px;
+  display: inline-block;
+  background-color: black;
+}
 /* a 标签默认效果 */
 ._a {
   padding: 1.5px 0 1.5px 0;

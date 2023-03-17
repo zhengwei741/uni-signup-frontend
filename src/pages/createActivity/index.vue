@@ -23,7 +23,7 @@
             ]
           },
           description: {
-            rules: [{ required: true, errorMessage: '结束时间不能为空' }]
+            rules: [{ required: true, errorMessage: '活动介绍不能为空' }]
           }
         }"
       >
@@ -49,11 +49,10 @@
           />
         </uni-forms-item>
         <uni-forms-item label="活动介绍" required name="description">
-          <uni-easyinput
-            type="textarea"
+          <uni-editer
             v-model="activityFormData.description"
-            placeholder="请输入活动介绍"
-          />
+            ref="uniEditerRef"
+          ></uni-editer>
         </uni-forms-item>
 
         <view class="uni-forms-item">
@@ -70,16 +69,7 @@
           </view>
         </view>
 
-        <text
-          style="
-            margin-bottom: 22px;
-            font-weight: bold;
-            color: #3a3a3a;
-            display: block;
-            font-size: 14px;
-          "
-          >报名填写信息</text
-        >
+        <text class="text">报名填写信息</text>
 
         <view class="uni-forms-item activity-field">
           <view class="label">
@@ -223,7 +213,8 @@ const goToActivityGroup = () => {
 }
 // 发布活动相关
 const instance = getCurrentInstance() as ComponentInternalInstance
-let { eventChannel } = useEventChannel()
+const { eventChannel } = useEventChannel()
+const uniEditerRef = ref()
 const removeMockId = () => {
   const remove = (item: any) => {
     if (item.id?.startsWith('mock_')) {
@@ -237,6 +228,7 @@ const publish = async () => {
   uni.showLoading({})
   try {
     const { refs } = instance
+    await uniEditerRef.value.save()
     // @ts-ignore
     await refs.activityForm.validate()
     // 移除前台构造id
@@ -287,5 +279,12 @@ const publish = async () => {
       height: 30px;
     }
   }
+}
+.text {
+  margin-bottom: 22px;
+  font-weight: bold;
+  color: #3a3a3a;
+  display: block;
+  font-size: 14px;
 }
 </style>

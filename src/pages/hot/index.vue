@@ -59,7 +59,7 @@ import { queryHotActivity } from '@/apis/activity'
 import type { HotActivity } from '@/typings/activity'
 import { usePagination } from '@/hooks/usePagination'
 import { getStatusStyle } from '@/utils'
-import { URL } from "@/const";
+import { URL } from '@/const'
 
 // height 56是searchBar高度
 const scrollHeight = useSafeScrollHeight() - 56

@@ -1,19 +1,65 @@
 <template>
-  <view id="_root" :class="(selectable?'_select ':'')+'_root'" :style="(editable?'min-height:200px;':'')+containerStyle" @tap="_containTap">
+  <view
+    id="_root"
+    :class="(selectable ? '_select ' : '') + '_root'"
+    :style="(editable ? 'min-height:200px;' : '') + containerStyle"
+    @tap="_containTap"
+  >
     <slot v-if="!nodes[0]" />
     <!-- #ifndef APP-PLUS-NVUE -->
-    <node v-else :childs="nodes" :opts="[lazyLoad,loadingImg,errorImg,showImgMenu,selectable,editable,placeholder,'nodes']" name="span" />
+    <node
+      v-else
+      :childs="nodes"
+      :opts="[
+        lazyLoad,
+        loadingImg,
+        errorImg,
+        showImgMenu,
+        selectable,
+        editable,
+        placeholder,
+        'nodes'
+      ]"
+      name="span"
+    />
     <!-- #endif -->
     <!-- #ifdef APP-PLUS-NVUE -->
-    <web-view ref="web" src="/static/app-plus/mp-html/local.html" :style="'margin-top:-2px;height:' + height + 'px'" @onPostMessage="_onMessage" />
+    <web-view
+      ref="web"
+      src="/static/app-plus/mp-html/local.html"
+      :style="'margin-top:-2px;height:' + height + 'px'"
+      @onPostMessage="_onMessage"
+    />
     <!-- #endif -->
-    <view v-if="tooltip" class="_tooltip_contain" :style="'top:'+tooltip.top+'px'">
+    <view
+      v-if="tooltip"
+      class="_tooltip_contain"
+      :style="'top:' + tooltip.top + 'px'"
+    >
       <view class="_tooltip">
-        <view v-for="(item, index) in tooltip.items" v-bind:key="index" class="_tooltip_item" :data-i="index" @tap="_tooltipTap">{{item}}</view>
+        <view
+          v-for="(item, index) in tooltip.items"
+          v-bind:key="index"
+          class="_tooltip_item"
+          :data-i="index"
+          @tap="_tooltipTap"
+          >{{ item }}</view
+        >
       </view>
     </view>
-    <view v-if="slider" class="_slider" :style="'top:'+slider.top+'px'">
-      <slider :value="slider.value" :min="slider.min" :max="slider.max" handle-size="14" block-size="14" show-value activeColor="white" style="padding:3px" @changing="_sliderChanging" @change="_sliderChange" />
+    <view v-if="slider" class="_slider" :style="'top:' + slider.top + 'px'">
+      <slider
+        :value="slider.value"
+        :min="slider.min"
+        :max="slider.max"
+        handle-size="14"
+        block-size="14"
+        show-value
+        activeColor="white"
+        style="padding: 3px"
+        @changing="_sliderChanging"
+        @change="_sliderChange"
+      />
     </view>
   </view>
 </template>
@@ -54,7 +100,7 @@ import style from './style/index.js'
 import txvVideo from './txv-video/index.js'
 import imgCache from './img-cache/index.js'
 import editable from './editable/index.js'
-const plugins=[emoji,style,txvVideo,imgCache,editable,]
+const plugins = [emoji, style, txvVideo, imgCache, editable]
 // #ifdef APP-PLUS-NVUE
 const dom = weex.requireModule('dom')
 // #endif
@@ -121,7 +167,7 @@ export default {
     useAnchor: [Boolean, Number]
   },
   // #ifdef VUE3
-  emits: ['load', 'ready', 'imgtap', 'linktap', 'play', 'error'],
+  emits: ['load', 'ready', 'imgtap', 'linktap', 'play', 'error', 'remove'],
   // #endif
   // #ifndef APP-PLUS-NVUE
   components: {
@@ -131,25 +177,24 @@ export default {
   watch: {
     editable(val) {
       this.setContent(val ? this.content : this.getContent())
-      if (!val)
-        this._maskTap()
+      if (!val) this._maskTap()
     },
-    content (content) {
+    content(content) {
       this.setContent(content)
     }
   },
-  created () {
+  created() {
     this.plugins = []
-    for (let i = plugins.length; i--;) {
+    for (let i = plugins.length; i--; ) {
       this.plugins.push(new plugins[i](this))
     }
   },
-  mounted () {
+  mounted() {
     if ((this.content || this.editable) && !this.nodes.length) {
       this.setContent(this.content)
     }
   },
-  beforeDestroy () {
+  beforeDestroy() {
     this._hook('onDetached')
   },
   methods: {
@@ -175,7 +220,7 @@ export default {
      * @param {String} selector scroll-view 的选择器
      * @param {String} scrollTop scroll-view scroll-top 属性绑定的变量名
      */
-    in (page, selector, scrollTop) {
+    in(page, selector, scrollTop) {
       // #ifndef APP-PLUS-NVUE
       if (page && selector && scrollTop) {
         this._in = {
@@ -193,7 +238,7 @@ export default {
      * @param {Number} offset 跳转位置的偏移量
      * @returns {Promise}
      */
-    navigateTo (id, offset) {
+    navigateTo(id, offset) {
       return new Promise((resolve, reject) => {
         if (!this.useAnchor) {
           reject(Error('Anchor is disabled'))
@@ -212,7 +257,11 @@ export default {
             reject,
             offset
           }
-          this.$refs.web.evalJs('uni.postMessage({data:{action:"getOffset",offset:(document.getElementById(' + id + ')||{}).offsetTop}})')
+          this.$refs.web.evalJs(
+            'uni.postMessage({data:{action:"getOffset",offset:(document.getElementById(' +
+              id +
+              ')||{}).offsetTop}})'
+          )
         }
         // #endif
         // #ifndef APP-PLUS-NVUE
@@ -220,24 +269,33 @@ export default {
         // #ifdef MP-WEIXIN || MP-QQ || MP-TOUTIAO
         deep = '>>>'
         // #endif
-        const selector = uni.createSelectorQuery()
+        const selector = uni
+          .createSelectorQuery()
           // #ifndef MP-ALIPAY
           .in(this._in ? this._in.page : this)
           // #endif
-          .select((this._in ? this._in.selector : '._root') + (id ? `${deep}#${id}` : '')).boundingClientRect()
+          .select(
+            (this._in ? this._in.selector : '._root') +
+              (id ? `${deep}#${id}` : '')
+          )
+          .boundingClientRect()
         if (this._in) {
-          selector.select(this._in.selector).scrollOffset()
-            .select(this._in.selector).boundingClientRect()
+          selector
+            .select(this._in.selector)
+            .scrollOffset()
+            .select(this._in.selector)
+            .boundingClientRect()
         } else {
           // 获取 scroll-view 的位置和滚动距离
           selector.selectViewport().scrollOffset() // 获取窗口的滚动距离
         }
-        selector.exec(res => {
+        selector.exec((res) => {
           if (!res[0]) {
             reject(Error('Label not found'))
             return
           }
-          const scrollTop = res[1].scrollTop + res[0].top - (res[2] ? res[2].top : 0) + offset
+          const scrollTop =
+            res[1].scrollTop + res[0].top - (res[2] ? res[2].top : 0) + offset
           if (this._in) {
             // scroll-view 跳转
             this._in.page[this._in.scrollTop] = scrollTop
@@ -258,9 +316,9 @@ export default {
      * @description 获取文本内容
      * @return {String}
      */
-    getText (nodes) {
-      let text = '';
-      (function traversal (nodes) {
+    getText(nodes) {
+      let text = ''
+      ;(function traversal(nodes) {
         for (let i = 0; i < nodes.length; i++) {
           const node = nodes[i]
           if (node.type === 'text') {
@@ -269,7 +327,12 @@ export default {
             text += '\n'
           } else {
             // 块级标签前后加换行
-            const isBlock = node.name === 'p' || node.name === 'div' || node.name === 'tr' || node.name === 'li' || (node.name[0] === 'h' && node.name[1] > '0' && node.name[1] < '7')
+            const isBlock =
+              node.name === 'p' ||
+              node.name === 'div' ||
+              node.name === 'tr' ||
+              node.name === 'li' ||
+              (node.name[0] === 'h' && node.name[1] > '0' && node.name[1] < '7')
             if (isBlock && text && text[text.length - 1] !== '\n') {
               text += '\n'
             }
@@ -292,25 +355,31 @@ export default {
      * @description 获取内容大小和位置
      * @return {Promise}
      */
-    getRect () {
+    getRect() {
       return new Promise((resolve, reject) => {
-        uni.createSelectorQuery()
+        uni
+          .createSelectorQuery()
           // #ifndef MP-ALIPAY
           .in(this)
           // #endif
-          .select('#_root').boundingClientRect().exec(res => res[0] ? resolve(res[0]) : reject(Error('Root label not found')))
+          .select('#_root')
+          .boundingClientRect()
+          .exec((res) =>
+            res[0] ? resolve(res[0]) : reject(Error('Root label not found'))
+          )
       })
     },
 
     /**
      * @description 暂停播放媒体
      */
-    pauseMedia () {
-      for (let i = (this._videos || []).length; i--;) {
+    pauseMedia() {
+      for (let i = (this._videos || []).length; i--; ) {
         this._videos[i].pause()
       }
       // #ifdef APP-PLUS
-      const command = 'for(var e=document.getElementsByTagName("video"),i=e.length;i--;)e[i].pause()'
+      const command =
+        'for(var e=document.getElementsByTagName("video"),i=e.length;i--;)e[i].pause()'
       // #ifndef APP-PLUS-NVUE
       let page = this.$parent
       while (!page.$scope) page = page.$parent
@@ -326,13 +395,15 @@ export default {
      * @description 设置媒体播放速率
      * @param {Number} rate 播放速率
      */
-    setPlaybackRate (rate) {
+    setPlaybackRate(rate) {
       this.playbackRate = rate
-      for (let i = (this._videos || []).length; i--;) {
+      for (let i = (this._videos || []).length; i--; ) {
         this._videos[i].playbackRate(rate)
       }
       // #ifdef APP-PLUS
-      const command = 'for(var e=document.getElementsByTagName("video"),i=e.length;i--;)e[i].playbackRate=' + rate
+      const command =
+        'for(var e=document.getElementsByTagName("video"),i=e.length;i--;)e[i].playbackRate=' +
+        rate
       // #ifndef APP-PLUS-NVUE
       let page = this.$parent
       while (!page.$scope) page = page.$parent
@@ -349,7 +420,7 @@ export default {
      * @param {String} content html 内容
      * @param {Boolean} append 是否在尾部追加
      */
-    setContent (content, append) {
+    setContent(content, append) {
       if (!append || !this.imgList) {
         this.imgList = []
       }
@@ -359,7 +430,11 @@ export default {
         this._set(nodes, append)
       }
       // #endif
-      this.$set(this, 'nodes', append ? (this.nodes || []).concat(nodes) : nodes)
+      this.$set(
+        this,
+        'nodes',
+        append ? (this.nodes || []).concat(nodes) : nodes
+      )
 
       // #ifndef APP-PLUS-NVUE
       this._videos = []
@@ -371,7 +446,7 @@ export default {
       if (this.lazyLoad || this.imgList._unloadimgs < this.imgList.length / 2) {
         // 设置懒加载，每 350ms 获取高度，不变则认为加载完毕
         let height = 0
-        const callback = rect => {
+        const callback = (rect) => {
           if (!rect || !rect.height) rect = {}
           // 350ms 总高度无变化就触发 ready 事件
           if (rect.height === height) {
@@ -387,11 +462,13 @@ export default {
       } else {
         // 未设置懒加载，等待所有图片加载完毕
         if (!this.imgList._unloadimgs) {
-          this.getRect().then(rect => {
-            this.$emit('ready', rect)
-          }).catch(() => {
-            this.$emit('ready', {})
-          })
+          this.getRect()
+            .then((rect) => {
+              this.$emit('ready', rect)
+            })
+            .catch(() => {
+              this.$emit('ready', {})
+            })
         }
       }
       // #endif
@@ -400,8 +477,8 @@ export default {
     /**
      * @description 调用插件钩子函数
      */
-    _hook (name) {
-      for (let i = plugins.length; i--;) {
+    _hook(name) {
+      for (let i = plugins.length; i--; ) {
         if (this.plugins[i][name]) {
           this.plugins[i][name]()
         }
@@ -412,14 +489,29 @@ export default {
     /**
      * @description 设置内容
      */
-    _set (nodes, append) {
-      this.$refs.web.evalJs('setContent(' + JSON.stringify(nodes).replace(/%22/g, '') + ',' + JSON.stringify([this.containerStyle.replace(/(?:margin|padding)[^;]+/g, ''), this.errorImg, this.loadingImg, this.pauseVideo, this.scrollTable, this.selectable]) + ',' + append + ')')
+    _set(nodes, append) {
+      this.$refs.web.evalJs(
+        'setContent(' +
+          JSON.stringify(nodes).replace(/%22/g, '') +
+          ',' +
+          JSON.stringify([
+            this.containerStyle.replace(/(?:margin|padding)[^;]+/g, ''),
+            this.errorImg,
+            this.loadingImg,
+            this.pauseVideo,
+            this.scrollTable,
+            this.selectable
+          ]) +
+          ',' +
+          append +
+          ')'
+      )
     },
 
     /**
      * @description 接收到 web-view 消息
      */
-    _onMessage (e) {
+    _onMessage(e) {
       const message = e.detail.data[0]
       switch (message.action) {
         // web-view 初始化完毕
@@ -437,11 +529,13 @@ export default {
           break
         // 所有图片加载完毕
         case 'onReady':
-          this.getRect().then(res => {
-            this.$emit('ready', res)
-          }).catch(() => {
-            this.$emit('ready', {})
-          })
+          this.getRect()
+            .then((res) => {
+              this.$emit('ready', res)
+            })
+            .catch(() => {
+              this.$emit('ready', {})
+            })
           break
         // 总高度发生变化
         case 'onHeightChange':
@@ -477,7 +571,7 @@ export default {
             } else {
               uni.navigateTo({
                 url: href,
-                fail () {
+                fail() {
                   uni.switchTab({
                     url: href
                   })

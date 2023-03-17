@@ -12,7 +12,7 @@ export function uuid() {
   })
 }
 
-export function getStatusStyle(status:string) {
+export function getStatusStyle(status: string) {
   return {
     color: status === '报名中' ? '#42b983' : '#6a6a6a',
     'font-size': '13px'

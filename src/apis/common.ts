@@ -43,7 +43,7 @@ export const loginByCode = async (code: string): Promise<string> => {
 }
 
 // 登录
-export const login = async () => {
+export const login = async (): Promise<string> => {
   try {
     const { token } = useCommonStore()
     if (token) {
@@ -53,5 +53,6 @@ export const login = async () => {
     return await loginByCode(code)
   } catch (error) {
     console.log(error)
+    return ''
   }
 }
