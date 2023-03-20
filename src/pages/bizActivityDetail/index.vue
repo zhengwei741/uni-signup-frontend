@@ -1,28 +1,332 @@
 <template>
   <uni-container>
-    <view class="activity-detail">
-      <text>2023年环太湖自行车比赛</text>
+    <view
+      class="light-background-color activity-detail"
+      :class="{ isShare: isShare }"
+    >
+      <uni-card margin="5px" padding="3px">
+        <view class="section">
+          <text class="g-title">{{ pageActivity.title }}</text>
+        </view>
 
-      <text>报名开始：2023-02-26 21:30</text>
-      <text>报名结束：2023-03-22 21:30</text>
+        <view class="section">
+          <view class="sub-title">报名开始：{{ pageActivity.startTime }}</view>
+          <view class="sub-title">报名结束：{{ pageActivity.endTime }}</view>
+        </view>
 
-      <view> 南京G捷号 </view>
+        <view class="section org-info">
+          <view class="organizationName">
+            <view class="g-title">南京G捷号</view>
+            <view>已认证</view>
+          </view>
+          <view class="link">Ta的主页</view>
+        </view>
 
-      <text>活动介绍</text>
+        <view class="section">
+          <text class="g-title">活动介绍</text>
+        </view>
+        <uni-editer
+          v-model="pageActivity.description"
+          :editable="false"
+        ></uni-editer>
 
-      <text>我的报名</text>
+        <view class="section">
+          <text class="g-title">所有报名</text>
 
-      <text>所有报名</text>
+          <uni-list v-if="allApplyList.length">
+            <uni-list-item
+              showArrow
+              v-for="(apply, index) in allApplyList"
+              :title="`${index + 1}、${apply.name}`"
+              :rightText="apply.groupName"
+              :index="apply.id"
+            />
+          </uni-list>
+          <uni-empty v-else></uni-empty>
+        </view>
+      </uni-card>
     </view>
+    <view class="actions">
+      <uni-grid
+        :column="4"
+        :show-border="false"
+        :square="false"
+        v-if="!isShare"
+      >
+        <uni-grid-item @tap="shareToggle">
+          <view class="grid-item-box">
+            <uni-icons
+              custom-prefix="iconfont"
+              type="icon-fenxiang3"
+              :size="25"
+              color="#777"
+            ></uni-icons>
+            <text class="text">分享</text>
+          </view>
+        </uni-grid-item>
+        <uni-grid-item>
+          <view class="grid-item-box">
+            <uni-icons
+              custom-prefix="iconfont"
+              type="icon-bianji"
+              :size="25"
+              color="#777"
+            ></uni-icons>
+            <text class="text">编辑</text>
+          </view>
+        </uni-grid-item>
+        <uni-grid-item>
+          <view class="grid-item-box">
+            <uni-icons
+              custom-prefix="iconfont"
+              type="icon-daochu"
+              :size="25"
+              color="#777"
+            ></uni-icons>
+            <text class="text">导出</text>
+          </view>
+        </uni-grid-item>
+        <uni-grid-item>
+          <view class="grid-item-box">
+            <uni-icons
+              custom-prefix="iconfont"
+              type="icon-tixian1"
+              :size="25"
+              color="#777"
+            ></uni-icons>
+            <text class="text">提现</text>
+          </view>
+        </uni-grid-item>
+      </uni-grid>
+      <view class="sign-up" v-else>
+        <view class="home" @tap="goToHome">
+          <view>
+            <uni-icons
+              custom-prefix="iconfont"
+              type="icon-shouye"
+              :size="18"
+              color="#777"
+            ></uni-icons
+          ></view>
+          <view>首页</view>
+        </view>
+        <view class="btn">
+          <button class="signUp-button">立即报名</button>
+        </view>
+      </view>
+    </view>
+    <uni-popup ref="shareRef" type="share" safeArea backgroundColor="#fff">
+      <view class="shard-popup">
+        <view class="shard-popup-title">分享到</view>
+        <view class="shard-popup-content">
+          <uni-row>
+            <uni-col :span="8">
+              <view class="warpper">
+                <button open-type="share" @tap="share" class="shareButton">
+                  <image src="../static/weixin-icon.png"></image>
+                </button>
+                <text>微信</text>
+              </view>
+            </uni-col>
+          </uni-row>
+        </view>
+      </view>
+    </uni-popup>
   </uni-container>
 </template>
 <script setup lang="ts">
-import { reactive } from 'vue'
+import { ref, computed, getCurrentInstance } from 'vue'
+import type { ComponentInternalInstance } from 'vue'
 import type { Activity } from '@/typings/activity'
+import { queryActivityDetail } from '@/apis/activity'
+import { queryAllApply } from '@/apis/apply'
+import type { Apply } from '@/typings/apply'
+import { onLoad, onShareAppMessage } from '@dcloudio/uni-app'
 
-const act = reactive<Activity>({})
+const activity = ref<Activity>({
+  title: '',
+  startTime: '',
+  endTime: '',
+  description: '',
+  fieldList: [],
+  groupList: [],
+  showFlag: '1', // 1 显示 0 不显示
+  id: ''
+})
+// 活动详情
+const pageActivity = computed<Activity>(() => {
+  return {
+    ...activity.value,
+    startTime: activity.value.startTime.replace('T', ' '),
+    endTime: activity.value.endTime.replace('T', ' ')
+  }
+})
+// 组织机构
+const organizationName = ref<string>('')
+// 所有报名
+const allApplyList = ref<Apply[]>([
+  {
+    groupName: '300公里-男子环湖组',
+    name: '林枫林枫林枫',
+    id: '1'
+  },
+  {
+    groupName: '300公里-男子环湖组',
+    name: '林枫林枫林枫',
+    id: '2'
+  },
+  {
+    groupName: '300公里-男子环湖组',
+    name: '林枫林枫林枫',
+    id: '3'
+  }
+])
+const isShare = ref<boolean>(true)
+// 分享相关
+const share = () => uni.showShareMenu({})
+const shareRef = ref()
+const instance = getCurrentInstance() as ComponentInternalInstance
+const shareToggle = () => {
+  const { refs } = instance
+  // @ts-ignore
+  refs.shareRef.open()
+}
+onShareAppMessage((res) => {
+  debugger
+  if (res.from === 'button') {
+    // 来自页面内分享按钮
+    console.log(res.target)
+  }
+  return {
+    title: activity.value.title,
+    path: `/pages/bizActivityDetail/index?id=${activity.value.id}&isShare=1`
+  }
+})
+const goToHome = () => uni.redirectTo({ url: '../hot/index' })
+// 初始化
+onLoad((option: any) => {
+  isShare.value = option.isShare === '1'
+
+  queryActivityDetail(option.id).then((ret) => {
+    const { data } = ret
+    activity.value = data.activity
+    organizationName.value = data.organizationName
+  })
+  queryAllApply(option.id).then((ret) => {
+    const { data } = ret
+    allApplyList.value = data.allApplyList
+  })
+})
 </script>
 <style scoped lang="scss">
 .activity-detail {
+  padding: 5px 0;
+  padding-bottom: 75px;
+}
+.sub-title {
+  color: #c5c5c5;
+  font-size: 13px;
+}
+.section {
+  margin-bottom: 5px;
+}
+.org-info {
+  display: flex;
+  height: 50px;
+  background-color: #e4fafc;
+  border-radius: 5px;
+  padding: 0 10px;
+  .organizationName {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    > view {
+      flex: 1;
+      line-height: 25px;
+    }
+  }
+  .link {
+    flex: 1;
+  }
+  .link {
+    color: #3498db;
+    line-height: 50px;
+    text-align: right;
+  }
+}
+.actions {
+  position: fixed;
+  width: 100%;
+  bottom: 0;
+  background-color: #fff;
+  z-index: 5;
+}
+
+.sign-up {
+  display: flex;
+  .home {
+    width: 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-size: 12px;
+    color: #3498db;
+  }
+  .btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    .signUp-button {
+      width: 80%;
+      height: 80%;
+      margin: auto;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+}
+.isShare {
+  padding-bottom: 50px !important;
+}
+
+.shard-popup {
+  display: flex;
+  flex-direction: column;
+  .shard-popup-title {
+    height: 50px;
+    line-height: 50px;
+    text-align: center;
+  }
+  .shard-popup-content {
+    flex: 1;
+  }
+}
+.warpper {
+  display: flex;
+  justify-content: center;
+  height: 60px;
+  flex-direction: column;
+  align-items: center;
+}
+.shareButton {
+  height: 50px;
+  width: 50px;
+  background-color: transparent;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  image {
+    height: 100%;
+    width: 100%;
+  }
+}
+.shareButton::after {
+  border-color: transparent;
 }
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <view class="editor_toolbox">
+  <view class="editor_toolbox" v-if="props.editable">
     <i class="iconfont icon-undo" data-method="undo" @tap="edit" />
     <i class="iconfont icon-redo" data-method="redo" @tap="edit" />
     <i class="iconfont icon-img" data-method="insertImg" @tap="edit" />
@@ -7,13 +7,13 @@
     <i class="iconfont icon-link" data-method="insertLink" @tap="edit" />
     <i class="iconfont icon-text" data-method="insertText" @tap="edit" />
     <i class="iconfont icon-clear" @tap="clear" />
-    <i class="iconfont icon-save" @tap="save" />
+    <!-- <i class="iconfont icon-save" @tap="save" /> -->
   </view>
   <mp-html
     ref="articleRef"
     container-style="padding:10px"
     :content="props.modelValue"
-    :editable="true"
+    :editable="props.editable"
     :domain="URL"
     lazy-load
     scroll-table
@@ -33,11 +33,13 @@ import { URL } from '@/const'
 
 type EditerProps = {
   modelValue: string
+  editable: boolean
 }
 
 // props
 const props = withDefaults(defineProps<EditerProps>(), {
-  modelValue: ''
+  modelValue: '',
+  editable: true
 })
 
 // emits

@@ -117,7 +117,7 @@ const gotoHomePage = (item: HotActivity) => {
 
 const gotoDetail = () => {
   uni.navigateTo({
-    url: `../activityDetail/index`
+    url: `../bizActivityDetail/index`
   })
 }
 

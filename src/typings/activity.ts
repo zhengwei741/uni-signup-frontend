@@ -1,5 +1,6 @@
 /** 活动 */
 export interface Activity {
+  id?: string
   /**活动标题*/
   title: string
   /**活动开始时间*/

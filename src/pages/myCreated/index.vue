@@ -1,8 +1,6 @@
 <template>
   <uni-logoImage :src="logoImgName"></uni-logoImage>
 
-  <!-- https://web-assets.dcloud.net.cn/unidoc/zh/shuijiao.jpg -->
-
   <uni-grid :column="4" :show-border="false" :square="false">
     <uni-grid-item>
       <view class="grid-item-box" @tap="goCreateActivity">
@@ -51,7 +49,12 @@
   </uni-grid>
 
   <view v-if="list.length" style="background-color: #f1f1f1; padding-top: 1px">
-    <view class="activity-card" v-for="activity in list" :key="activity.id">
+    <view
+      class="activity-card"
+      v-for="activity in list"
+      :key="activity.id"
+      @tap="goToBizActivityDetail(activity.id)"
+    >
       <view class="activity-card__content">
         <view :span="24">
           <view class="activity-card__content__title">{{
@@ -106,6 +109,12 @@ const goBizAuth = () => {
         organizationName.value = orgName
       }
     }
+  })
+}
+
+const goToBizActivityDetail = (id: string) => {
+  uni.navigateTo({
+    url: `../bizActivityDetail/index?id=${id}`
   })
 }
 
