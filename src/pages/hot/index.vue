@@ -16,7 +16,7 @@
     @onPullUp="onPullUp"
   >
     <template #default="{ item }">
-      <view class="activity-card" @tap="gotoDetail">
+      <view class="activity-card" @tap="gotoDetail(item.id)">
         <view class="uni-card uni-shadow uni-border">
           <view class="uni-card__header">
             <view class="uni-card__header-box">
@@ -115,12 +115,11 @@ const gotoHomePage = (item: HotActivity) => {
   })
 }
 
-const gotoDetail = () => {
+const gotoDetail = (id:string) => {
   uni.navigateTo({
-    url: `../bizActivityDetail/index`
+    url: `../bizActivityDetail/index?id=${id}`
   })
 }
-
 // 初始化
 onMounted(() => {
   refresh()

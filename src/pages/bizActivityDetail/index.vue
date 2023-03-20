@@ -115,23 +115,7 @@
         </view>
       </view>
     </view>
-    <uni-popup ref="shareRef" type="share" safeArea backgroundColor="#fff">
-      <view class="shard-popup">
-        <view class="shard-popup-title">分享到</view>
-        <view class="shard-popup-content">
-          <uni-row>
-            <uni-col :span="8">
-              <view class="warpper">
-                <button open-type="share" @tap="share" class="shareButton">
-                  <image src="../static/weixin-icon.png"></image>
-                </button>
-                <text>微信</text>
-              </view>
-            </uni-col>
-          </uni-row>
-        </view>
-      </view>
-    </uni-popup>
+    <uni-shard ref="shareRef"></uni-shard>
   </uni-container>
 </template>
 <script setup lang="ts">
@@ -164,26 +148,9 @@ const pageActivity = computed<Activity>(() => {
 // 组织机构
 const organizationName = ref<string>('')
 // 所有报名
-const allApplyList = ref<Apply[]>([
-  {
-    groupName: '300公里-男子环湖组',
-    name: '林枫林枫林枫',
-    id: '1'
-  },
-  {
-    groupName: '300公里-男子环湖组',
-    name: '林枫林枫林枫',
-    id: '2'
-  },
-  {
-    groupName: '300公里-男子环湖组',
-    name: '林枫林枫林枫',
-    id: '3'
-  }
-])
+const allApplyList = ref<Apply[]>([])
 const isShare = ref<boolean>(true)
 // 分享相关
-const share = () => uni.showShareMenu({})
 const shareRef = ref()
 const instance = getCurrentInstance() as ComponentInternalInstance
 const shareToggle = () => {
@@ -192,7 +159,6 @@ const shareToggle = () => {
   refs.shareRef.open()
 }
 onShareAppMessage((res) => {
-  debugger
   if (res.from === 'button') {
     // 来自页面内分享按钮
     console.log(res.target)
@@ -203,6 +169,7 @@ onShareAppMessage((res) => {
   }
 })
 const goToHome = () => uni.redirectTo({ url: '../hot/index' })
+
 // 初始化
 onLoad((option: any) => {
   isShare.value = option.isShare === '1'
@@ -293,40 +260,4 @@ onLoad((option: any) => {
   padding-bottom: 50px !important;
 }
 
-.shard-popup {
-  display: flex;
-  flex-direction: column;
-  .shard-popup-title {
-    height: 50px;
-    line-height: 50px;
-    text-align: center;
-  }
-  .shard-popup-content {
-    flex: 1;
-  }
-}
-.warpper {
-  display: flex;
-  justify-content: center;
-  height: 60px;
-  flex-direction: column;
-  align-items: center;
-}
-.shareButton {
-  height: 50px;
-  width: 50px;
-  background-color: transparent;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  image {
-    height: 100%;
-    width: 100%;
-  }
-}
-.shareButton::after {
-  border-color: transparent;
-}
 </style>
