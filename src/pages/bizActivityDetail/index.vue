@@ -1,35 +1,332 @@
 <template>
   <uni-container>
-    <view class="activity-detail">
-      <text>2023年环太湖自行车比赛</text>
+    <view
+      class="light-background-color activity-detail"
+      :class="{ isShare: isShare }"
+    >
+      <uni-card margin="5px" padding="3px">
+        <view class="section">
+          <text class="g-title">{{ pageActivity.title }}</text>
+        </view>
 
-      <text>报名开始：2023-02-26 21:30</text>
-      <text>报名结束：2023-03-22 21:30</text>
+        <view class="section">
+          <view class="sub-title">报名开始：{{ pageActivity.startTime }}</view>
+          <view class="sub-title">报名结束：{{ pageActivity.endTime }}</view>
+        </view>
 
-      <view> 南京G捷号 </view>
+        <view class="section org-info">
+          <view class="organizationName">
+            <view class="g-title">南京G捷号</view>
+            <view>已认证</view>
+          </view>
+          <view class="link">Ta的主页</view>
+        </view>
 
-      <text>活动介绍</text>
+        <view class="section">
+          <text class="g-title">活动介绍</text>
+        </view>
+        <uni-editer
+          v-model="pageActivity.description"
+          :editable="false"
+        ></uni-editer>
 
-      <text>我的报名</text>
+        <view class="section">
+          <text class="g-title">所有报名</text>
 
-      <text>所有报名</text>
+          <uni-list v-if="allApplyList.length">
+            <uni-list-item
+              showArrow
+              v-for="(apply, index) in allApplyList"
+              :title="`${index + 1}、${apply.name}`"
+              :rightText="apply.groupName"
+              :index="apply.id"
+            />
+          </uni-list>
+          <uni-empty v-else></uni-empty>
+        </view>
+      </uni-card>
     </view>
-
-    <uni-editer v-model="html"></uni-editer>
+    <view class="actions">
+      <uni-grid
+        :column="4"
+        :show-border="false"
+        :square="false"
+        v-if="!isShare"
+      >
+        <uni-grid-item @tap="shareToggle">
+          <view class="grid-item-box">
+            <uni-icons
+              custom-prefix="iconfont"
+              type="icon-fenxiang3"
+              :size="25"
+              color="#777"
+            ></uni-icons>
+            <text class="text">分享</text>
+          </view>
+        </uni-grid-item>
+        <uni-grid-item>
+          <view class="grid-item-box">
+            <uni-icons
+              custom-prefix="iconfont"
+              type="icon-bianji"
+              :size="25"
+              color="#777"
+            ></uni-icons>
+            <text class="text">编辑</text>
+          </view>
+        </uni-grid-item>
+        <uni-grid-item>
+          <view class="grid-item-box">
+            <uni-icons
+              custom-prefix="iconfont"
+              type="icon-daochu"
+              :size="25"
+              color="#777"
+            ></uni-icons>
+            <text class="text">导出</text>
+          </view>
+        </uni-grid-item>
+        <uni-grid-item>
+          <view class="grid-item-box">
+            <uni-icons
+              custom-prefix="iconfont"
+              type="icon-tixian1"
+              :size="25"
+              color="#777"
+            ></uni-icons>
+            <text class="text">提现</text>
+          </view>
+        </uni-grid-item>
+      </uni-grid>
+      <view class="sign-up" v-else>
+        <view class="home" @tap="goToHome">
+          <view>
+            <uni-icons
+              custom-prefix="iconfont"
+              type="icon-shouye"
+              :size="18"
+              color="#777"
+            ></uni-icons
+          ></view>
+          <view>首页</view>
+        </view>
+        <view class="btn">
+          <button class="signUp-button">立即报名</button>
+        </view>
+      </view>
+    </view>
+    <uni-popup ref="shareRef" type="share" safeArea backgroundColor="#fff">
+      <view class="shard-popup">
+        <view class="shard-popup-title">分享到</view>
+        <view class="shard-popup-content">
+          <uni-row>
+            <uni-col :span="8">
+              <view class="warpper">
+                <button open-type="share" @tap="share" class="shareButton">
+                  <image src="../static/weixin-icon.png"></image>
+                </button>
+                <text>微信</text>
+              </view>
+            </uni-col>
+          </uni-row>
+        </view>
+      </view>
+    </uni-popup>
   </uni-container>
 </template>
 <script setup lang="ts">
-import { reactive } from 'vue'
+import { ref, computed, getCurrentInstance } from 'vue'
+import type { ComponentInternalInstance } from 'vue'
 import type { Activity } from '@/typings/activity'
+import { queryActivityDetail } from '@/apis/activity'
+import { queryAllApply } from '@/apis/apply'
+import type { Apply } from '@/typings/apply'
+import { onLoad, onShareAppMessage } from '@dcloudio/uni-app'
 
-// const act = reactive<Activity>({})
+const activity = ref<Activity>({
+  title: '',
+  startTime: '',
+  endTime: '',
+  description: '',
+  fieldList: [],
+  groupList: [],
+  showFlag: '1', // 1 显示 0 不显示
+  id: ''
+})
+// 活动详情
+const pageActivity = computed<Activity>(() => {
+  return {
+    ...activity.value,
+    startTime: activity.value.startTime.replace('T', ' '),
+    endTime: activity.value.endTime.replace('T', ' ')
+  }
+})
+// 组织机构
+const organizationName = ref<string>('')
+// 所有报名
+const allApplyList = ref<Apply[]>([
+  {
+    groupName: '300公里-男子环湖组',
+    name: '林枫林枫林枫',
+    id: '1'
+  },
+  {
+    groupName: '300公里-男子环湖组',
+    name: '林枫林枫林枫',
+    id: '2'
+  },
+  {
+    groupName: '300公里-男子环湖组',
+    name: '林枫林枫林枫',
+    id: '3'
+  }
+])
+const isShare = ref<boolean>(true)
+// 分享相关
+const share = () => uni.showShareMenu({})
+const shareRef = ref()
+const instance = getCurrentInstance() as ComponentInternalInstance
+const shareToggle = () => {
+  const { refs } = instance
+  // @ts-ignore
+  refs.shareRef.open()
+}
+onShareAppMessage((res) => {
+  debugger
+  if (res.from === 'button') {
+    // 来自页面内分享按钮
+    console.log(res.target)
+  }
+  return {
+    title: activity.value.title,
+    path: `/pages/bizActivityDetail/index?id=${activity.value.id}&isShare=1`
+  }
+})
+const goToHome = () => uni.redirectTo({ url: '../hot/index' })
+// 初始化
+onLoad((option: any) => {
+  isShare.value = option.isShare === '1'
 
-
-const html = `
-<h1 class=\"ql-align-center\">【亲子骑行】</h1><h1 class=\"ql-align-center\">徐家院</h1><p><br></p><p><span style=\"color: rgb(87, 107, 149);\">南京G捷号单车俱乐部</span>&nbsp;</p><p><br></p><p>上期活动</p><iframe class=\"ql-video\" frameborder=\"0\" allowfullscreen=\"true\" src=\"https://player.youku.com/embed/XNTk0ODQzMTQxNg==\"></iframe><p><br></p><p>亲子骑行感受田园风格～徐家院</p><p>春天看花花的季节</p><p>徐家院的油菜花正开的很旺盛</p><p>你心动了吗心动就行动喔</p><p>上午场9:00、下午场13:00</p><p>集合地点大塘金对面停车场</p><p>报名租车的</p><p>请填写租车人正确身高</p><p>从即刻开始报名截止</p><p>周六下午17:00结束。</p><p class=\"ql-align-justify\">备注：集体活动请小伙伴们不要迟到 谢谢支持</p><p class=\"ql-align-justify\"><img src=\"https://www.14tech.cn/files/activityImg/2023/3/254933448700125184/95e66fb3faf44cc197d60de555d84c3f.jpg\"></p><p class=\"ql-align-justify\"><img src=\"https://www.14tech.cn/files/activityImg/2023/3/254933448700125184/20b6f5a114b44415ad71baf5d21fb887.jpg\"></p><p class=\"ql-align-justify\"><img src=\"https://www.14tech.cn/files/activityImg/2023/3/254933448700125184/ff5803b82c1d49188b732639a806493b.jpg\"></p><p class=\"ql-align-justify\"><br></p><p class=\"ql-align-justify\"><span class=\"ql-size-large\" style=\"color: rgb(255, 0, 0);\">注：本次活动分上午场、下午场</span></p><p class=\"ql-align-justify\"><br></p><p class=\"ql-align-center\"><span style=\"color: rgb(22, 126, 251);\">【集结时间、地点】</span></p><p><span style=\"color: inherit;\">周日：3月19日 </span>上午场9:00、下午场13:00</p><p class=\"ql-align-justify\"><span class=\"ql-size-small\">地点：</span>大塘金对面停车场</p><p class=\"ql-align-justify\"><img src=\"https://www.14tech.cn/files/activityImg/2023/3/254933448700125184/a5833c60807e448da85c0b92cdd2bc05.jpg\"></p><h5 class=\"ql-align-justify\"><br></h5><h5 class=\"ql-align-justify\"><span class=\"ql-size-small\" style=\"color: rgb(22, 126, 251);\">报名</span></h5><h5 class=\"ql-align-justify\"><span class=\"ql-size-small\" style=\"color: rgb(255, 41, 65);\">参加活动必须佩戴头盔、家长陪同骑行</span></h5><h5 class=\"ql-align-justify\"><span class=\"ql-size-small\" style=\"color: rgb(34, 34, 34);\">租车数量有限需单独报名；报满截止</span></h5><p>1、单次报名费用¥30元</p><p>当天保险、补给、后援车费用（陪骑家长无需报名）</p><p><br></p><p>2、单次报名+租车一次费用¥80元</p><p>当天保险、补给、后援车费用（陪骑家长无需报名）</p><p>可租用一辆自行车、一个头盔</p><p><br></p><p>3、全年报名费¥480元</p><p><span style=\"color: rgb(230, 0, 0);\">注：报名全年活动享受骑行服半价174元/套&nbsp;</span></p><p><span class=\"ql-size-small\" style=\"color: inherit;\">可参加俱乐部每周举办的骑行活动、当天保险、补给、后援车费用（陪骑家长无需报名）</span></p><p><br></p><p><span class=\"ql-size-small\" style=\"color: inherit;\">4、已全年报名</span></p><p><span class=\"ql-size-small\" style=\"color: inherit;\">已交全年报名费的骑友，选择该组别进行信息登记即可</span></p><p><br></p><p><span class=\"ql-size-small\" style=\"color: inherit;\">5、已全年报名+租车一次费用¥50元</span></p><p><span class=\"ql-size-small\" style=\"color: inherit;\">已交全年报名费的骑友，选择该组别进行信息登记即可</span></p><p><span class=\"ql-size-small\" style=\"color: inherit;\">可租用一辆自行车、一个头盔</span></p><p><br></p><p><span class=\"ql-size-small\" style=\"color: inherit;\">6、家长租车一次费用¥50元</span></p><h5 class=\"ql-align-justify\"><span class=\"ql-size-small\">家长可租用一辆自行车、一个头盔</span></h5><p class=\"ql-align-justify\"><br></p><p class=\"ql-align-justify\"><img src=\"https://www.14tech.cn/files/activityImg/2022/10/254933448700125184/00141211399f411386b73af362cb5615.jpg\"></p><p class=\"ql-align-justify\"><img src=\"https://www.14tech.cn/files/activityImg/2023/3/254933448700125184/85ca072353bf4e5abae92f35c6ff8024.jpg\"></p><p class=\"ql-align-justify\"><br></p><h5 class=\"ql-align-justify\"><span class=\"ql-size-small\" style=\"color: rgb(0, 128, 255);\">报名包含</span></h5><h5 class=\"ql-align-justify\"><span class=\"ql-size-small\">1、专业知识：骑行知识讲解</span></h5><h5 class=\"ql-align-justify\"><span class=\"ql-size-small\">2、骑行保障：服务人员费用、骑行人身意外保险</span></h5><h5 class=\"ql-align-justify\"><span class=\"ql-size-small\">3、护骑服务：专业教练随队护骑</span></h5><h5 class=\"ql-align-justify\"><span class=\"ql-size-small\">注：请进系统报名，报名填写孩子真实姓名、身份证号、可联系的电话号码，因需购买当天意外保险，未满18岁儿童购买保险需一位家长身份信息请正确填写，谢谢！</span></h5><p class=\"ql-align-justify\"><img src=\"https://www.14tech.cn/files/activityImg/2023/3/254933448700125184/f7717eb52a5e4b6092b1505f113e4da8.jpg\"></p><h5 class=\"ql-align-justify\"><span class=\"ql-size-small\" style=\"color: rgb(0, 128, 255);\">报名不含</span></h5><h5 class=\"ql-align-justify\"><span class=\"ql-size-small\">1、活动费用不包含个人原因所产生的消费。</span></h5><h5 class=\"ql-align-justify\"><span class=\"ql-size-small\">2、骑行装备（自行车、头盔等）自备，如需租用，费用自付。</span></h5><h5 class=\"ql-align-justify\"><span class=\"ql-size-small\" style=\"color: rgb(237, 35, 8);\">注：自行车租赁（包含头盔）全程：￥50元/辆/次</span></h5><p class=\"ql-align-justify\"><span class=\"ql-size-small\">租车请在系统报名后再联系说明身高，需要备注大小自行车。</span></p><p><br></p><p class=\"ql-align-justify\"><img src=\"https://www.14tech.cn/files/activityImg/2022/4/254933448700125184/ebd4e375a37c4821a53577074ffbc9bf.jpg\"></p><p class=\"ql-align-justify\"><br></p><h5 class=\"ql-align-justify\"><span class=\"ql-size-small\" style=\"color: rgb(0, 128, 255);\">关于等级</span></h5><h5 class=\"ql-align-justify\"><span class=\"ql-size-small\">课程中累计骑行达到：</span></h5><p class=\"ql-align-justify\">100km为青铜小骑士</p><p class=\"ql-align-justify\">200km为白银小骑士</p><p class=\"ql-align-justify\">400km为黄金小骑士</p><p class=\"ql-align-justify\">600km为钻石小骑士</p><p class=\"ql-align-justify\">800km为自由小骑士</p><p class=\"ql-align-justify\">后续长距离骑行和儿童赛事小骑士可优先报名</p><p class=\"ql-align-justify\"><br></p><p class=\"ql-align-justify\">本次活动工作人员：</p><h5 class=\"ql-align-justify\"><span class=\"ql-size-small\">队长：鲍鲍</span></h5><h5 class=\"ql-align-justify\"><span class=\"ql-size-small\">领队：万教练</span></h5><h5 class=\"ql-align-justify\"><span class=\"ql-size-small\">护骑：疯教练</span></h5><h5 class=\"ql-align-justify\"><span class=\"ql-size-small\">邀请有兴趣的车友参加护骑哟</span></h5><p class=\"ql-align-justify\"><br></p><p class=\"ql-align-justify\"><span style=\"color: rgb(255, 41, 65);\">报名咨询</span></p><p class=\"ql-align-justify\"><span style=\"color: inherit;\">☏15951742629鲍鲍&nbsp;&nbsp;&nbsp;</span><span style=\"color: rgb(39, 45, 52);\">捷安特殷巷店</span></p><p class=\"ql-align-justify\"><span style=\"color: inherit;\">☏15851875186可可&nbsp;&nbsp;&nbsp;</span><span style=\"color: rgb(39, 45, 52);\">捷安特南站店</span></p><p class=\"ql-align-justify\"><br></p><p class=\"ql-align-justify\"><span style=\"color: rgb(255, 169, 0);\">风险告知</span></p><p class=\"ql-align-justify\"><span style=\"color: rgb(255, 169, 0);\">俱乐部严格遵照国家法律法规开展活动，课程设计合理科学，安全性高，全程教练后勤人员监护保障，足额投保责任险意外险双重保险，但户外运动有风险，摔伤擦伤时有发生，请正确对待运动伤病，谨慎报名。</span></p><p class=\"ql-align-justify\"><span style=\"color: rgb(255, 169, 0);\">户外活动请保管好个人财物，请勿携带贵重物品，对个人原因引起的一切事故俱乐部不负责任。</span></p>
-`
+  queryActivityDetail(option.id).then((ret) => {
+    const { data } = ret
+    activity.value = data.activity
+    organizationName.value = data.organizationName
+  })
+  queryAllApply(option.id).then((ret) => {
+    const { data } = ret
+    allApplyList.value = data.allApplyList
+  })
+})
 </script>
 <style scoped lang="scss">
 .activity-detail {
+  padding: 5px 0;
+  padding-bottom: 75px;
+}
+.sub-title {
+  color: #c5c5c5;
+  font-size: 13px;
+}
+.section {
+  margin-bottom: 5px;
+}
+.org-info {
+  display: flex;
+  height: 50px;
+  background-color: #e4fafc;
+  border-radius: 5px;
+  padding: 0 10px;
+  .organizationName {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    > view {
+      flex: 1;
+      line-height: 25px;
+    }
+  }
+  .link {
+    flex: 1;
+  }
+  .link {
+    color: #3498db;
+    line-height: 50px;
+    text-align: right;
+  }
+}
+.actions {
+  position: fixed;
+  width: 100%;
+  bottom: 0;
+  background-color: #fff;
+  z-index: 5;
+}
+
+.sign-up {
+  display: flex;
+  .home {
+    width: 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-size: 12px;
+    color: #3498db;
+  }
+  .btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    .signUp-button {
+      width: 80%;
+      height: 80%;
+      margin: auto;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+}
+.isShare {
+  padding-bottom: 50px !important;
+}
+
+.shard-popup {
+  display: flex;
+  flex-direction: column;
+  .shard-popup-title {
+    height: 50px;
+    line-height: 50px;
+    text-align: center;
+  }
+  .shard-popup-content {
+    flex: 1;
+  }
+}
+.warpper {
+  display: flex;
+  justify-content: center;
+  height: 60px;
+  flex-direction: column;
+  align-items: center;
+}
+.shareButton {
+  height: 50px;
+  width: 50px;
+  background-color: transparent;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  image {
+    height: 100%;
+    width: 100%;
+  }
+}
+.shareButton::after {
+  border-color: transparent;
 }
 </style>

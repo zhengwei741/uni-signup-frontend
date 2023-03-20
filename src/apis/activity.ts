@@ -51,8 +51,8 @@ export const insertActivity = (activity: Activity) => {
  * @returns
  */
 export const queryActivityDetail = (id: string) => {
-  return request<API.PaginationResult<HotActivity>>({
-    url: '/aciittvy/mini/queryActivityDetail',
+  return request<API.Result<{ activity: Activity; organizationName: string }>>({
+    url: '/activity/mini/queryActivityDetail',
     method: 'POST',
     data: {
       id

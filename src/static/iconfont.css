@@ -11,6 +11,34 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.icon-weixin1:before {
+  content: '\e707';
+}
+
+.icon-weixin:before {
+  content: '\e607';
+}
+
+.icon-shouye:before {
+  content: '\e601';
+}
+
+.icon-remen:before {
+  content: '\e8f4';
+}
+
+.icon-tixian1:before {
+  content: '\e678';
+}
+
+.icon-bianji:before {
+  content: '\e600';
+}
+
+.icon-daochu:before {
+  content: '\e6df';
+}
+
 .icon-img:before {
   content: '\e699';
 }
