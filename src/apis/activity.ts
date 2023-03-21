@@ -70,11 +70,28 @@ export const queryActivityDetail = (id: string) => {
  * @param id
  * @returns
  */
-export const queryActivityField = (id: string = '425603971007307776') => {
+export const queryActivityField = (id: string) => {
   return request<
     API.Result<{ fieldList: ActivityField[]; groupList: ActivityGroup[] }>
   >({
     url: '/activity/mini/queryActivityField',
+    method: 'POST',
+    data: {
+      id
+    }
+  })
+}
+
+/**
+ * 删除活动
+ * @param id
+ * @returns
+ */
+export const deleteActivity = (id: string) => {
+  return request<
+    API.Result<{ fieldList: ActivityField[]; groupList: ActivityGroup[] }>
+  >({
+    url: '/activity/mini/deleteActivity',
     method: 'POST',
     data: {
       id

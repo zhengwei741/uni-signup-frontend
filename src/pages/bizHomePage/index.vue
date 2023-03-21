@@ -1,6 +1,6 @@
 <template>
   <uni-container>
-    <view class="warpper">
+    <view class="warpper" :style="{ 'padding-bottom': list.length < 3 ? 0 : '50px' }">
       <image
         mode="aspectFit"
         v-if="bizInfo?.logoImgName"
@@ -41,15 +41,39 @@
       <uni-empty v-else></uni-empty>
       <uni-load-more v-if="list.length" iconType="circle" :status="status" />
     </view>
-    <div class="actions" id="actions">
-      <button type="mini" class="btn">首页</button>
-      <button type="mini" class="btn">分享</button>
-    </div>
+    <view class="actions">
+      <view class="sign-up">
+        <view class="cell" @tap="goToHome">
+          <view>
+            <uni-icons
+              custom-prefix="iconfont"
+              type="icon-shouye"
+              :size="18"
+              color="#777"
+            ></uni-icons
+          ></view>
+          <view>首页</view>
+        </view>
+        <view class="cell" @tap="shareToggle">
+          <view>
+            <uni-icons
+              custom-prefix="iconfont"
+              type="icon-fenxiang3"
+              :size="18"
+              color="#777"
+            ></uni-icons
+          ></view>
+          <view>分享</view>
+        </view>
+      </view>
+    </view>
+    <uni-shard ref="shareRef"></uni-shard>
   </uni-container>
 </template>
 <script setup lang="ts">
-import { ref } from 'vue'
-import { onLoad } from '@dcloudio/uni-app'
+import { ref, getCurrentInstance } from 'vue'
+import type { ComponentInternalInstance } from 'vue'
+import { onLoad, onShareAppMessage } from '@dcloudio/uni-app'
 import { getStatusStyle } from '@/utils'
 import type { BizInfo } from '@/typings/user'
 import type { HotActivity } from '@/typings/activity'
@@ -60,6 +84,7 @@ import { usePageScroll } from '@/hooks/usePageScroll'
 import { onReachBottom } from '@dcloudio/uni-app'
 
 const bizInfo = ref<BizInfo>()
+const creater = ref('')
 
 const { refresh, next, status, list } = usePageScroll<HotActivity[]>({
   action({ pageNo, pageSize }) {
@@ -77,19 +102,42 @@ const { refresh, next, status, list } = usePageScroll<HotActivity[]>({
 
 // 上拉加载
 onReachBottom(next)
-
-onLoad((option) => {
-  if (option && option.creater) {
-    queryBizInfo(option.creater).then((ret) => {
-      const { data } = ret
-      bizInfo.value = data
-      uni.setNavigationBarTitle({
-        title: `${data.userName}的主页`
-      })
+onLoad((option: any) => {
+  creater.value = option.creater
+  queryBizInfo(option.creater).then((ret) => {
+    const { data } = ret
+    bizInfo.value = data
+    uni.setNavigationBarTitle({
+      title: `${data.userName}的主页`
     })
-    refresh()
+  })
+  refresh()
+})
+
+const goToHome = () => {
+  uni.navigateBack({
+    fail(result) {
+      uni.switchTab({
+        url: '/pages/hot/index'
+      })
+    },
+  })
+}
+// 分享相关
+const shareRef = ref()
+const instance = getCurrentInstance() as ComponentInternalInstance
+const shareToggle = () => {
+  const { refs } = instance
+  // @ts-ignore
+  refs.shareRef.open()
+}
+onShareAppMessage((res) => {
+  return {
+    title: `${bizInfo.value?.userName}的主页`,
+    path: `/pages/bizHomePage/index?creater=${creater.value}`
   }
 })
+
 </script>
 <style scoped lang="scss">
 .warpper {
@@ -149,18 +197,24 @@ onLoad((option) => {
 }
 .actions {
   position: fixed;
-  bottom: 0;
   width: 100%;
-  display: flex;
-  padding: 5px;
-  height: 40px;
-  display: flex;
-  align-items: center;
+  bottom: 0;
   background-color: #fff;
-  .btn {
-    height: 30px;
-    line-height: 30px;
-    font-size: 12px;
+  z-index: 5;
+  border-top: 1px solid #d6d6d6;
+  height: 60px;
+  .sign-up {
+    display: flex;
+    height: 100%;
+    .cell {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      font-size: 12px;
+      color: #3498db;
+    }
   }
 }
 </style>

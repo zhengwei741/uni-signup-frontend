@@ -39,7 +39,7 @@
       </uni-activityDetail>
       <view class="actions">
         <view class="sign-up">
-          <view class="home" @tap="goToHome">
+          <view class="cell" @tap="goToHome">
             <view>
               <uni-icons
                 custom-prefix="iconfont"
@@ -50,7 +50,7 @@
             ></view>
             <view>首页</view>
           </view>
-          <view class="home" @tap="shareToggle">
+          <view class="cell" @tap="shareToggle">
             <view>
               <uni-icons
                 custom-prefix="iconfont"
@@ -126,31 +126,32 @@ const gotoSingupPage = () => {
   background-color: #fff;
   z-index: 5;
   border-top: 1px solid #d6d6d6;
-}
-.sign-up {
-  display: flex;
-  .home {
-    width: 60px;
+
+  .sign-up {
     display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    font-size: 12px;
-    color: #3498db;
-  }
-  .btn {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    .signUp-button {
-      width: 80%;
-      height: 80%;
-      margin: auto;
-      border-radius: 20px;
+    .cell {
+      width: 60px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      font-size: 12px;
+      color: #3498db;
+    }
+    .btn {
+      flex: 1;
       display: flex;
       align-items: center;
       justify-content: center;
+      .signUp-button {
+        width: 80%;
+        height: 80%;
+        margin: auto;
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
     }
   }
 }

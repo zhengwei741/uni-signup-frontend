@@ -14,7 +14,7 @@
       </view>
     </uni-grid-item>
     <uni-grid-item>
-      <view class="grid-item-box">
+      <view class="grid-item-box" @tap="shareToggle">
         <uni-icons
           custom-prefix="iconfont"
           type="icon-fenxiang3"
@@ -68,7 +68,7 @@
             }}</text>
           </view>
           <view class="del-btn">
-            <button type="warn" size="mini">删除</button>
+            <button type="warn" size="mini" @tap="deleteAct(activity.id)">删除</button>
           </view>
         </view>
       </view>
@@ -76,19 +76,22 @@
     <uni-load-more v-if="list.length" iconType="circle" :status="status" />
   </view>
   <uni-empty v-else />
+  <uni-shard ref="shareRef"></uni-shard>
 </template>
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
-import { queryActivityByBiz } from '@/apis/activity'
+import { onMounted, ref, getCurrentInstance } from 'vue'
+import type { ComponentInternalInstance } from 'vue'
+import { queryActivityByBiz, deleteActivity } from '@/apis/activity'
 import { queryPersonalInfo } from '@/apis/user'
 import type { HotActivity } from '@/typings/activity'
 import { getStatusStyle } from '@/utils'
 import { usePageScroll } from '@/hooks/usePageScroll'
-import { onReachBottom } from '@dcloudio/uni-app'
+import { onReachBottom, onShareAppMessage } from '@dcloudio/uni-app'
 
 // 组织机构名称 是否认证过
 const organizationName = ref<string>('')
 const logoImgName = ref<string>('')
+const userName = ref<string>('')
 
 const goCreateActivity = () => {
   uni.navigateTo({
@@ -118,6 +121,12 @@ const goToBizActivityDetail = (id: string) => {
   })
 }
 
+const deleteAct = (id: string) => {
+  deleteActivity(id).then(() => {
+    refresh()
+  })
+}
+
 const { refresh, next, status, list } = usePageScroll<HotActivity[]>({
   action({ pageNo, pageSize }) {
     return queryActivityByBiz({ pageNo, pageSize }).then((ret) => {
@@ -140,7 +149,24 @@ onMounted(() => {
   queryPersonalInfo().then((ret) => {
     organizationName.value = ret.data.organizationName
     logoImgName.value = ret.data.logoImgName
+    userName.value = ret.data.userName
   })
+})
+
+// 分享相关
+const shareRef = ref()
+const instance = getCurrentInstance() as ComponentInternalInstance
+const shareToggle = () => {
+  const { refs } = instance
+  // @ts-ignore
+  refs.shareRef.open()
+}
+onShareAppMessage((res) => {
+  return {
+    title: `${userName.value}的主页`,
+    // TODO
+    path: `/pages/bizHomePage/index?creater=${232984780246827008}`
+  }
 })
 </script>
 <style scoped lang="scss">

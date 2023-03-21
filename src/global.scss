@@ -15,13 +15,15 @@ button[disabled]:not([type]) {
 
 .forms-cls {
   .uni-forms {
-    text {
-      font-weight: bold;
-      color: #3a3a3a;
-    }
-    .is-required {
-      color: #dd524d;
-      font-weight: bold;
+    .uni-forms-item__label{
+      text {
+        font-weight: bold;
+        color: #3a3a3a;
+      }
+      .is-required {
+        color: #dd524d;
+        font-weight: bold;
+      }
     }
     .uni-forms-item__error {
       text {
@@ -55,5 +57,11 @@ button[disabled]:not([type]) {
     margin-top: 5px;
     font-size: 13px;
     color: #3498db;
+  }
+}
+
+.user-agreement{
+  .uni-data-checklist .checklist-group .checklist-box{
+    margin: 0 !important;
   }
 }

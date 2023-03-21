@@ -128,17 +128,24 @@
         <!-- 动态字段 end -->
 
         <!-- 用户协议 start-->
-        <view class="uni-forms-item" @tap.capture="() => (isAgree[0] = 0)">
+        <!-- <view class="uni-forms-item" @tap.capture="() => (isAgree[0] = 0)"> -->
+        <view class="uni-forms-item user-agreement">
           <uni-data-checkbox
             multiple
             v-model="isAgree"
-            :localdata="[{ text: '已阅读并同意《用户服务协议》', value: 0 }]"
+            :localdata="[{ text: '', value: 0 }]"
+            
           ></uni-data-checkbox>
+          <text @tap="openUserAgreement">已阅读并同意
+            <text style="color: #007aff;">《用户服务协议》</text>
+          </text>
         </view>
         <!-- 用户协议 end-->
 
         <button :disabled="!canSubmit" @tap="publish">发布活动</button>
       </uni-forms>
+
+      <uni-userAgreement ref="agRef"></uni-userAgreement>
     </view>
   </uni-container>
 </template>
@@ -256,6 +263,14 @@ const publish = async () => {
   } finally {
     uni.hideLoading()
   }
+}
+
+// 用户协议相关
+const agRef = ref()
+const openUserAgreement = () => {
+  const { refs } = instance
+  // @ts-ignore
+  refs.agRef.toggle()
 }
 </script>
 <style scoped lang="scss">

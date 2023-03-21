@@ -28,11 +28,11 @@ export function getMockID() {
 
 // 后台金额转前台
 export function toFront(value: number = 0) {
-  return currency(value).divide(1000).value
+  return currency(value).divide(100).value
 }
 // 前台金额转后台
 export function toBack(value: number = 0) {
-  return currency(value).multiply(1000).value
+  return currency(value).multiply(100).value
 }
 
 export function formatTime(time: any, format: string = 'YYYY-MM-DD HH:mm:ss') {

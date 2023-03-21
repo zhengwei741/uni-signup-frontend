@@ -16,7 +16,7 @@
     @onPullUp="onPullUp"
   >
     <template #default="{ item }">
-      <view class="activity-card" @tap="gotoDetail(item.id)">
+      <view class="activity-card" @tap.stop="gotoDetail(item.id)">
         <view class="uni-card uni-shadow uni-border">
           <view class="uni-card__header">
             <view class="uni-card__header-box">
@@ -40,7 +40,7 @@
               </view>
             </view>
           </view>
-          <view class="uni-card__content" @tap="gotoHomePage(item)">
+          <view class="uni-card__content" @tap.stop="gotoHomePage(item)">
             <text class="org-name">{{ item.organizationName }}</text>
             <text class="org-link">Ta的主页</text>
           </view>
