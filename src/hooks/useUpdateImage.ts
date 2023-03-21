@@ -12,7 +12,7 @@ export const useUpdateImage = (url: string) => {
           success: (res) => {
             // @ts-ignore
             const uploadFile = res.tempFiles[0]
-            if (uploadFile.size >= 10240) {
+            if (uploadFile.size >= 10485760) {
               reject('图片不能大于10M')
             }
             uni.compressImage({

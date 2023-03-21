@@ -26,63 +26,21 @@
         :editable="false"
       ></uni-editer>
 
-      <view class="section" v-if="myApply">
-        <text class="g-title">我的报名</text>
-        <uni-list v-if="pageMyApplyList.length">
-          <uni-list-item
-            showArrow
-            v-for="(apply, index) in pageMyApplyList"
-            :title="`${index + 1}、${apply.name}`"
-            :rightText="apply.groupName"
-            :index="apply.id"
-          />
-        </uni-list>
-        <uni-empty v-else></uni-empty>
-      </view>
+      <slot name="myApply"></slot>
 
-      <view class="section" v-if="cancelApply">
-        <text class="g-title">取消的报名</text>
-        <uni-list v-if="pageCancelApplyList.length">
-          <uni-list-item
-            showArrow
-            v-for="(apply, index) in pageCancelApplyList"
-            :title="`${index + 1}、${apply.name}`"
-            :rightText="apply.groupName"
-            :index="apply.id"
-          />
-        </uni-list>
-        <uni-empty v-else></uni-empty>
-      </view>
+      <slot name="cancelApply"></slot>
 
-      <view class="section">
-        <text class="g-title">所有报名</text>
-        <uni-list v-if="pageAllApplyList.length">
-          <uni-list-item
-            showArrow
-            v-for="(apply, index) in pageAllApplyList"
-            :title="`${index + 1}、${apply.name}`"
-            :rightText="apply.groupName"
-            :index="apply.id"
-          />
-        </uni-list>
-        <uni-empty v-else></uni-empty>
-      </view>
+      <slot name="allApplyList"></slot>
     </uni-card>
   </view>
 </template>
 <script setup lang="ts">
 import { computed } from 'vue'
 import type { Activity } from '@/typings/activity'
-import type { Apply } from '@/typings/apply'
 
 const props = defineProps<{
   activity: Activity
   organizationName: string
-  allApplyList: Apply[]
-  myApply: boolean
-  myApplyList: Apply[]
-  cancelApply: boolean
-  cancelApplyList: Apply[]
 }>()
 
 // 活动详情
@@ -95,12 +53,6 @@ const pageActivity = computed<Activity>(() => {
 })
 // 组织机构
 const pageOrgName = computed<string>(() => props.organizationName)
-// 所有报名
-const pageAllApplyList = computed<Apply[]>(() => props.allApplyList)
-// 我的报名
-const pageMyApplyList = computed<Apply[]>(() => props.myApplyList)
-// 取消报名
-const pageCancelApplyList = computed<Apply[]>(() => props.cancelApplyList)
 </script>
 <style scoped lang="scss">
 .sub-title {

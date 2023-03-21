@@ -55,7 +55,7 @@ import type { ComponentInternalInstance } from 'vue'
 import type { ActivityGroup } from '@/typings/activity'
 import { onLoad } from '@dcloudio/uni-app'
 import { useEventChannel } from '@/hooks/useEventChannel'
-import { getMockID } from '@/utils'
+import { getMockID, toBack } from '@/utils'
 
 const activityGroups = ref<ActivityGroup[]>([])
 
@@ -110,7 +110,7 @@ const saveGroupHandel = async () => {
     const { refs } = instance
     await validateFrom(refs)
     if (eventChannel.value) {
-      eventChannel.value.emit('onGroupSave', unref(activityGroups))
+      eventChannel.value.emit('onGroupSave', unref(activityGroups.value))
     }
     uni.navigateBack()
   } catch (e) {

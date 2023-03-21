@@ -150,7 +150,7 @@ import dayjs from 'dayjs'
 import type { Activity, ActivityField, ActivityGroup } from '@/typings/activity'
 import { insertActivity } from '@/apis/activity'
 import { useEventChannel } from '@/hooks/useEventChannel'
-import { getMockID, formatTime } from '@/utils'
+import { getMockID, formatTime, toBack } from '@/utils'
 
 // 活动字段
 const activityFields = reactive<ActivityField[]>([])
@@ -236,7 +236,12 @@ const publish = async () => {
     await insertActivity({
       ...activityFormData,
       startTime: formatTime(activityFormData.startTime),
-      endTime: formatTime(activityFormData.endTime)
+      endTime: formatTime(activityFormData.endTime),
+      // 金额转换
+      groupList: activityFormData.groupList.map((group) => ({
+        ...group,
+        money: toBack(group.money)
+      }))
     })
     uni.showToast({ title: '创建成功' })
     setTimeout(() => {

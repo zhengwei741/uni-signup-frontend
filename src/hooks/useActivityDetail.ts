@@ -6,9 +6,9 @@ import { queryActivityDetail } from '@/apis/activity'
 import { queryAllApply, queryCancelApply, queryMyApply } from '@/apis/apply'
 
 interface optionsProps {
-  allApply: boolean
-  cancelApply: boolean
-  myApply: boolean
+  allApply?: boolean
+  cancelApply?: boolean
+  myApply?: boolean
 }
 
 export const useActivityDetail = (

@@ -12,7 +12,7 @@
   <mp-html
     ref="articleRef"
     container-style="padding:10px"
-    :content="props.modelValue"
+    :content="content"
     :editable="props.editable"
     :domain="URL"
     lazy-load
@@ -26,7 +26,7 @@
 <script setup lang="ts">
 //@ts-ignore
 import mpHtml from '@/components/mp-html/components/mp-html/mp-html'
-import { getCurrentInstance, ref, onMounted } from 'vue'
+import { getCurrentInstance, ref, onMounted, computed } from 'vue'
 import type { ComponentInternalInstance } from 'vue'
 import { useUpdateImage } from '@/hooks/useUpdateImage'
 import { URL } from '@/const'
@@ -46,6 +46,8 @@ const props = withDefaults(defineProps<EditerProps>(), {
 const emits = defineEmits<{
   (e: 'update:modelValue', value: string): void
 }>()
+
+const content = computed(() => props.modelValue.replaceAll('video', 'iframe'))
 
 const tagStyle = {
   table:
@@ -140,8 +142,8 @@ const clear = () => {
 }
 
 const save = () => {
-  const content = articleRef.value.getContent() || ''
-  content.replaceAll('video', 'iframe')
+  let content = articleRef.value.getContent() || ''
+  content = content.replaceAll('video', 'iframe')
   emits('update:modelValue', content)
 }
 

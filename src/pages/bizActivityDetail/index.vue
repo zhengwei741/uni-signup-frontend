@@ -4,8 +4,24 @@
       <uni-activityDetail
         :activity="activity"
         :organizationName="organizationName"
-        :allApplyList="allApplyList"
-      ></uni-activityDetail>
+      >
+        <template #myApply>
+          <view class="section">
+            <text class="g-title list-title">所有报名</text>
+            <uni-list v-if="allApplyList.length">
+              <uni-list-item
+                showArrow
+                v-for="(apply, index) in allApplyList"
+                :title="`${index + 1}、${apply.name}`"
+                :rightText="apply.groupName"
+                :index="apply.id"
+                @tap="() => cancelApply(apply)"
+              />
+            </uni-list>
+            <uni-empty v-else></uni-empty>
+          </view>
+        </template>
+      </uni-activityDetail>
       <view class="actions">
         <uni-grid :column="5" :show-border="false" :square="false">
           <uni-grid-item @tap="shareToggle">
@@ -74,6 +90,7 @@ import { ref, getCurrentInstance } from 'vue'
 import type { ComponentInternalInstance } from 'vue'
 import { onShareAppMessage } from '@dcloudio/uni-app'
 import { useActivityDetail } from '@/hooks/useActivityDetail'
+import type { Apply } from '@/typings/apply'
 
 const { activity, organizationName, allApplyList, refresh } =
   useActivityDetail()
@@ -95,6 +112,11 @@ const gotoSingupPage = () => {
       }
     }
   })
+}
+
+// 取消报名
+const cancelApply = (apply: Apply) => {
+
 }
 
 onShareAppMessage((res) => {

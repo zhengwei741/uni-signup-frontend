@@ -240,7 +240,9 @@ function Editable (vm) {
           }
         })
       }
-    }).catch(() => { })
+    }).catch((e) => {
+      console.log(e)
+    })
   }
 
   /**
