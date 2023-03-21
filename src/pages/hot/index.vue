@@ -115,9 +115,9 @@ const gotoHomePage = (item: HotActivity) => {
   })
 }
 
-const gotoDetail = (id:string) => {
+const gotoDetail = (id: string) => {
   uni.navigateTo({
-    url: `../bizActivityDetail/index?id=${id}`
+    url: `../visitorActivityDetail/index?id=${id}`
   })
 }
 // 初始化

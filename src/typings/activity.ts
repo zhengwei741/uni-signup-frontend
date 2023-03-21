@@ -15,15 +15,23 @@ export interface Activity {
   groupList: ActivityGroup[]
   /**显示报名人员*/
   showFlag: string // 1 显示 0 不显示
+  //
+  status?: string
 }
 
 export interface ActivityField {
   /** 字段ID */
-  id?: string
+  id: string
   /** 字段名 */
   fieldName: string
   /** 是否必填 */
   requiredFlag: '1' | '0'
+
+  activityId?: string
+
+  creater?: string
+
+  rules?: any[] // 前台校验用
 }
 
 export interface ActivityGroup {
@@ -36,6 +44,12 @@ export interface ActivityGroup {
   peopleNumber: number
   /** 是否限制人数 */
   limit?: boolean
+  /** 报名人数 */
+  applicantNumber?: number
+
+  activityId?: string
+
+  creater?: string
 }
 
 /** 热门活动 */

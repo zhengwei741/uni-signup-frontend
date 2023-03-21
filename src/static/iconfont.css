@@ -11,6 +11,10 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.icon-sign:before {
+  content: '\e649';
+}
+
 .icon-weixin1:before {
   content: '\e707';
 }

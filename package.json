@@ -50,6 +50,7 @@
     "@dcloudio/uni-mp-weixin": "3.0.0-alpha-3061620221230002",
     "@dcloudio/uni-quickapp-webview": "3.0.0-alpha-3061620221230002",
     "@dcloudio/uni-ui": "^1.4.26",
+    "currency.js": "^2.0.4",
     "dayjs": "^1.11.7",
     "mp-html": "^2.4.1",
     "pinia": "^2.0.33",

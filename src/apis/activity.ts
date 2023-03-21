@@ -1,5 +1,10 @@
 import { request } from '@/utils/request'
-import type { HotActivity, Activity } from '@/typings/activity'
+import type {
+  HotActivity,
+  Activity,
+  ActivityField,
+  ActivityGroup
+} from '@/typings/activity'
 
 type QueryHotActivityParam = API.Pagination<{
   title: string
@@ -53,6 +58,23 @@ export const insertActivity = (activity: Activity) => {
 export const queryActivityDetail = (id: string) => {
   return request<API.Result<{ activity: Activity; organizationName: string }>>({
     url: '/activity/mini/queryActivityDetail',
+    method: 'POST',
+    data: {
+      id
+    }
+  })
+}
+
+/**
+ * 根据活动id查询活动报名字段
+ * @param id
+ * @returns
+ */
+export const queryActivityField = (id: string = '425603971007307776') => {
+  return request<
+    API.Result<{ fieldList: ActivityField[]; groupList: ActivityGroup[] }>
+  >({
+    url: '/activity/mini/queryActivityField',
     method: 'POST',
     data: {
       id

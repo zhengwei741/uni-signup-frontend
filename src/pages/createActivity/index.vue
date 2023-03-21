@@ -150,7 +150,7 @@ import dayjs from 'dayjs'
 import type { Activity, ActivityField, ActivityGroup } from '@/typings/activity'
 import { insertActivity } from '@/apis/activity'
 import { useEventChannel } from '@/hooks/useEventChannel'
-import { getMockID } from '@/utils'
+import { getMockID, formatTime } from '@/utils'
 
 // 活动字段
 const activityFields = reactive<ActivityField[]>([])
@@ -233,7 +233,11 @@ const publish = async () => {
     await refs.activityForm.validate()
     // 移除前台构造id
     removeMockId()
-    await insertActivity(activityFormData)
+    await insertActivity({
+      ...activityFormData,
+      startTime: formatTime(activityFormData.startTime),
+      endTime: formatTime(activityFormData.endTime)
+    })
     uni.showToast({ title: '创建成功' })
     setTimeout(() => {
       uni.navigateBack()

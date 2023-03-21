@@ -73,6 +73,12 @@
       "usingComponents": {
         "txv-video": "plugin://tencentvideo/video"
       }
+    },
+    {
+      "path": "pages/singupPage/index",
+      "style": {
+        "navigationBarTitleText": "报名"
+      }
     }
   ],
   "globalStyle": {
