@@ -79,6 +79,12 @@
       "style": {
         "navigationBarTitleText": "报名"
       }
+    },
+    {
+      "path": "pages/cashOut/index",
+      "style": {
+        "navigationBarTitleText": "提现"
+      }
     }
   ],
   "globalStyle": {

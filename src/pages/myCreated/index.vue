@@ -1,5 +1,5 @@
 <template>
-  <uni-logoImage :src="logoImgName"></uni-logoImage>
+  <uni-logoImage :src="bizInfo.logoImgName"></uni-logoImage>
 
   <uni-grid :column="4" :show-border="false" :square="false">
     <uni-grid-item>
@@ -24,7 +24,7 @@
         <text class="text">分享</text>
       </view>
     </uni-grid-item>
-    <uni-grid-item v-if="!organizationName">
+    <uni-grid-item v-if="!bizInfo.organizationName">
       <view class="grid-item-box" @tap="goBizAuth">
         <uni-icons
           custom-prefix="iconfont"
@@ -89,11 +89,15 @@ import type { HotActivity } from '@/typings/activity'
 import { getStatusStyle } from '@/utils'
 import { usePageScroll } from '@/hooks/usePageScroll'
 import { onReachBottom, onShareAppMessage } from '@dcloudio/uni-app'
+import type { BizInfo } from '@/typings/user'
 
-// 组织机构名称 是否认证过
-const organizationName = ref<string>('')
-const logoImgName = ref<string>('')
-const userName = ref<string>('')
+const bizInfo = ref<BizInfo>({
+  organizationName: '',
+  logoImgName: '',
+  mobile: '',
+  userName: '',
+  id: ''
+})
 
 const goCreateActivity = () => {
   uni.navigateTo({
@@ -111,7 +115,7 @@ const goBizAuth = () => {
     url: '../bizAuth/index',
     events: {
       onBizAuthSuccess(orgName: string) {
-        organizationName.value = orgName
+        bizInfo.value.organizationName = orgName
       }
     }
   })
@@ -156,9 +160,7 @@ onReachBottom(next)
 onMounted(() => {
   refresh()
   queryPersonalInfo().then((ret) => {
-    organizationName.value = ret.data.organizationName
-    logoImgName.value = ret.data.logoImgName
-    userName.value = ret.data.userName
+    bizInfo.value = ret.data
   })
 })
 
@@ -172,9 +174,8 @@ const shareToggle = () => {
 }
 onShareAppMessage((res) => {
   return {
-    title: `${userName.value}的主页`,
-    // TODO
-    path: `/pages/bizHomePage/index?creater=${232984780246827008}`
+    title: `${bizInfo.value.userName}的主页`,
+    path: `/pages/bizHomePage/index?creater=${bizInfo.value.id}`
   }
 })
 </script>

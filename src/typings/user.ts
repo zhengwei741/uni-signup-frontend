@@ -1,6 +1,7 @@
 export interface BizInfo {
-  organizationName: string,
-  logoImgName: string,
-  mobile: string,
+  organizationName: string
+  logoImgName: string
+  mobile: string
   userName: string
+  id: string
 }

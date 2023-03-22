@@ -62,8 +62,8 @@
               <text class="text">编辑</text>
             </view>
           </uni-grid-item>
-          <uni-grid-item>
-            <view class="grid-item-box" @tap="exportXlsx">
+          <uni-grid-item @tap="exportXlsx">
+            <view class="grid-item-box">
               <uni-icons
                 custom-prefix="iconfont"
                 type="icon-daochu"
@@ -73,7 +73,7 @@
               <text class="text">导出</text>
             </view>
           </uni-grid-item>
-          <uni-grid-item>
+          <uni-grid-item @tap="gotoCashOut">
             <view class="grid-item-box">
               <uni-icons
                 custom-prefix="iconfont"
@@ -165,6 +165,12 @@ const gotoSingupPage = () => {
         refresh()
       }
     }
+  })
+}
+
+const gotoCashOut = () => {
+  uni.navigateTo({
+    url: `/pages/cashOut/index?id=${activity.value.id}&title=${activity.value.title}`,
   })
 }
 
