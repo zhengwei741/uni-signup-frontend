@@ -12,10 +12,18 @@
 
       <view class="section org-info">
         <view class="organizationName">
-          <view class="g-title">{{ pageOrgName }}</view>
-          <view>已认证</view>
+          <view class="g-title auth-name">{{ pageOrgName || '未认证' }}</view>
+          <view class="auth-icon" v-if="pageOrgName">
+            <uni-icons
+              custom-prefix="iconfont"
+              type="icon-renzheng"
+              :size="15"
+              color="#22f300"
+            ></uni-icons>
+            已认证</view
+          >
         </view>
-        <view class="link">Ta的主页</view>
+        <view class="link" @tap.stop="emits('onTapHomeLink')">Ta的主页</view>
       </view>
 
       <view class="section">
@@ -41,6 +49,11 @@ import type { Activity } from '@/typings/activity'
 const props = defineProps<{
   activity: Activity
   organizationName: string
+}>()
+
+// emits
+const emits = defineEmits<{
+  (e: 'onTapHomeLink'): void
 }>()
 
 // 活动详情
@@ -85,5 +98,9 @@ const pageOrgName = computed<string>(() => props.organizationName)
     line-height: 50px;
     text-align: right;
   }
+}
+.auth-name {
+  display: flex;
+  align-items: center;
 }
 </style>

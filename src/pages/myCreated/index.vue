@@ -53,7 +53,7 @@
       class="activity-card"
       v-for="activity in list"
       :key="activity.id"
-      @tap="goToBizActivityDetail(activity.id)"
+      @tap.stop="goToBizActivityDetail(activity.id)"
     >
       <view class="activity-card__content">
         <view :span="24">
@@ -68,7 +68,9 @@
             }}</text>
           </view>
           <view class="del-btn">
-            <button type="warn" size="mini" @tap="deleteAct(activity.id)">删除</button>
+            <button type="warn" size="mini" @tap.stop="deleteAct(activity.id)">
+              删除
+            </button>
           </view>
         </view>
       </view>
@@ -122,8 +124,15 @@ const goToBizActivityDetail = (id: string) => {
 }
 
 const deleteAct = (id: string) => {
-  deleteActivity(id).then(() => {
-    refresh()
+  uni.showModal({
+    content: `确定要删除该活动？`,
+    success({ confirm }) {
+      if (confirm) {
+        deleteActivity(id).then(() => {
+          refresh()
+        })
+      }
+    }
   })
 }
 

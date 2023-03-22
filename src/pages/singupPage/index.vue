@@ -54,8 +54,8 @@ import { queryActivityField } from '@/apis/activity'
 import { insertApply } from '@/apis/apply'
 import type { ActivityField, ActivityGroup } from '@/typings/activity'
 import { toFront } from '@/utils'
-import { useLoading } from '@/hooks/useLoading'
 import { useEventChannel } from '@/hooks/useEventChannel'
+import { usePay } from '@/hooks/usePay'
 
 // 表单
 const formData = reactive<{
@@ -147,14 +147,13 @@ const cost = computed(() => {
 })
 
 // 新增报名
-const { loading, run } = useLoading(insertApply)
+const loading = ref(false)
 const instance = getCurrentInstance() as ComponentInternalInstance
 const { eventChannel } = useEventChannel()
 const submit = async (fromName: string = 'singupForm') => {
-  const { refs } = instance
   try {
     // @ts-ignore
-    await refs[fromName].validate()
+    await instance.refs[fromName].validate()
     const { domains, groupId } = formData
     const { name, mobile } = domains
     delete domains.name
@@ -169,20 +168,34 @@ const submit = async (fromName: string = 'singupForm') => {
         fieldValue: domains[key]
       }))
     }
-    if (cost.value == 0) {
-      await run(finalParams)
-      uni.showToast({ title: '报名成功' })
-      eventChannel.value.emit('onSingSuccess')
-      setTimeout(() => {
-        uni.navigateBack()
-      }, 300)
+
+    loading.value = true
+
+    const { data } = await insertApply(finalParams)
+    // 支付
+    if (data.package) {
+      await usePay(data)
     }
+    uni.showToast({ title: '报名成功' })
+    eventChannel.value.emit('onSingSuccess')
+    setTimeout(() => {
+      uni.navigateBack()
+    }, 1000)
   } catch (e: any) {
-    uni.showToast({
-      title: e.msg || '操作失败',
-      icon: 'error'
-    })
+    const { errMsg } = e
+    if (errMsg) {
+      let title = errMsg
+      if (errMsg === 'requestPayment:fail cancel') {
+        title = '用户取消支付'
+      }
+      uni.showToast({
+        title,
+        icon: 'error'
+      })
+    }
     console.log(e)
+  } finally {
+    loading.value = false
   }
 }
 

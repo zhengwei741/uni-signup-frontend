@@ -134,10 +134,10 @@
             multiple
             v-model="isAgree"
             :localdata="[{ text: '', value: 0 }]"
-            
           ></uni-data-checkbox>
-          <text @tap="openUserAgreement">已阅读并同意
-            <text style="color: #007aff;">《用户服务协议》</text>
+          <text @tap="openUserAgreement"
+            >已阅读并同意
+            <text style="color: #007aff">《用户服务协议》</text>
           </text>
         </view>
         <!-- 用户协议 end-->
@@ -214,7 +214,10 @@ const goToActivityGroup = () => {
     },
     success: function (res) {
       // 通过eventChannel向被打开页面传送数据
-      res.eventChannel.emit('onGroupOpen', unref(activityGroups))
+      res.eventChannel.emit(
+        'onGroupOpen',
+        JSON.parse(JSON.stringify(activityGroups))
+      )
     }
   })
 }

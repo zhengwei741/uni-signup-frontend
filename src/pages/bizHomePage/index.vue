@@ -1,6 +1,6 @@
 <template>
   <uni-container>
-    <view class="warpper" :style="{ 'padding-bottom': list.length < 3 ? 0 : '50px' }">
+    <view class="warpper">
       <image
         mode="aspectFit"
         v-if="bizInfo?.logoImgName"
@@ -11,11 +11,11 @@
       <view class="biz-info" id="biz-info">
         <view>
           <text class="f-b">发布人：</text>
-          <text>{{ bizInfo?.userName }}</text>
+          <text>{{ bizInfo?.userName || '未认证' }}</text>
         </view>
         <view>
           <text class="f-b">手机号：</text>
-          <text>{{ bizInfo?.mobile }}</text>
+          <text>{{ bizInfo?.mobile || '未认证' }}</text>
         </view>
       </view>
 
@@ -24,6 +24,7 @@
         v-if="list.length"
         v-for="item of list"
         :key="item.id"
+        @tap.stop="gotoActivityDetail(item.id)"
       >
         <view class="activity-card__content">
           <view :span="24">
@@ -108,7 +109,7 @@ onLoad((option: any) => {
     const { data } = ret
     bizInfo.value = data
     uni.setNavigationBarTitle({
-      title: `${data.userName}的主页`
+      title: `${data.userName || 'TA'}的主页`
     })
   })
   refresh()
@@ -120,7 +121,7 @@ const goToHome = () => {
       uni.switchTab({
         url: '/pages/hot/index'
       })
-    },
+    }
   })
 }
 // 分享相关
@@ -137,7 +138,17 @@ onShareAppMessage((res) => {
     path: `/pages/bizHomePage/index?creater=${creater.value}`
   }
 })
-
+// 跳转详情
+const gotoActivityDetail = (id: string) => {
+  uni.navigateTo({
+    url: `/pages/visitorActivityDetail/index?id=${id}`,
+    fail() {
+      uni.reLaunch({
+        url: `/pages/visitorActivityDetail/index?id=${id}`
+      })
+    }
+  })
+}
 </script>
 <style scoped lang="scss">
 .warpper {

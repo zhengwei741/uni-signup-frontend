@@ -26,7 +26,8 @@ export const useActivityDetail = (
     fieldList: [],
     groupList: [],
     showFlag: '1', // 1 显示 0 不显示
-    id: ''
+    id: '',
+    creater: ''
   })
   // 组织机构
   const organizationName = ref<string>('')
@@ -44,28 +45,33 @@ export const useActivityDetail = (
     refresh()
   })
 
-  const refresh = () => {
+  const refresh = async () => {
+    uni.showLoading({ title: '加载中' })
     const { allApply, cancelApply, myApply } = options
-    queryActivityDetail(id.value).then((ret) => {
+    await queryActivityDetail(id.value).then((ret) => {
       const { data } = ret
       activity.value = data.activity
       organizationName.value = data.organizationName
     })
-    allApply &&
-      queryAllApply(id.value).then((ret) => {
+    if (allApply) {
+      await queryAllApply(id.value).then((ret) => {
         const { data } = ret
         allApplyList.value = data.allApplyList
       })
-    cancelApply &&
-      queryCancelApply(id.value).then((ret) => {
+    }
+    if (cancelApply) {
+      await queryCancelApply(id.value).then((ret) => {
         const { data } = ret
         cancelApplyList.value = data.cancelList
       })
-    myApply &&
-      queryMyApply(id.value).then((ret) => {
+    }
+    if (myApply) {
+      await queryMyApply(id.value).then((ret) => {
         const { data } = ret
         myApplyList.value = data.myApplyList
       })
+    }
+    uni.hideLoading()
   }
 
   return {

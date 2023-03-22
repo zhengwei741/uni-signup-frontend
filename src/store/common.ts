@@ -26,6 +26,7 @@ export const useCommonStore = defineStore('common', () => {
   return {
     token,
     setToken,
+
     selected,
     setSelected
   }

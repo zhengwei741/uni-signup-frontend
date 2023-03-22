@@ -17,6 +17,8 @@ export interface Activity {
   showFlag: string // 1 显示 0 不显示
   //
   status?: string
+  //
+  creater?: string
 }
 
 export interface ActivityField {

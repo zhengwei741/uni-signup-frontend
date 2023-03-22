@@ -4,9 +4,7 @@
       <uni-activityDetail
         :activity="activity"
         :organizationName="organizationName"
-        :allApplyList="allApplyList"
-        myApply
-        :myApplyList="myApplyList"
+        @onTapHomeLink="onTapHomeLink"
       >
         <template #myApply>
           <view class="section">
@@ -82,7 +80,7 @@ import type { ComponentInternalInstance } from 'vue'
 import { onShareAppMessage } from '@dcloudio/uni-app'
 import { useActivityDetail } from '@/hooks/useActivityDetail'
 
-const { activity, organizationName, allApplyList, myApplyList ,refresh } =
+const { activity, organizationName, allApplyList, myApplyList, refresh } =
   useActivityDetail({ allApply: true, myApply: true })
 // 报名是否关闭
 const isClose = computed(() => activity.value.status === '1')
@@ -111,6 +109,13 @@ const gotoSingupPage = () => {
         refresh()
       }
     }
+  })
+}
+
+// 跳转TA的主页
+const onTapHomeLink = () => {
+  uni.navigateTo({
+    url: `/pages/bizHomePage/index?creater=${activity.value.creater}`
   })
 }
 </script>
@@ -155,7 +160,7 @@ const gotoSingupPage = () => {
     }
   }
 }
-.list-title{
+.list-title {
   margin-bottom: 5px;
   display: inline-block;
 }

@@ -1,5 +1,5 @@
 import { request } from '@/utils/request'
-import type { Apply } from '@/typings/apply'
+import type { Apply, ApplyInfo, PayRet } from '@/typings/apply'
 /**
  * 根据活动Id查询所有报名
  * @param params
@@ -21,7 +21,7 @@ export const queryAllApply = (activityId: string) => {
  * @returns
  */
 export const insertApply = (params: any) => {
-  return request<API.Result>({
+  return request<API.Result<PayRet>>({
     url: '/apply/mini/insertApply',
     method: 'POST',
     data: params
@@ -54,6 +54,36 @@ export const queryMyApply = (activityId: string) => {
     method: 'POST',
     data: {
       activityId
+    }
+  })
+}
+
+/**
+ * 根据报名Id查询报名详情
+ * @param params
+ * @returns
+ */
+export const queryApplyDetail = (id: string) => {
+  return request<API.Result<ApplyInfo>>({
+    url: '/apply/mini/queryApplyDetail',
+    method: 'POST',
+    data: {
+      id
+    }
+  })
+}
+
+/**
+ * 根据报名Id取消报名
+ * @param params
+ * @returns
+ */
+export const delApply = (id: string) => {
+  return request<API.Result>({
+    url: '/apply/mini/delApply',
+    method: 'POST',
+    data: {
+      id
     }
   })
 }

@@ -41,7 +41,9 @@
             </view>
           </view>
           <view class="uni-card__content" @tap.stop="gotoHomePage(item)">
-            <text class="org-name">{{ item.organizationName }}</text>
+            <text class="org-name">{{
+              item.organizationName || '未认证'
+            }}</text>
             <text class="org-link">Ta的主页</text>
           </view>
         </view>
