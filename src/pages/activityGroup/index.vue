@@ -13,10 +13,10 @@
         }"
       >
         <uni-forms-item label="组别名称" required name="groupName">
-          <uni-easyinput v-model="group.groupName" placeholder="输入组别名称" />
+          <uni-easyinput type="text" v-model="group.groupName" placeholder="输入组别名称" @input="() => onGroupChange(group)" />
         </uni-forms-item>
         <uni-forms-item label="金额(￥)" required name="money">
-          <uni-easyinput v-model="group.money" placeholder="输入金额" />
+          <uni-easyinput type="digit" v-model="group.money" placeholder="输入金额" @input="() => onGroupChange(group)" />
         </uni-forms-item>
       </uni-forms>
 
@@ -29,6 +29,7 @@
             :activeText="getActiveText(group)"
             size="mini"
             v-model:value="group.limit"
+            @chagne="() => onGroupChange(group)"
           ></uni-switch>
         </view>
         <view class="right">
@@ -37,6 +38,8 @@
               :disabled="inputDisabled(group.limit)"
               v-model="group.peopleNumber"
               placeholder="请输入限制人数"
+              @input="() => onGroupChange(group)"
+              type="number"
             />
           </uni-forms-item>
         </view>
@@ -74,12 +77,12 @@
   </uni-container>
 </template>
 <script setup lang="ts">
-import { getCurrentInstance, nextTick, ref, unref } from 'vue'
+import { getCurrentInstance, nextTick, ref } from 'vue'
 import type { ComponentInternalInstance } from 'vue'
 import type { ActivityGroup } from '@/typings/activity'
 import { onLoad } from '@dcloudio/uni-app'
 import { useEventChannel } from '@/hooks/useEventChannel'
-import { getMockID, toBack, isMockId, toFront } from '@/utils'
+import { getMockID, toBack, isMockId } from '@/utils'
 import { deleteGroup, updateGroup } from '@/apis/activity'
 
 const activityGroups = ref<ActivityGroup[]>([])
@@ -97,7 +100,6 @@ onLoad(async (option: any) => {
   await nextTick()
   // 打开页面传入的分组列表
   eventChannel.value.on('onGroupOpen', function (data: ActivityGroup[]) {
-    data.forEach((item) => (item.money = toFront(item.money)))
     activityGroups.value = data
   })
 })
@@ -160,8 +162,13 @@ const saveGroupHandel = async () => {
   try {
     const { refs } = instance
     await validateFrom(refs)
+
+    if (isEdit.value) {
+      await saveChangeGroup()
+    }
+
     if (eventChannel.value) {
-      eventChannel.value.emit('onGroupSave', unref(activityGroups.value))
+      eventChannel.value.emit('onGroupSave', JSON.parse(JSON.stringify(activityGroups.value)))
     }
     uni.navigateBack()
   } catch (e) {
@@ -171,14 +178,20 @@ const saveGroupHandel = async () => {
 }
 
 // 更新组别
-const updateOneGroup = (group: ActivityGroup) => {
+const updateOneGroup = (group: ActivityGroup, showTip = true): Promise<unknown> => {
   const { peopleNumber, applicantNumber = 0, limit } = group
   if (limit && peopleNumber < applicantNumber) {
+    const title = `已有${applicantNumber}人报名, 限制人数不能小于该人数`
     uni.showToast({
-      title: `已有${applicantNumber}人报名, 限制人数不能小于该人数`,
+      title,
       icon: 'none'
     })
-    return
+    return Promise.reject(title)
+  }
+  if (group.money > 5000) {
+    const title = '最大金额不能超过5000'
+    uni.showToast({ title , icon: 'none' })
+    return Promise.reject(title)
   }
   const _group = {
     id: group.id,
@@ -187,9 +200,27 @@ const updateOneGroup = (group: ActivityGroup) => {
     groupName: group.groupName,
     money: toBack(group.money)
   }
-  updateGroup(_group).then(() => {
-    uni.showToast({ title: '保存成功' })
+  return updateGroup(_group).then(() => {
+    chagneIds.delete(group.id)
+    showTip && uni.showToast({ title: '保存成功' })
   })
+}
+
+// 保存所有修改过的id
+const chagneIds = new Set()
+const onGroupChange = (group: ActivityGroup) => {
+  if (!isMockId(group.id)) {
+    chagneIds.add(group.id)
+  }
+}
+const saveChangeGroup = async () => {
+  const promises: Promise<unknown>[] = []
+  activityGroups.value.forEach(group => {
+    if (chagneIds.has(group.id)) {
+      promises.push(updateOneGroup(group, false))
+    }
+  })
+  return Promise.all(promises)
 }
 </script>
 <style scoped lang="scss">

@@ -78,7 +78,7 @@ import { onLoad, onShareAppMessage } from '@dcloudio/uni-app'
 import { getStatusStyle } from '@/utils'
 import type { BizInfo } from '@/typings/user'
 import type { HotActivity } from '@/typings/activity'
-import { queryActivityByBiz } from '@/apis/activity'
+import { queryActivityByCreater } from '@/apis/activity'
 import { queryBizInfo } from '@/apis/user'
 import { URL } from '@/const'
 import { usePageScroll } from '@/hooks/usePageScroll'
@@ -89,7 +89,7 @@ const creater = ref('')
 
 const { refresh, next, status, list } = usePageScroll<HotActivity[]>({
   action({ pageNo, pageSize }) {
-    return queryActivityByBiz({ pageNo, pageSize }).then((ret) => {
+    return queryActivityByCreater({ creater: creater.value, pageNo, pageSize }).then((ret) => {
       const pageInfo = ret.data.pageInfo
       return {
         list: pageInfo.list,
@@ -108,9 +108,6 @@ onLoad((option: any) => {
   queryBizInfo(option.creater).then((ret) => {
     const { data } = ret
     bizInfo.value = data
-    uni.setNavigationBarTitle({
-      title: `${data.userName || 'TA'}的主页`
-    })
   })
   refresh()
 })

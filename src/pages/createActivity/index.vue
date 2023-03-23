@@ -101,6 +101,7 @@
               placeholder="请输入需要添加的字段"
               v-model="field.fieldName"
               :disabled="!isMockId(field.id)"
+              :maxlength="10"
             />
           </view>
           <view class="activity-field__actions">
@@ -166,7 +167,7 @@ import {
   modifyActivity
 } from '@/apis/activity'
 import { useEventChannel } from '@/hooks/useEventChannel'
-import { getMockID, formatTime, toBack, isMockId } from '@/utils'
+import { getMockID, formatTime, toBack, isMockId, toFront } from '@/utils'
 import { onLoad } from '@dcloudio/uni-app'
 
 // 活动字段
@@ -318,7 +319,10 @@ onLoad((option: any) => {
 
         const fieldRet = ret[1]
         activityFields.value = fieldRet.data.fieldList
-        activityGroups.value = fieldRet.data.groupList
+        activityGroups.value = fieldRet.data.groupList.map((group) => ({
+          ...group,
+          money: toFront(group.money)
+        }))
 
         isAgree.value = [0]
       })
@@ -363,11 +367,14 @@ const edit = async () => {
 
   removeMockId()
 
+  // 校验自定义字段
+  await validateFields()
+
   const modifyAct: Activity = {
     id: activityFormData.value.id,
     title: activityFormData.value.title,
-    startTime: activityFormData.value.startTime,
-    endTime: activityFormData.value.endTime,
+    startTime: formatTime(activityFormData.value.startTime),
+    endTime: formatTime(activityFormData.value.endTime),
     showFlag: activityFormData.value.showFlag,
     description: activityFormData.value.description,
     groupList: activityGroups.value.filter((group) => !group.id),

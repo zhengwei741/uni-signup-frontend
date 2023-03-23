@@ -99,7 +99,15 @@ onShareAppMessage((res) => {
   }
 })
 
-const goToHome = () => uni.redirectTo({ url: '../hot/index' })
+const goToHome = () => {
+  uni.navigateBack({
+    fail() {
+      uni.switchTab({
+        url: '/pages/hot/index'
+      })
+    }
+  })
+}
 
 const gotoSingupPage = () => {
   uni.navigateTo({

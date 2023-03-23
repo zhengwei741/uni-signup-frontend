@@ -174,3 +174,17 @@ export const updateGroup = (group: ActivityGroup) => {
     data: group
   })
 }
+
+/**
+ * 分页查询指定创建人的活动
+ * @returns
+ */
+export const queryActivityByCreater = (params: API.Pagination<{
+  creater: string
+}>) => {
+  return request<API.Result>({
+    url: '/activity/mini/queryActivityByCreater',
+    method: 'POST',
+    data: params
+  })
+}
