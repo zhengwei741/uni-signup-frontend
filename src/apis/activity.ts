@@ -98,3 +98,79 @@ export const deleteActivity = (id: string) => {
     }
   })
 }
+
+/**
+ * 删除自定义字段
+ * @param id
+ * @returns
+ */
+export const deleteField = (id: any, activityId: string) => {
+  return request<API.Result>({
+    url: '/activity/mini/deleteField',
+    method: 'POST',
+    data: {
+      id,
+      activityId
+    }
+  })
+}
+
+/**
+ * 编辑自定义字段是否必填
+ * @param id
+ * @returns
+ */
+export const modifyField = (
+  id: any,
+  activityId: string,
+  requiredFlag: string
+) => {
+  return request<API.Result>({
+    url: '/activity/mini/modifyField',
+    method: 'POST',
+    data: {
+      id,
+      activityId,
+      requiredFlag
+    }
+  })
+}
+
+/**
+ * 编辑活动
+ * @returns
+ */
+export const modifyActivity = (activity: Activity) => {
+  return request<API.Result>({
+    url: '/activity/mini/modifyActivity',
+    method: 'POST',
+    data: activity
+  })
+}
+
+/**
+ * 删除组别
+ * @returns
+ */
+export const deleteGroup = (id: any, activityId: string) => {
+  return request<API.Result>({
+    url: '/activity/mini/deleteGroup',
+    method: 'POST',
+    data: {
+      id,
+      activityId
+    }
+  })
+}
+
+/**
+ * 更新组别
+ * @returns
+ */
+export const updateGroup = (group: ActivityGroup) => {
+  return request<API.Result>({
+    url: '/activity/mini/updateGroup',
+    method: 'POST',
+    data: group
+  })
+}

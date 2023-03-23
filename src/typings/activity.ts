@@ -23,7 +23,7 @@ export interface Activity {
 
 export interface ActivityField {
   /** 字段ID */
-  id: string
+  id?: string
   /** 字段名 */
   fieldName: string
   /** 是否必填 */

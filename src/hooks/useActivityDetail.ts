@@ -46,7 +46,6 @@ export const useActivityDetail = (
   })
 
   const refresh = async () => {
-    uni.showLoading({ title: '加载中' })
     const { allApply, cancelApply, myApply } = options
     await queryActivityDetail(id.value).then((ret) => {
       const { data } = ret
@@ -71,7 +70,6 @@ export const useActivityDetail = (
         myApplyList.value = data.myApplyList
       })
     }
-    uni.hideLoading()
   }
 
   return {

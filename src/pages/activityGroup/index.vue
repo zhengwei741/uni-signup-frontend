@@ -21,9 +21,12 @@
       </uni-forms>
 
       <view class="uni-forms-item">
-        <view class="left">
+        <view
+          class="left"
+          :style="{ width: group.applicantNumber ? '200px' : '130px' }"
+        >
           <uni-switch
-            activeText="限制人数"
+            :activeText="getActiveText(group)"
             size="mini"
             v-model:value="group.limit"
           ></uni-switch>
@@ -39,8 +42,29 @@
         </view>
       </view>
 
-      <view style="text-align: center">
-        <button type="warn" size="mini" @tap="delGroup(index)">删除</button>
+      <view class="btn-wapper">
+        <button
+          v-if="isEdit && !isMockId(group.id || '')"
+          size="mini"
+          @tap="
+            () => {
+              updateOneGroup(group)
+            }
+          "
+        >
+          保存
+        </button>
+        <button
+          type="warn"
+          size="mini"
+          @tap="
+            () => {
+              delGroup(group, index)
+            }
+          "
+        >
+          删除
+        </button>
       </view>
     </uni-card>
     <view style="text-align: center">
@@ -55,20 +79,33 @@ import type { ComponentInternalInstance } from 'vue'
 import type { ActivityGroup } from '@/typings/activity'
 import { onLoad } from '@dcloudio/uni-app'
 import { useEventChannel } from '@/hooks/useEventChannel'
-import { getMockID, toBack } from '@/utils'
+import { getMockID, toBack, isMockId, toFront } from '@/utils'
+import { deleteGroup, updateGroup } from '@/apis/activity'
 
 const activityGroups = ref<ActivityGroup[]>([])
 
 const instance = getCurrentInstance() as ComponentInternalInstance
 let { eventChannel } = useEventChannel()
 
-onLoad(async () => {
+const activityId = ref('')
+const isEdit = ref(false)
+
+onLoad(async (option: any) => {
+  activityId.value = option.activityId
+  isEdit.value = option.activityId !== 'undefined'
+
   await nextTick()
   // 打开页面传入的分组列表
   eventChannel.value.on('onGroupOpen', function (data: ActivityGroup[]) {
+    data.forEach((item) => (item.money = toFront(item.money)))
     activityGroups.value = data
   })
 })
+
+const getActiveText = (group: ActivityGroup) => {
+  const { applicantNumber = 0 } = group
+  return applicantNumber ? `限制人数(${applicantNumber}人已报名)` : '限制人数'
+}
 
 // 限制人数不可编辑
 const inputDisabled = (limit: boolean | undefined) => !!!limit
@@ -83,7 +120,7 @@ const addGroup = () => {
   })
 }
 // 删除组别
-const delGroup = (index: number) => {
+const delGroup = (group: ActivityGroup, index: number) => {
   if (activityGroups.value.length === 1) {
     uni.showToast({
       title: '至少要有一个组别',
@@ -91,7 +128,21 @@ const delGroup = (index: number) => {
     })
     return
   }
-  activityGroups.value.splice(index, 1)
+  if (isEdit.value && !isMockId(group.id || '')) {
+    uni.showModal({
+      title: '确认',
+      content: '删除立即生效，是否确认删除操作？',
+      success: (res) => {
+        if (res.confirm) {
+          deleteGroup(group.id || '', activityId.value).then(() => {
+            activityGroups.value.splice(index, 1)
+          })
+        }
+      }
+    })
+  } else {
+    activityGroups.value.splice(index, 1)
+  }
 }
 
 const validateFrom = async (
@@ -118,6 +169,28 @@ const saveGroupHandel = async () => {
     console.log('校验不通过')
   }
 }
+
+// 更新组别
+const updateOneGroup = (group: ActivityGroup) => {
+  const { peopleNumber, applicantNumber = 0, limit } = group
+  if (limit && peopleNumber < applicantNumber) {
+    uni.showToast({
+      title: `已有${applicantNumber}人报名, 限制人数不能小于该人数`,
+      icon: 'none'
+    })
+    return
+  }
+  const _group = {
+    id: group.id,
+    activityId: group.activityId,
+    peopleNumber: limit ? 0 : group.peopleNumber,
+    groupName: group.groupName,
+    money: toBack(group.money)
+  }
+  updateGroup(_group).then(() => {
+    uni.showToast({ title: '保存成功' })
+  })
+}
 </script>
 <style scoped lang="scss">
 .uni-forms-item {
@@ -133,6 +206,12 @@ const saveGroupHandel = async () => {
     ::v-deep .uni-forms-item {
       margin-bottom: 0;
     }
+  }
+}
+.btn-wapper {
+  display: flex;
+  button {
+    width: 100px;
   }
 }
 </style>

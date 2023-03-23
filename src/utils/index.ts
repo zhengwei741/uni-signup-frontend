@@ -26,6 +26,13 @@ export function getMockID() {
   return `mock_${Math.random()}`
 }
 
+export function isMockId(id: any) {
+  if (typeof id === 'string') {
+    return id.startsWith('mock_')
+  }
+  return false
+}
+
 // 后台金额转前台
 export function toFront(value: number = 0) {
   return currency(value).divide(100).value

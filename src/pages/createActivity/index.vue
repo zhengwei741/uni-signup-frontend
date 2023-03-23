@@ -100,6 +100,7 @@
             <input
               placeholder="请输入需要添加的字段"
               v-model="field.fieldName"
+              :disabled="!isMockId(field.id)"
             />
           </view>
           <view class="activity-field__actions">
@@ -109,12 +110,11 @@
               size="mini"
               activeValue="1"
               inactiValue="0"
+              @chagne="(value: any) => {
+                onSwitchChagne(value, field)
+              }"
             />
-            <button
-              size="mini"
-              type="warn"
-              @click="() => activityFields.splice(index, 1)"
-            >
+            <button size="mini" type="warn" @click="delField(field.id, index)">
               删除
             </button>
           </view>
@@ -142,7 +142,9 @@
         </view>
         <!-- 用户协议 end-->
 
-        <button :disabled="!canSubmit" @tap="publish">发布活动</button>
+        <button :disabled="!canSubmit" @tap="publishOrEdit">
+          {{ isEdit ? '保存' : '发布活动' }}
+        </button>
       </uni-forms>
 
       <uni-userAgreement ref="agRef"></uni-userAgreement>
@@ -151,35 +153,43 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, computed, unref, getCurrentInstance } from 'vue'
+import { ref, computed, getCurrentInstance } from 'vue'
 import type { ComponentInternalInstance } from 'vue'
 import dayjs from 'dayjs'
 import type { Activity, ActivityField, ActivityGroup } from '@/typings/activity'
-import { insertActivity } from '@/apis/activity'
+import {
+  insertActivity,
+  queryActivityDetail,
+  queryActivityField,
+  deleteField,
+  modifyField,
+  modifyActivity
+} from '@/apis/activity'
 import { useEventChannel } from '@/hooks/useEventChannel'
-import { getMockID, formatTime, toBack } from '@/utils'
+import { getMockID, formatTime, toBack, isMockId } from '@/utils'
+import { onLoad } from '@dcloudio/uni-app'
 
 // 活动字段
-const activityFields = reactive<ActivityField[]>([])
+const activityFields = ref<ActivityField[]>([])
 const addActivityField = () => {
-  activityFields.push({
+  activityFields.value.push({
     id: getMockID(),
     fieldName: '',
     requiredFlag: '1'
   })
 }
 // 活动组别
-let activityGroups = reactive<ActivityGroup[]>([
+let activityGroups = ref<ActivityGroup[]>([
   { id: getMockID(), groupName: '团体', money: 0, peopleNumber: 0 }
 ])
 // 活动表单
-const activityFormData = reactive<Activity>({
+const activityFormData = ref<Activity>({
   title: '',
   startTime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
   endTime: dayjs().add(1, 'day').format('YYYY-MM-DD HH:mm:ss'),
   description: '',
-  fieldList: activityFields,
-  groupList: activityGroups,
+  fieldList: activityFields.value,
+  groupList: activityGroups.value,
   showFlag: '1'
 })
 const validateTime = (
@@ -199,7 +209,7 @@ const canSubmit = computed(() => isAgree.value[0] === 0)
 // 跳转编辑组编
 const goToActivityGroup = () => {
   uni.navigateTo({
-    url: '../activityGroup/index',
+    url: `../activityGroup/index?activityId=${activityId.value}`,
     events: {
       onGroupSave: function (data: ActivityGroup[] = []) {
         // 不限制人数重置peopleNumber为0
@@ -207,16 +217,16 @@ const goToActivityGroup = () => {
           ...group,
           peopleNumber: group.limit ? group.peopleNumber : 0
         }))
-        activityGroups = saveData
+        activityGroups.value = saveData
         // 重新获取引用
-        activityFormData.groupList = activityGroups
+        activityFormData.value.groupList = activityGroups.value
       }
     },
     success: function (res) {
       // 通过eventChannel向被打开页面传送数据
       res.eventChannel.emit(
         'onGroupOpen',
-        JSON.parse(JSON.stringify(activityGroups))
+        JSON.parse(JSON.stringify(activityGroups.value))
       )
     }
   })
@@ -227,28 +237,37 @@ const { eventChannel } = useEventChannel()
 const uniEditerRef = ref()
 const removeMockId = () => {
   const remove = (item: any) => {
-    if (item.id?.startsWith('mock_')) {
+    if (isMockId(item.id)) {
       delete item.id
     }
   }
-  activityFields.forEach(remove)
-  activityGroups.forEach(remove)
+  activityFields.value.forEach(remove)
+  activityGroups.value.forEach(remove)
+}
+const validateFields = async () => {
+  const ret = activityFields.value.some((field) => field.fieldName === '')
+  if (ret) {
+    uni.showToast({ title: '自定义字段名称不能为空', icon: 'none' })
+    throw new Error('自定义字段名称不能为空')
+  }
 }
 const publish = async () => {
-  uni.showLoading({})
   try {
     const { refs } = instance
     await uniEditerRef.value.save()
     // @ts-ignore
     await refs.activityForm.validate()
+    // 校验自定义字段
+    await validateFields()
     // 移除前台构造id
     removeMockId()
+    // 发布
     await insertActivity({
-      ...activityFormData,
-      startTime: formatTime(activityFormData.startTime),
-      endTime: formatTime(activityFormData.endTime),
+      ...activityFormData.value,
+      startTime: formatTime(activityFormData.value.startTime),
+      endTime: formatTime(activityFormData.value.endTime),
       // 金额转换
-      groupList: activityFormData.groupList.map((group) => ({
+      groupList: activityFormData.value.groupList.map((group) => ({
         ...group,
         money: toBack(group.money)
       }))
@@ -263,8 +282,14 @@ const publish = async () => {
     }, 300)
   } catch (e) {
     console.log(e)
-  } finally {
-    uni.hideLoading()
+  }
+}
+
+const publishOrEdit = () => {
+  if (isEdit.value) {
+    edit()
+  } else {
+    publish()
   }
 }
 
@@ -274,6 +299,92 @@ const openUserAgreement = () => {
   const { refs } = instance
   // @ts-ignore
   refs.agRef.toggle()
+}
+// 编辑相关
+const activityId = ref('')
+const isEdit = computed(() => !!activityId.value)
+// 回显活动数据
+onLoad((option: any) => {
+  activityId.value = option.activityId
+  if (option.activityId) {
+    Promise.all([
+      queryActivityDetail(activityId.value),
+      queryActivityField(activityId.value)
+    ])
+      .then((ret) => {
+        const detailRet = ret[0]
+        formatTimeField(detailRet.data.activity)
+        activityFormData.value = detailRet.data.activity
+
+        const fieldRet = ret[1]
+        activityFields.value = fieldRet.data.fieldList
+        activityGroups.value = fieldRet.data.groupList
+
+        isAgree.value = [0]
+      })
+      .catch((e: any) => {
+        console.log(e)
+      })
+  }
+})
+const formatTimeField = (activity: Activity) => {
+  const { startTime, endTime } = activity
+  activity.startTime = formatTime(startTime)
+  activity.endTime = formatTime(endTime)
+}
+// 删除字段
+const delField = (id: any, index: number) => {
+  if (isEdit.value && !isMockId(id)) {
+    uni.showModal({
+      title: '确认',
+      content: '删除立即生效，是否确认删除操作？',
+      success: (res) => {
+        if (res.confirm) {
+          deleteField(id, activityId.value).then((ret) => {
+            activityFields.value.splice(index, 1)
+          })
+        }
+      }
+    })
+  } else {
+    activityFields.value.splice(index, 1)
+  }
+}
+// 修改必选
+const onSwitchChagne = (requiredFlag: any, field: ActivityField) => {
+  if (!isMockId(field.id)) {
+    modifyField(field.id, activityId.value, requiredFlag)
+  }
+}
+// 提交编辑
+const edit = async () => {
+  // 获取最新编辑内容
+  await uniEditerRef.value.save()
+
+  removeMockId()
+
+  const modifyAct: Activity = {
+    id: activityFormData.value.id,
+    title: activityFormData.value.title,
+    startTime: activityFormData.value.startTime,
+    endTime: activityFormData.value.endTime,
+    showFlag: activityFormData.value.showFlag,
+    description: activityFormData.value.description,
+    groupList: activityGroups.value.filter((group) => !group.id),
+    // 只提交新增的字段
+    fieldList: activityFields.value.filter((field) => !field.id)
+  }
+
+  modifyActivity(modifyAct).then(() => {
+    uni.showToast({ title: '保存成功', icon: 'none' })
+    setTimeout(() => {
+      uni.navigateBack()
+      // 通知上层页面刷新
+      if (eventChannel.value) {
+        eventChannel.value.emit('onActiveSaveSuccess')
+      }
+    }, 500)
+  })
 }
 </script>
 <style scoped lang="scss">

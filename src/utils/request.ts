@@ -24,15 +24,35 @@ uni.addInterceptor('request', {
   }
 })
 
+const requestStack: string[] = []
+
+function showLoading(url: string) {
+  if (!requestStack.length) {
+    uni.showLoading({})
+  }
+  requestStack.push(url)
+}
+
+function hideLoading() {
+  requestStack.pop()
+  if (!requestStack.length) {
+    uni.hideLoading()
+  }
+}
+
 export const request: RequestMethod = (options: UniApp.RequestOptions) => {
   return new Promise((resolve, reject) => {
+    showLoading(options.url)
+
     login().then(() => {
       uni.request({
         ...options,
         success: (ret) => {
           // @ts-ignore
-          const { code } = ret.data
+          const { code, msg } = ret.data
           if (code !== SUCCESS_CODE) {
+            uni.showToast({ title: msg, icon: 'none' })
+            hideLoading()
             reject(ret.data)
             return
           }
@@ -43,13 +63,18 @@ export const request: RequestMethod = (options: UniApp.RequestOptions) => {
             uni.switchTab({
               url: '/pages/hot/index'
             })
+            hideLoading()
             reject(ret.data)
             return
           }
+          hideLoading()
           // @ts-ignore
           resolve(ret.data)
         },
-        fail: reject
+        fail(ret) {
+          hideLoading()
+          reject(ret)
+        }
       })
     })
   })

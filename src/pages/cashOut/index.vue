@@ -17,7 +17,9 @@
         </view>
 
         <view class="section">
-          <text class="g-title" style="color: red; margin-bottom: 5px;">*此次提现(￥)</text>
+          <text class="g-title" style="color: red; margin-bottom: 5px"
+            >*此次提现(￥)</text
+          >
           <uni-easyinput
             v-model="cash"
             placeholder="输入金额"
@@ -35,7 +37,11 @@
         <view class="section">
           <text class="g-title">提现记录</text>
 
-          <text class="record" v-for="(record, index) in cashOut.withdrawCashList" :key="index">
+          <text
+            class="record"
+            v-for="(record, index) in cashOut.withdrawCashList"
+            :key="index"
+          >
             {{ index + 1 }}、{{ formatRecord(record) }}
           </text>
         </view>
@@ -43,7 +49,10 @@
         <view class="section" v-if="cashOut.adminFlag === '1'">
           <uni-forms ref="form" :modelValue="formData" label-width="100px">
             <uni-forms-item label="时间" name="createTime">
-              <uni-datetime-picker type="datetime" v-model="formData.createTime" />
+              <uni-datetime-picker
+                type="datetime"
+                v-model="formData.createTime"
+              />
             </uni-forms-item>
             <uni-forms-item label="提现金额(￥)" name="amount">
               <uni-easyinput v-model="formData.amount" />
@@ -64,7 +73,11 @@
 </template>
 <script setup lang="ts">
 import { ref, reactive } from 'vue'
-import { queryActivityAmount, withdraw, insertWithdrawalRecord } from '@/apis/order'
+import {
+  queryActivityAmount,
+  withdraw,
+  insertWithdrawalRecord
+} from '@/apis/order'
 import { onLoad } from '@dcloudio/uni-app'
 import type { CashOut } from '@/typings/order'
 import { toBack, toFront, formatTime } from '@/utils'
@@ -73,8 +86,8 @@ import dayjs from 'dayjs'
 
 const cash = ref(0)
 const cashOut = ref<CashOut>({
-  adminFlag: "0",
-  status: "0",
+  adminFlag: '0',
+  status: '0',
   balance: 0,
   totalAmount: 0,
   withdrawCashList: []
@@ -97,42 +110,45 @@ const confirm = () => {
   run({
     activityId: activityId.value,
     amount: toBack(cash.value)
-  }).then(getActivityAmount).catch((e: any) => {
-    uni.showToast({
-      title: e.msg,
-      icon: 'none'
-    })
   })
+    .then(getActivityAmount)
+    .catch((e: any) => {
+      uni.showToast({
+        title: e.msg,
+        icon: 'none'
+      })
+    })
 }
 
 const getActivityAmount = () => {
-  uni.showLoading({})
-  queryActivityAmount(activityId.value || '426423103583870976').then(ret => {
+  queryActivityAmount(activityId.value).then((ret) => {
     cashOut.value = {
       ...ret.data,
       balance: toFront(ret.data.balance),
       totalAmount: toFront(ret.data.totalAmount)
     }
-  }).finally(uni.hideLoading)
+  })
 }
 
 const formData = reactive({
   createTime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
   amount: 0,
-  platformServiceFee: 0,
+  platformServiceFee: 0
 })
 const addRecord = () => {
   insertWithdrawalRecord({
     amount: toBack(formData.amount),
     platformServiceFee: toBack(formData.platformServiceFee),
     createTime: formatTime(formData.createTime),
-    activityId: activityId.value,
-  }).then(getActivityAmount).catch((e: any) => {
-    uni.showToast({
-      title: e.msg,
-      icon: 'none'
-    })
+    activityId: activityId.value
   })
+    .then(getActivityAmount)
+    .catch((e: any) => {
+      uni.showToast({
+        title: e.msg,
+        icon: 'none'
+      })
+    })
 }
 const formatRecord = (record: any) => {
   const { amount, createTime } = record
@@ -146,7 +162,7 @@ onLoad((option: any) => {
 })
 </script>
 <style scoped lang="scss">
-.container{
+.container {
   height: calc(100vh - env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
@@ -156,7 +172,7 @@ onLoad((option: any) => {
     width: 100%;
     display: flex;
     overflow: scroll;
-    .inner{
+    .inner {
       width: 100%;
       margin: 5px;
       padding: 5px 10px;
@@ -165,32 +181,32 @@ onLoad((option: any) => {
       background-color: #fff;
       overflow-y: scroll;
     }
-    .section{
+    .section {
       margin-bottom: 20px;
-      text{
+      text {
         display: block;
       }
-      .unit{
+      .unit {
         margin-top: 5px;
         font-size: 14px;
         color: #7f7f7f;
       }
-      .record{
+      .record {
         color: #7f7f7f;
         font-size: 14px;
         margin: 3px 0;
       }
     }
-    .tip{
+    .tip {
       color: #ffb400;
       margin-bottom: 20px;
     }
   }
-  .title{
+  .title {
     font-size: 20px;
     font-weight: bold;
   }
-  .foot{
+  .foot {
     height: 30px;
     width: 100%;
     display: flex;

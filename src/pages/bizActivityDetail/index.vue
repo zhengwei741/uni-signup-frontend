@@ -51,7 +51,7 @@
               <text class="text">分享</text>
             </view>
           </uni-grid-item>
-          <uni-grid-item>
+          <uni-grid-item @tap="gotoEdit">
             <view class="grid-item-box">
               <uni-icons
                 custom-prefix="iconfont"
@@ -170,7 +170,18 @@ const gotoSingupPage = () => {
 
 const gotoCashOut = () => {
   uni.navigateTo({
-    url: `/pages/cashOut/index?id=${activity.value.id}&title=${activity.value.title}`,
+    url: `/pages/cashOut/index?id=${activity.value.id}&title=${activity.value.title}`
+  })
+}
+
+const gotoEdit = () => {
+  uni.navigateTo({
+    url: `/pages/createActivity/index?activityId=${activity.value.id}`,
+    events: {
+      onActiveSaveSuccess() {
+        refresh()
+      }
+    }
   })
 }
 
@@ -179,17 +190,14 @@ const dialogRef = ref()
 const applyInfo = ref<ApplyInfo>()
 // 取消报名
 const cancelApply = (apply: Apply) => {
-  uni.showLoading({})
-  queryApplyDetail(apply.id)
-    .then((ret) => {
-      applyInfo.value = {
-        ...ret.data,
-        money: toFront(ret.data.money)
-      }
-      // @ts-ignore
-      instance.refs.popupRef.open('center')
-    })
-    .finally(uni.hideLoading)
+  queryApplyDetail(apply.id).then((ret) => {
+    applyInfo.value = {
+      ...ret.data,
+      money: toFront(ret.data.money)
+    }
+    // @ts-ignore
+    instance.refs.popupRef.open('center')
+  })
 }
 const close = () => {
   // @ts-ignore
@@ -197,14 +205,11 @@ const close = () => {
 }
 const confirm = () => {
   if (applyInfo.value) {
-    uni.showLoading({})
-    delApply(applyInfo.value.id)
-      .then(() => {
-        // @ts-ignore
-        instance.refs.dialogRef.close()
-        return refresh()
-      })
-      .finally(uni.hideLoading)
+    delApply(applyInfo.value.id).then(() => {
+      // @ts-ignore
+      instance.refs.dialogRef.close()
+      return refresh()
+    })
   }
 }
 // 导出相关
