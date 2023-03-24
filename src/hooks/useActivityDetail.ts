@@ -9,13 +9,15 @@ interface optionsProps {
   allApply?: boolean
   cancelApply?: boolean
   myApply?: boolean
+  showAlway?: boolean
 }
 
 export const useActivityDetail = (
   options: optionsProps = {
     allApply: true,
     cancelApply: false,
-    myApply: false
+    myApply: false,
+    showAlway: false
   }
 ) => {
   const activity = ref<Activity>({
@@ -46,7 +48,7 @@ export const useActivityDetail = (
   })
 
   const refresh = async () => {
-    const { allApply, cancelApply, myApply } = options
+    const { allApply, cancelApply, myApply, showAlway } = options
     await queryActivityDetail(id.value).then((ret) => {
       const { data } = ret
       activity.value = data.activity
@@ -59,7 +61,7 @@ export const useActivityDetail = (
     if (allApply) {
       await queryAllApply(id.value).then((ret) => {
         const { data } = ret
-        if (activity.value.showFlag === '1') {
+        if (!!showAlway || activity.value.showFlag === '1') {
           allApplyList.value = data.allApplyList
         }
       })

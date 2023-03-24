@@ -6,6 +6,7 @@
         :organizationName="organizationName"
         :is-shadow="false"
         :is-full="true"
+        @onTapHomeLink="onTapHomeLink"
       >
         <template #cancelApply>
           <view class="section">
@@ -113,21 +114,29 @@
         @confirm="confirm"
       >
         <view class="container">
-          <uni-list>
-            <uni-list-item title="组别:" :rightText="applyInfo?.groupName" />
-            <uni-list-item title="昵称:" :rightText="applyInfo?.name" />
-            <uni-list-item title="手机:" :rightText="applyInfo?.mobile" />
-            <uni-list-item
-              title="报名费用(元):"
-              :rightText="`${applyInfo?.money}`"
-            />
-            <uni-list-item
+          <view class="apply-list">
+            <view class="apply-list_item">
+              <view class="list-item_groupName">组别:</view>
+              <view class="list-item_value">{{ applyInfo?.groupName }}</view>
+            </view>
+            <view class="apply-list_item">
+              <view class="list-item_groupName">昵称:</view>
+              <view class="list-item_value">{{ applyInfo?.name }}</view>
+            </view>
+            <view class="apply-list_item">
+              <view class="list-item_groupName">手机:</view>
+              <view class="list-item_value">{{ applyInfo?.mobile }}</view>
+            </view>
+
+            <view
+              class="apply-list_item"
               v-for="(apply, index) in applyInfo?.fieldList"
-              :title="`${apply.fieldName}:`"
-              :rightText="apply.fieldValue"
               :key="index"
-            />
-          </uni-list>
+            >
+              <view class="list-item_groupName">{{ apply.fieldName }}:</view>
+              <view class="list-item_value">{{ apply.fieldValue }}</view>
+            </view>
+          </view>
         </view>
       </uni-popup-dialog>
     </uni-popup>
@@ -144,7 +153,7 @@ import { useDownloadFile } from '@/hooks/useDownloadFile'
 import { toFront } from '@/utils'
 
 const { activity, organizationName, allApplyList, cancelApplyList, refresh } =
-  useActivityDetail({ allApply: true, cancelApply: true })
+  useActivityDetail({ allApply: true, cancelApply: true, showAlway: true })
 // 分享相关
 const shareRef = ref()
 const instance = getCurrentInstance() as ComponentInternalInstance
@@ -184,6 +193,12 @@ const gotoEdit = () => {
         refresh()
       }
     }
+  })
+}
+
+const onTapHomeLink = () => {
+  uni.navigateTo({
+    url: `/pages/bizHomePage/index?creater=${activity.value.creater}`
   })
 }
 
@@ -262,5 +277,25 @@ const exportXlsx = () => {
   height: 40vh;
   width: 80vw;
   overflow-y: scroll;
+  .apply-list{
+    width: 100%;
+    .apply-list_item{
+      display: flex;
+      padding: 12px 15px;
+      border-bottom: 1px solid #d6d6d6;
+      .list-item_groupName, .list-item_value{
+        flex: 1;
+        font-size: 14px;
+        color: #3b4144;
+        display: flex;
+        align-items: center;
+      }
+      .list-item_value{
+        color: #999;
+        font-size: 12px;
+        justify-content: flex-end;
+      }
+    }
+  }
 }
 </style>

@@ -4,7 +4,7 @@
       <view class="clear">
         <uni-icons type="clear" size="30" @tap="clear"></uni-icons>
       </view>
-      <image mode="aspectFit" :src="fullSrc" style="width: 100%"></image>
+      <image mode="aspectFill" :src="fullSrc" style="width: 100%"></image>
     </view>
     <button size="mini" plain="true" v-else @click="uploadLogo">
       点击上传Logo

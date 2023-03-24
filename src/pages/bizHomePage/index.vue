@@ -2,7 +2,7 @@
   <uni-container>
     <view class="warpper">
       <image
-        mode="aspectFit"
+        mode="aspectFill"
         v-if="bizInfo?.logoImgName"
         :src="URL + '/' + bizInfo?.logoImgName"
         style="width: 100%; background-color: #fff"
@@ -120,12 +120,8 @@ onLoad((option: any) => {
 })
 
 const goToHome = () => {
-  uni.navigateBack({
-    fail(result) {
-      uni.switchTab({
-        url: '/pages/hot/index'
-      })
-    }
+  uni.switchTab({
+    url: '/pages/hot/index'
   })
 }
 // 分享相关
