@@ -1,6 +1,11 @@
 <template>
   <view class="light-background-color">
-    <uni-card margin="5px" padding="3px">
+    <uni-card
+      :margin="props.margin"
+      :padding="props.padding"
+      :isShadow="props.isShadow"
+      :is-full="props.isFull"
+    >
       <view class="section">
         <text class="g-title">{{ pageActivity.title }}</text>
       </view>
@@ -46,10 +51,20 @@
 import { computed } from 'vue'
 import type { Activity } from '@/typings/activity'
 
-const props = defineProps<{
-  activity: Activity
-  organizationName: string
-}>()
+const props = withDefaults(
+  defineProps<{
+    activity: Activity
+    organizationName: string
+    margin: string
+    padding: string
+    isShadow: boolean
+    isFull: boolean
+  }>(),
+  {
+    margin: '5px',
+    padding: '3px'
+  }
+)
 
 // emits
 const emits = defineEmits<{

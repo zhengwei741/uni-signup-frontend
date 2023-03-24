@@ -4,12 +4,14 @@
       <uni-activityDetail
         :activity="activity"
         :organizationName="organizationName"
+        :is-shadow="false"
+        :is-full="true"
         @onTapHomeLink="onTapHomeLink"
       >
         <template #myApply>
-          <view class="section">
+          <view class="section" v-if="myApplyList.length">
             <text class="g-title list-title">我的报名</text>
-            <uni-list v-if="myApplyList.length">
+            <uni-list>
               <uni-list-item
                 v-for="(apply, index) in myApplyList"
                 :title="`${index + 1}、${apply.name}`"
@@ -17,13 +19,12 @@
                 :index="apply.id"
               />
             </uni-list>
-            <uni-empty v-else></uni-empty>
           </view>
         </template>
         <template #allApplyList>
-          <view class="section">
+          <view class="section" v-if="allApplyList.length">
             <text class="g-title list-title">所有报名</text>
-            <uni-list v-if="allApplyList.length">
+            <uni-list>
               <uni-list-item
                 v-for="(apply, index) in allApplyList"
                 :title="`${index + 1}、${apply.name}`"
@@ -31,7 +32,6 @@
                 :index="apply.id"
               />
             </uni-list>
-            <uni-empty v-else></uni-empty>
           </view>
         </template>
       </uni-activityDetail>
@@ -100,12 +100,8 @@ onShareAppMessage((res) => {
 })
 
 const goToHome = () => {
-  uni.navigateBack({
-    fail() {
-      uni.switchTab({
-        url: '/pages/hot/index'
-      })
-    }
+  uni.switchTab({
+    url: '/pages/hot/index'
   })
 }
 

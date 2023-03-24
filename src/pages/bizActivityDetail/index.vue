@@ -4,6 +4,8 @@
       <uni-activityDetail
         :activity="activity"
         :organizationName="organizationName"
+        :is-shadow="false"
+        :is-full="true"
       >
         <template #cancelApply>
           <view class="section">
@@ -204,13 +206,20 @@ const close = () => {
   instance.refs.dialogRef.close()
 }
 const confirm = () => {
-  if (applyInfo.value) {
-    delApply(applyInfo.value.id).then(() => {
-      // @ts-ignore
-      instance.refs.dialogRef.close()
-      return refresh()
-    })
-  }
+  uni.showModal({
+    content: `确定要取消该报名？`,
+    success({ confirm }) {
+      if (confirm) {
+        if (applyInfo.value) {
+          delApply(applyInfo.value.id).then(() => {
+            // @ts-ignore
+            instance.refs.dialogRef.close()
+            return refresh()
+          })
+        }
+      }
+    }
+  })
 }
 // 导出相关
 const exportXlsx = () => {

@@ -1,4 +1,4 @@
-import { ref } from 'vue'
+import { ref, nextTick } from 'vue'
 import type { Apply } from '@/typings/apply'
 import type { Activity } from '@/typings/activity'
 import { onLoad } from '@dcloudio/uni-app'
@@ -52,10 +52,16 @@ export const useActivityDetail = (
       activity.value = data.activity
       organizationName.value = data.organizationName
     })
+
+    await nextTick()
+
+    // 是否显示报名
     if (allApply) {
       await queryAllApply(id.value).then((ret) => {
         const { data } = ret
-        allApplyList.value = data.allApplyList
+        if (activity.value.showFlag === '1') {
+          allApplyList.value = data.allApplyList
+        }
       })
     }
     if (cancelApply) {

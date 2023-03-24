@@ -9,6 +9,9 @@
       ></image>
 
       <view class="biz-info" id="biz-info">
+        <view style="text-align: center">
+          <text class="f-b">{{ bizInfo?.organizationName }}</text>
+        </view>
         <view>
           <text class="f-b">发布人：</text>
           <text>{{ bizInfo?.userName || '未认证' }}</text>
@@ -89,7 +92,11 @@ const creater = ref('')
 
 const { refresh, next, status, list } = usePageScroll<HotActivity[]>({
   action({ pageNo, pageSize }) {
-    return queryActivityByCreater({ creater: creater.value, pageNo, pageSize }).then((ret) => {
+    return queryActivityByCreater({
+      creater: creater.value,
+      pageNo,
+      pageSize
+    }).then((ret) => {
       const pageInfo = ret.data.pageInfo
       return {
         list: pageInfo.list,
@@ -131,7 +138,7 @@ const shareToggle = () => {
 }
 onShareAppMessage((res) => {
   return {
-    title: `${bizInfo.value?.userName}的主页`,
+    title: `${bizInfo.value?.organizationName}`,
     path: `/pages/bizHomePage/index?creater=${creater.value}`
   }
 })
@@ -156,7 +163,6 @@ const gotoActivityDetail = (id: string) => {
 .biz-info {
   background-color: #fff;
   padding: 10px;
-  height: 60px;
   > view {
     padding: 5px 0;
   }
