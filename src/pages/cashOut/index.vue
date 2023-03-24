@@ -121,7 +121,7 @@ const confirm = () => {
 }
 
 const getActivityAmount = () => {
-  queryActivityAmount(activityId.value).then((ret) => {
+  return queryActivityAmount(activityId.value).then((ret) => {
     cashOut.value = {
       ...ret.data,
       balance: toFront(ret.data.balance),
