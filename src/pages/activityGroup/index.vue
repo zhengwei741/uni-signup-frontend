@@ -1,5 +1,5 @@
 <template>
-  <uni-container>
+  <view class="bg">
     <uni-card v-for="(group, index) in activityGroups" :key="group.id">
       <uni-forms
         :modelValue="group"
@@ -13,10 +13,22 @@
         }"
       >
         <uni-forms-item label="组别名称" required name="groupName">
-          <uni-easyinput type="text" v-model="group.groupName" placeholder="输入组别名称" @input="() => onGroupChange(group)" />
+          <uni-easyinput
+            type="text"
+            v-model="group.groupName"
+            placeholder="输入组别名称"
+            @input="() => onGroupChange(group)"
+            :disabled="group.applicantNumber !== 0"
+          />
         </uni-forms-item>
         <uni-forms-item label="金额(￥)" required name="money">
-          <uni-easyinput type="digit" v-model="group.money" placeholder="输入金额" @input="() => onGroupChange(group)" />
+          <uni-easyinput
+            type="digit"
+            v-model="group.money"
+            placeholder="输入金额"
+            @input="() => onGroupChange(group)"
+            :disabled="group.applicantNumber !== 0"
+          />
         </uni-forms-item>
       </uni-forms>
 
@@ -74,7 +86,7 @@
       <button @tap="addGroup" size="mini">添加组别</button>
     </view>
     <button @tap="saveGroupHandel">保存</button>
-  </uni-container>
+  </view>
 </template>
 <script setup lang="ts">
 import { getCurrentInstance, nextTick, ref } from 'vue'
@@ -100,6 +112,10 @@ onLoad(async (option: any) => {
   await nextTick()
   // 打开页面传入的分组列表
   eventChannel.value.on('onGroupOpen', function (data: ActivityGroup[]) {
+    data.forEach((activityGroup) => {
+      // 设置是否限制人数
+      activityGroup.limit = activityGroup.peopleNumber !== 0
+    })
     activityGroups.value = data
   })
 })
@@ -168,7 +184,10 @@ const saveGroupHandel = async () => {
     }
 
     if (eventChannel.value) {
-      eventChannel.value.emit('onGroupSave', JSON.parse(JSON.stringify(activityGroups.value)))
+      eventChannel.value.emit(
+        'onGroupSave',
+        JSON.parse(JSON.stringify(activityGroups.value))
+      )
     }
     uni.navigateBack()
   } catch (e) {
@@ -178,7 +197,10 @@ const saveGroupHandel = async () => {
 }
 
 // 更新组别
-const updateOneGroup = (group: ActivityGroup, showTip = true): Promise<unknown> => {
+const updateOneGroup = (
+  group: ActivityGroup,
+  showTip = true
+): Promise<unknown> => {
   const { peopleNumber, applicantNumber = 0, limit } = group
   if (limit && peopleNumber < applicantNumber) {
     const title = `已有${applicantNumber}人报名, 限制人数不能小于该人数`
@@ -190,13 +212,14 @@ const updateOneGroup = (group: ActivityGroup, showTip = true): Promise<unknown> 
   }
   if (group.money > 5000) {
     const title = '最大金额不能超过5000'
-    uni.showToast({ title , icon: 'none' })
+    uni.showToast({ title, icon: 'none' })
     return Promise.reject(title)
   }
+
   const _group = {
     id: group.id,
     activityId: group.activityId,
-    peopleNumber: limit ? 0 : group.peopleNumber,
+    peopleNumber: limit ? group.peopleNumber : 0,
     groupName: group.groupName,
     money: toBack(group.money)
   }
@@ -215,7 +238,7 @@ const onGroupChange = (group: ActivityGroup) => {
 }
 const saveChangeGroup = async () => {
   const promises: Promise<unknown>[] = []
-  activityGroups.value.forEach(group => {
+  activityGroups.value.forEach((group) => {
     if (chagneIds.has(group.id)) {
       promises.push(updateOneGroup(group, false))
     }
@@ -244,5 +267,12 @@ const saveChangeGroup = async () => {
   button {
     width: 100px;
   }
+}
+
+.bg {
+  background-color: #f1f1f1;
+  position: absolute;
+  top: 0;
+  width: 100%;
 }
 </style>

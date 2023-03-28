@@ -88,7 +88,11 @@ import { queryPersonalInfo } from '@/apis/user'
 import type { HotActivity } from '@/typings/activity'
 import { getStatusStyle } from '@/utils'
 import { usePageScroll } from '@/hooks/usePageScroll'
-import { onReachBottom, onShareAppMessage } from '@dcloudio/uni-app'
+import {
+  onReachBottom,
+  onShareAppMessage,
+  onShareTimeline
+} from '@dcloudio/uni-app'
 import type { BizInfo } from '@/typings/user'
 
 const bizInfo = ref<BizInfo>({
@@ -172,6 +176,7 @@ const shareToggle = () => {
   // @ts-ignore
   refs.shareRef.open()
 }
+
 onShareAppMessage((res) => {
   return {
     title: `${bizInfo.value.userName}的主页`,

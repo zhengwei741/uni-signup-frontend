@@ -6,7 +6,7 @@
         <uni-row>
           <uni-col :span="8">
             <view class="warpper">
-              <button open-type="share" @tap="share" class="shareButton">
+              <button open-type="share" class="shareButton">
                 <image src="../static/weixin-icon.png"></image>
               </button>
               <text>微信</text>
@@ -23,7 +23,6 @@ import { ref, getCurrentInstance } from 'vue'
 import type { ComponentInternalInstance } from 'vue'
 
 // 分享相关
-const share = () => uni.showShareMenu({})
 const shareRef = ref()
 const instance = getCurrentInstance() as ComponentInternalInstance
 defineExpose({

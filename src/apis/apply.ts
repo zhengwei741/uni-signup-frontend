@@ -87,3 +87,19 @@ export const delApply = (id: string) => {
     }
   })
 }
+
+/**
+ * 取消报名并退款
+ * @param params
+ * @returns
+ */
+export const delApplyRefund = (id: string, activityId: string) => {
+  return request<API.Result>({
+    url: '/apply/mini/delApplyRefund',
+    method: 'POST',
+    data: {
+      id,
+      activityId
+    }
+  })
+}

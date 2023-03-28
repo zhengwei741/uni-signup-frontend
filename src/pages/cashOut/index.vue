@@ -29,9 +29,14 @@
 
         <view class="tip">
           <view>提示：</view>
-          <view>1、提现及时到账；</view>
-          <view>2、单次提现最少0.3元，最多500元；</view>
-          <view>3、同一个微信账号，一天最多提现10次，最多提现5000元；</view>
+          <view>1、提现及时到账。</view>
+          <view
+            >2、单次提现最少0.3元，最多5000元;超过500元时，系统自动按每次500元进行分批提现。</view
+          >
+          <view>3、同一个微信账号，一天最多提现10次，最多提现5000元。</view>
+          <view
+            >4、提现金额超过2万元时，可联系官方客服一次性提取(微信号:17366181441)。</view
+          >
         </view>
 
         <view class="section">
@@ -83,6 +88,7 @@ import type { CashOut } from '@/typings/order'
 import { toBack, toFront, formatTime } from '@/utils'
 import { useLoading } from '@/hooks/useLoading'
 import dayjs from 'dayjs'
+import { NOT_AUTH } from '@/const'
 
 const cash = ref(0)
 const cashOut = ref<CashOut>({
@@ -113,6 +119,19 @@ const confirm = () => {
   })
     .then(getActivityAmount)
     .catch((e: any) => {
+      // 用户未认证
+      if (e.code === NOT_AUTH) {
+        uni.showToast({
+          title: '当前用户未认证,请先认证',
+          icon: 'none'
+        })
+        setTimeout(() => {
+          uni.navigateTo({
+            url: '/pages/bizAuth/index'
+          })
+        }, 500)
+        return
+      }
       uni.showToast({
         title: e.msg,
         icon: 'none'
@@ -152,7 +171,7 @@ const addRecord = () => {
 }
 const formatRecord = (record: any) => {
   const { amount, createTime } = record
-  return `${createTime.replaceAll('T', '')} 提现 ${toFront(amount)} 元`
+  return `${createTime.replaceAll('T', ' ')} 提现 ${toFront(amount)} 元`
 }
 
 onLoad((option: any) => {
