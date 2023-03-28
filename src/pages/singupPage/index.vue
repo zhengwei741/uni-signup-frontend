@@ -182,18 +182,18 @@ const submit = async (fromName: string = 'singupForm') => {
       uni.navigateBack()
     }, 1000)
   } catch (e: any) {
-    const { errMsg } = e
-    if (errMsg) {
-      let title = errMsg
-      if (errMsg === 'requestPayment:fail cancel') {
-        title = '用户取消支付'
-      }
-      uni.showToast({
-        title,
-        icon: 'error'
-      })
+    const { errMsg, msg } = e
+    let title = ''
+    if (errMsg && errMsg === 'requestPayment:fail cancel') {
+      title = '用户取消支付'
     }
-    console.log(e)
+    if (msg) {
+      title = msg
+    }
+    uni.showToast({
+      title,
+      icon: 'error'
+    })
   } finally {
     loading.value = false
   }

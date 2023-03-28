@@ -18,6 +18,7 @@ export interface ApplyInfo {
   status: string
   updateTime: string
   updater: string
+  statusDesc?: string
 }
 
 export type PayRet = {

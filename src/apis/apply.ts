@@ -103,3 +103,15 @@ export const delApplyRefund = (id: string, activityId: string) => {
     }
   })
 }
+
+/**
+ * 导出报名人员
+ * @param params
+ * @returns
+ */
+export const exportPersonXlsx = (activityId: string) => {
+  return request<API.Result>({
+    url: `/apply/mini/exportPersonXlsx/${activityId}`,
+    method: 'GET'
+  })
+}

@@ -135,6 +135,12 @@
                 applyInfo?.updateTime.replace('T', ' ')
               }}</view>
             </view>
+            <view class="apply-list_item">
+              <view class="list-item_groupName">状态:</view>
+              <view class="list-item_value">{{
+                applyInfo?.statusDesc
+              }}</view>
+            </view>
 
             <view
               class="apply-list_item"
@@ -178,7 +184,7 @@ import type { ComponentInternalInstance } from 'vue'
 import { onShareAppMessage } from '@dcloudio/uni-app'
 import { useActivityDetail } from '@/hooks/useActivityDetail'
 import type { Apply, ApplyInfo } from '@/typings/apply'
-import { queryApplyDetail, delApply, delApplyRefund } from '@/apis/apply'
+import { queryApplyDetail, delApply, delApplyRefund, exportPersonXlsx } from '@/apis/apply'
 import { useDownloadFile } from '@/hooks/useDownloadFile'
 import { toFront } from '@/utils'
 
@@ -199,6 +205,12 @@ onShareAppMessage((res) => {
 })
 
 const gotoSingupPage = () => {
+  if (activity.value.status === '1') {
+    uni.showToast({
+      title: '报名已结束'
+    })
+    return
+  }
   uni.navigateTo({
     url: `../singupPage/index?id=${activity.value.id}`,
     events: {
@@ -296,19 +308,27 @@ const cancelApplyAndRawback = () => {
   })
 }
 // 导出相关
-const exportXlsx = () => {
+const exportXlsx = async () => {
   uni.showLoading({ title: '下载中' })
+
+  const { data } = await exportPersonXlsx(activity.value.id || '')
+
   useDownloadFile(
-    `/api/apply/mini/exportPersonXlsx/${activity.value.id}`,
+    data,
     '导出人员.xlsx'
   )
-    .then((filePath) => {
-      uni.showModal({
-        content: `文件已下载完成,是否直接打开`,
-        success({ confirm }) {
-          if (confirm) {
-            uni.openDocument({ filePath })
-          }
+    .then(({ savedFilePath, fileUrl }) => {
+      uni.setClipboardData({
+        data: fileUrl,
+        success() {
+          uni.showModal({
+            content: `文件下载地址已复制，可以通过第三方浏览器下载！确认立即打开吗？`,
+            success({ confirm }) {
+              if (confirm) {
+                uni.openDocument({ filePath: savedFilePath })
+              }
+            }
+          })
         }
       })
     })

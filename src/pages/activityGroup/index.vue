@@ -18,7 +18,7 @@
             v-model="group.groupName"
             placeholder="输入组别名称"
             @input="() => onGroupChange(group)"
-            :disabled="group.applicantNumber !== 0"
+            :disabled="group.applicantNumber !== 0 && !isMockId(group.id)"
           />
         </uni-forms-item>
         <uni-forms-item label="金额(￥)" required name="money">
@@ -27,7 +27,7 @@
             v-model="group.money"
             placeholder="输入金额"
             @input="() => onGroupChange(group)"
-            :disabled="group.applicantNumber !== 0"
+            :disabled="group.applicantNumber !== 0 && !isMockId(group.id)"
           />
         </uni-forms-item>
       </uni-forms>

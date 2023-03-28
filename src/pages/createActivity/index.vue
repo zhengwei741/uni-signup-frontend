@@ -216,7 +216,8 @@ const goToActivityGroup = () => {
         // 不限制人数重置peopleNumber为0
         const saveData = data.map((group) => ({
           ...group,
-          peopleNumber: group.limit ? group.peopleNumber : 0
+          peopleNumber: group.limit ? group.peopleNumber : 0,
+          money: Number(group.money)
         }))
         activityGroups.value = saveData
         // 重新获取引用
