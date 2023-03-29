@@ -59,24 +59,17 @@
 
       <view class="btn-wapper">
         <button
-          v-if="isEdit && !isMockId(group.id || '')"
+          v-if="isEdit && !isMockId(group.id)"
           size="mini"
-          @tap="
-            () => {
-              updateOneGroup(group)
-            }
-          "
+          @tap="() => updateOneGroup(group)"
         >
           保存
         </button>
         <button
+          v-if="group.applicantNumber === 0"
           type="warn"
           size="mini"
-          @tap="
-            () => {
-              delGroup(group, index)
-            }
-          "
+          @tap="() => delGroup(group, index)"
         >
           删除
         </button>
@@ -129,6 +122,10 @@ const getActiveText = (group: ActivityGroup) => {
 const inputDisabled = (limit: boolean | undefined) => !!!limit
 // 添加组别
 const addGroup = () => {
+  if (activityGroups.value.length >= 20) {
+    uni.showToast({ title: '最多20个组别', icon: 'none' })
+    return
+  }
   activityGroups.value.push({
     id: getMockID(),
     groupName: '',

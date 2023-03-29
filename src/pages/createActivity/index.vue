@@ -35,18 +35,10 @@
           />
         </uni-forms-item>
         <uni-forms-item label="报名开始" required name="startTime">
-          <uni-datetime-picker
-            type="datetime"
-            return-type="timestamp"
-            v-model="activityFormData.startTime"
-          />
+          <uni-dateTimePicker v-model="activityFormData.startTime"></uni-dateTimePicker>
         </uni-forms-item>
         <uni-forms-item label="报名结束" required name="endTime">
-          <uni-datetime-picker
-            type="datetime"
-            return-type="timestamp"
-            v-model="activityFormData.endTime"
-          />
+          <uni-dateTimePicker v-model="activityFormData.endTime"></uni-dateTimePicker>
         </uni-forms-item>
         <uni-forms-item label="活动介绍" required name="description">
           <uni-editer
@@ -378,7 +370,10 @@ const edit = async () => {
     endTime: formatTime(activityFormData.value.endTime),
     showFlag: activityFormData.value.showFlag,
     description: activityFormData.value.description,
-    groupList: activityGroups.value.filter((group) => !group.id),
+    groupList: activityGroups.value.filter((group) => !group.id).map((group) => ({
+      ...group,
+      money: toBack(group.money)
+    })),
     // 只提交新增的字段
     fieldList: activityFields.value.filter((field) => !field.id)
   }

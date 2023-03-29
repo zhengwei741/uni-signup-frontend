@@ -62,6 +62,7 @@ import type { HotActivity } from '@/typings/activity'
 import { usePagination } from '@/hooks/usePagination'
 import { getStatusStyle } from '@/utils'
 import { URL } from '@/const'
+import { onShareAppMessage } from '@dcloudio/uni-app'
 
 // height 56是searchBar高度
 const scrollHeight = useSafeScrollHeight() - 56
@@ -125,6 +126,13 @@ const gotoDetail = (id: string) => {
 // 初始化
 onMounted(() => {
   refresh()
+})
+
+onShareAppMessage((res) => {
+  return {
+    title: '57报名',
+    path: `/pages/hot/index`
+  }
 })
 </script>
 <style lang="scss" scoped>
