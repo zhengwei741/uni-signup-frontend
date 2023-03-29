@@ -51,8 +51,8 @@ export const request: RequestMethod = (options: UniApp.RequestOptions) => {
           // @ts-ignore
           const { code, msg } = ret.data
           if (code !== SUCCESS_CODE) {
-            uni.showToast({ title: msg, icon: 'none' })
             hideLoading()
+            uni.showToast({ title: msg, icon: 'none' })
             reject(ret.data)
             return
           }
