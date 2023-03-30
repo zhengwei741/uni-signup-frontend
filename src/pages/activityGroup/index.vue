@@ -131,7 +131,8 @@ const addGroup = () => {
     groupName: '',
     money: 0,
     peopleNumber: 10,
-    limit: false
+    limit: false,
+    applicantNumber: 0
   })
 }
 // 删除组别

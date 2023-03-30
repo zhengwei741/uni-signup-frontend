@@ -173,7 +173,7 @@ const addActivityField = () => {
 }
 // 活动组别
 let activityGroups = ref<ActivityGroup[]>([
-  { id: getMockID(), groupName: '团体', money: 0, peopleNumber: 0 }
+  { id: getMockID(), groupName: '团体', money: 0, peopleNumber: 0, applicantNumber: 0 }
 ])
 // 活动表单
 const activityFormData = ref<Activity>({
