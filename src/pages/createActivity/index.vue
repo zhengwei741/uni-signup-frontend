@@ -193,8 +193,9 @@ const validateTime = (
 ) => {
   const { startTime, endTime } = data
   if (dayjs(startTime).diff(dayjs(endTime)) > 0) {
-    callback('开始时间不能小于结束时间')
+    callback('开始时间必须小于结束时间')
   }
+  return true
 }
 // 用户服务协议
 const isAgree = ref<number[]>([])
@@ -357,6 +358,10 @@ const onSwitchChagne = (requiredFlag: any, field: ActivityField) => {
 const edit = async () => {
   // 获取最新编辑内容
   await uniEditerRef.value.save()
+
+  const { refs } = instance
+  // @ts-ignore
+  await refs.activityForm.validate()
 
   removeMockId()
 
