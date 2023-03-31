@@ -35,10 +35,14 @@
           />
         </uni-forms-item>
         <uni-forms-item label="报名开始" required name="startTime">
-          <uni-dateTimePicker v-model="activityFormData.startTime"></uni-dateTimePicker>
+          <uni-dateTimePicker
+            v-model="activityFormData.startTime"
+          ></uni-dateTimePicker>
         </uni-forms-item>
         <uni-forms-item label="报名结束" required name="endTime">
-          <uni-dateTimePicker v-model="activityFormData.endTime"></uni-dateTimePicker>
+          <uni-dateTimePicker
+            v-model="activityFormData.endTime"
+          ></uni-dateTimePicker>
         </uni-forms-item>
         <uni-forms-item label="活动介绍" required name="description">
           <uni-editer
@@ -173,7 +177,13 @@ const addActivityField = () => {
 }
 // 活动组别
 let activityGroups = ref<ActivityGroup[]>([
-  { id: getMockID(), groupName: '团体', money: 0, peopleNumber: 0, applicantNumber: 0 }
+  {
+    id: getMockID(),
+    groupName: '团体',
+    money: 0,
+    peopleNumber: 0,
+    applicantNumber: 0
+  }
 ])
 // 活动表单
 const activityFormData = ref<Activity>({
@@ -249,6 +259,7 @@ const validateFields = async () => {
 const publish = async () => {
   try {
     const { refs } = instance
+
     await uniEditerRef.value.save()
     // @ts-ignore
     await refs.activityForm.validate()
@@ -375,10 +386,12 @@ const edit = async () => {
     endTime: formatTime(activityFormData.value.endTime),
     showFlag: activityFormData.value.showFlag,
     description: activityFormData.value.description,
-    groupList: activityGroups.value.filter((group) => !group.id).map((group) => ({
-      ...group,
-      money: toBack(group.money)
-    })),
+    groupList: activityGroups.value
+      .filter((group) => !group.id)
+      .map((group) => ({
+        ...group,
+        money: toBack(group.money)
+      })),
     // 只提交新增的字段
     fieldList: activityFields.value.filter((field) => !field.id)
   }

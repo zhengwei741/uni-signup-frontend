@@ -141,9 +141,39 @@ const clear = () => {
   })
 }
 
+const replaceVid = (content: string) => {
+  const videoBaseUrl = `https://v.qq.com/txp/iframe/player.html?`
+  const regex = / (\w+)=["']?((?:.(?!["']?\s+(?:\S+)=|\s*\/?[>"']))+.)["']?/g
+
+  let m
+  let finalContent = content
+  while ((m = regex.exec(content)) !== null) {
+    if (m.index === regex.lastIndex) {
+      regex.lastIndex++
+    }
+    if (m[1] === 'vid') {
+      const vidProps = m[0]
+      finalContent = finalContent.replace(
+        vidProps,
+        ` src=${videoBaseUrl}${vidProps.trim()}`
+      )
+    }
+  }
+  return finalContent
+}
+
 const save = () => {
+  // https://v.qq.com/txp/iframe/player.html?vid=i3506xg09ew
   let content = articleRef.value.getContent() || ''
-  content = content.replaceAll('video', 'iframe')
+
+  if (content.indexOf('txv-video') !== -1) {
+    content = content.replaceAll('txv-video', 'iframe')
+    content = replaceVid(content)
+  } else {
+    content = content
+      .replaceAll('<video', '<iframe')
+      .replaceAll('</video>', '</iframe>')
+  }
   emits('update:modelValue', content)
 }
 
