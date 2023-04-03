@@ -85,6 +85,12 @@
       "style": {
         "navigationBarTitleText": "提现"
       }
+    },
+    {
+      "path": "pages/vedioCourse/index",
+      "style": {
+        "navigationBarTitleText": "视频教程"
+      }
     }
   ],
   "globalStyle": {

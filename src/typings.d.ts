@@ -18,6 +18,7 @@ declare namespace API {
         isLastPage: boolean
         hasNextPage: boolean
       }
+      adminFlag?: '1' | '0'
     }
   }
 

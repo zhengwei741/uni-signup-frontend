@@ -36,7 +36,7 @@
       </view>
     </uni-grid-item>
     <uni-grid-item>
-      <view class="grid-item-box">
+      <view class="grid-item-box" @tap="goVedioCourse">
         <uni-icons
           custom-prefix="iconfont"
           type="icon-jiaocheng"
@@ -56,7 +56,7 @@
       @tap.stop="goToBizActivityDetail(activity.id)"
     >
       <view class="activity-card__content">
-        <view :span="24">
+        <view>
           <view class="activity-card__content__title">{{
             activity.title
           }}</view>
@@ -88,11 +88,7 @@ import { queryPersonalInfo } from '@/apis/user'
 import type { HotActivity } from '@/typings/activity'
 import { getStatusStyle } from '@/utils'
 import { usePageScroll } from '@/hooks/usePageScroll'
-import {
-  onReachBottom,
-  onShareAppMessage,
-  onShareTimeline
-} from '@dcloudio/uni-app'
+import { onReachBottom, onShareAppMessage } from '@dcloudio/uni-app'
 import type { BizInfo } from '@/typings/user'
 
 const bizInfo = ref<BizInfo>({
@@ -122,6 +118,12 @@ const goBizAuth = () => {
         bizInfo.value.organizationName = orgName
       }
     }
+  })
+}
+
+const goVedioCourse = () => {
+  uni.navigateTo({
+    url: '/pages/vedioCourse/index'
   })
 }
 

@@ -55,3 +55,14 @@ export const bizAuth = (params: {
     data: params
   })
 }
+
+/**
+ * 视频教程
+ * @returns
+ */
+export const queryVedioCourse = () => {
+  return request<API.Result<{ vedioVid: string; vedioName: string }[]>>({
+    url: '/user/mini/queryVedioCourse',
+    method: 'GET'
+  })
+}

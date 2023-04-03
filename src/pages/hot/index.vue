@@ -13,7 +13,9 @@
     :height="scrollHeight"
     :isNoMore="isLastPage"
     pullUp
+    dropDown
     @onPullUp="onPullUp"
+    @onDropDown="onDropDown"
   >
     <template #default="{ item }">
       <view class="activity-card" @tap.stop="gotoDetail(item.id)">
@@ -90,6 +92,7 @@ const { next, refresh, isLastPage } = usePagination({
 })
 // 列表相关
 let activeList = ref<HotActivity[]>([])
+const isAdmin = ref(false)
 // 上拉加载
 const onPullUp = (close: () => void) => next(close)
 const getHotActivityList = (type: string = 'init', pageNo = 1, pageSize = 30) =>
@@ -99,6 +102,7 @@ const getHotActivityList = (type: string = 'init', pageNo = 1, pageSize = 30) =>
     pageSize
   }).then((ret) => {
     const pageInfo = ret.data.pageInfo
+    isAdmin.value = ret.data.adminFlag === '1'
     if (type === 'init') {
       activeList.value = pageInfo.list
     } else {
@@ -118,10 +122,18 @@ const gotoHomePage = (item: HotActivity) => {
   })
 }
 
+const onDropDown = (close: () => void) => refresh(close)
+
 const gotoDetail = (id: string) => {
-  uni.navigateTo({
-    url: `../visitorActivityDetail/index?id=${id}`
-  })
+  if (isAdmin.value) {
+    uni.navigateTo({
+      url: `../bizActivityDetail/index?id=${id}`
+    })
+  } else {
+    uni.navigateTo({
+      url: `../visitorActivityDetail/index?id=${id}`
+    })
+  }
 }
 // 初始化
 onMounted(() => {
