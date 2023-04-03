@@ -155,7 +155,7 @@ const replaceVid = (content: string) => {
       const vidProps = m[0]
       finalContent = finalContent.replace(
         vidProps,
-        ` src=${videoBaseUrl}${vidProps.trim()}`
+        ` src=${videoBaseUrl}${m[1]}=${m[2]}`
       )
     }
   }

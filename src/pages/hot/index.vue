@@ -92,6 +92,7 @@ const { next, refresh, isLastPage } = usePagination({
 })
 // 列表相关
 let activeList = ref<HotActivity[]>([])
+// 是否是超管
 const isAdmin = ref(false)
 // 上拉加载
 const onPullUp = (close: () => void) => next(close)
