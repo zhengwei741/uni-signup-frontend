@@ -13,6 +13,7 @@
             <text class="g-title list-title">我的报名</text>
             <uni-list>
               <uni-list-item
+                @tap="showApply(apply)"
                 v-for="(apply, index) in myApplyList"
                 :title="`${index + 1}、${apply.name}`"
                 :rightText="apply.groupName"
@@ -72,6 +73,10 @@
       </view>
     </view>
     <uni-shard ref="shareRef"></uni-shard>
+
+    <uni-popup ref="popupRef" type="dialog">
+      <uni-apply-dialog :applyInfo="applyInfo"></uni-apply-dialog>
+    </uni-popup>
   </uni-container>
 </template>
 <script setup lang="ts">
@@ -79,6 +84,9 @@ import { ref, getCurrentInstance, computed } from 'vue'
 import type { ComponentInternalInstance } from 'vue'
 import { onShareAppMessage } from '@dcloudio/uni-app'
 import { useActivityDetail } from '@/hooks/useActivityDetail'
+import { queryApplyDetail } from '@/apis/apply'
+import type { Apply, ApplyInfo } from '@/typings/apply'
+import { toFront } from '@/utils'
 
 const { activity, organizationName, allApplyList, myApplyList, refresh } =
   useActivityDetail({ allApply: true, myApply: true })
@@ -120,6 +128,19 @@ const gotoSingupPage = () => {
 const onTapHomeLink = () => {
   uni.navigateTo({
     url: `/pages/bizHomePage/index?creater=${activity.value.creater}`
+  })
+}
+
+// 报名信息相关
+const applyInfo = ref<ApplyInfo>()
+const showApply = (apply: Apply) => {
+  queryApplyDetail(apply.id).then((ret) => {
+    applyInfo.value = {
+      ...ret.data,
+      money: toFront(ret.data.money)
+    }
+    // @ts-ignore
+    instance.refs.popupRef.open('center')
   })
 }
 </script>
