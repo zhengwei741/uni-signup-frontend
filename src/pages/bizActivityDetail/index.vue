@@ -148,7 +148,8 @@ onShareAppMessage((res) => {
 const gotoSingupPage = () => {
   if (activity.value.status === '1') {
     uni.showToast({
-      title: '报名已结束'
+      title: '报名已结束',
+      icon: 'none'
     })
     return
   }

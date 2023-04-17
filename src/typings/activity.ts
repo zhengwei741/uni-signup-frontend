@@ -19,6 +19,8 @@ export interface Activity {
   status?: string
   //
   creater?: string
+
+  hotFlag: '0' | '1' // 显示到热门活动页 0关1开
 }
 
 export interface ActivityField {
@@ -34,6 +36,9 @@ export interface ActivityField {
   creater?: string
 
   rules?: any[] // 前台校验用
+
+  // 前台用
+  type: '0' | '1' // 0单行文本 1 下拉框
 }
 
 export interface ActivityGroup {

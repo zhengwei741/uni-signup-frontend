@@ -65,6 +65,20 @@
           </view>
         </view>
 
+        <view class="uni-forms-item">
+          <view class="label">
+            <text>公开到热门活动页</text>
+          </view>
+          <view class="switch">
+            <uni-switch
+              v-model:value="activityFormData.hotFlag"
+              size="mini"
+              activeValue="1"
+              inactiValue="0"
+            />
+          </view>
+        </view>
+
         <text class="text">报名填写信息</text>
 
         <view class="uni-forms-item activity-field">
@@ -101,19 +115,48 @@
             />
           </view>
           <view class="activity-field__actions">
-            <uni-switch
-              v-model:value="activityFields[index].requiredFlag"
-              activeText="必填"
-              size="mini"
-              activeValue="1"
-              inactiValue="0"
-              @chagne="(value: any) => {
-                onSwitchChagne(value, field)
-              }"
-            />
-            <button size="mini" type="warn" @click="delField(field.id, index)">
-              删除
-            </button>
+            <uni-row :gutter="30">
+              <uni-col :span="12">
+                <uni-switch
+                  v-model:value="activityFields[index].requiredFlag"
+                  activeText="必填"
+                  size="mini"
+                  activeValue="1"
+                  inactiValue="0"
+                  @chagne="(value: any) => {
+                    onSwitchChagne(value, field)
+                  }"
+              /></uni-col>
+              <uni-col :span="12">
+                <button
+                  :style="{
+                    visibility: field.type === '1' ? 'visible' : 'hidden'
+                  }"
+                  size="mini"
+                  @click="editSelectField"
+                >
+                  编辑
+                </button>
+              </uni-col>
+              <uni-col :span="12">
+                <uni-data-select
+                  v-model="field.type"
+                  :localdata="[
+                    { value: '0', text: '单行文本' },
+                    { value: '1', text: '下拉框' }
+                  ]"
+                ></uni-data-select>
+              </uni-col>
+              <uni-col :span="12" class="col">
+                <button
+                  size="mini"
+                  type="warn"
+                  @click="delField(field.id, index)"
+                >
+                  删除
+                </button>
+              </uni-col>
+            </uni-row>
           </view>
         </view>
 
@@ -172,7 +215,8 @@ const addActivityField = () => {
   activityFields.value.push({
     id: getMockID(),
     fieldName: '',
-    requiredFlag: '1'
+    requiredFlag: '1',
+    type: '0'
   })
 }
 // 活动组别
@@ -193,7 +237,8 @@ const activityFormData = ref<Activity>({
   description: '',
   fieldList: activityFields.value,
   groupList: activityGroups.value,
-  showFlag: '1'
+  showFlag: '1',
+  hotFlag: '1'
 })
 const validateTime = (
   rule: any,
@@ -386,6 +431,7 @@ const edit = async () => {
     endTime: formatTime(activityFormData.value.endTime),
     showFlag: activityFormData.value.showFlag,
     description: activityFormData.value.description,
+    hotFlag: activityFormData.value.hotFlag,
     groupList: activityGroups.value
       .filter((group) => !group.id)
       .map((group) => ({
@@ -405,6 +451,27 @@ const edit = async () => {
         eventChannel.value.emit('onActiveSaveSuccess')
       }
     }, 500)
+  })
+}
+
+// 编辑下拉
+const editSelectField = () => {
+  uni.navigateTo({
+    url: `/pages/editSelect/index?activityId=${activityId.value}`,
+    events: {
+      onSelectSave: function (data: ActivityField[] = []) {
+        const saveData = data.map((group) => group)
+        activityFields.value = saveData
+        // 重新获取引用
+        activityFormData.value.fieldList = activityFields.value
+      }
+    },
+    success: function (res) {
+      res.eventChannel.emit(
+        'onSelectOpen',
+        JSON.parse(JSON.stringify(activityFields.value))
+      )
+    }
   })
 }
 </script>
@@ -432,6 +499,8 @@ const edit = async () => {
 .activity-field {
   border-bottom: 1px solid #e5e5e5;
   .activity-field__actions {
+    padding: 5px 0;
+    width: 200px;
     display: flex;
     align-items: center;
     > button {

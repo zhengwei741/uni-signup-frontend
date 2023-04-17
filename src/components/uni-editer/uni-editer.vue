@@ -11,7 +11,6 @@
   </view>
   <mp-html
     ref="articleRef"
-    container-style="padding:10px"
     :content="content"
     :editable="props.editable"
     :domain="URL"

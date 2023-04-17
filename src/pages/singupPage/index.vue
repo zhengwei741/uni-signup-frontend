@@ -23,8 +23,9 @@
         >
           <view>
             <uni-easyinput
-              v-model="formData.domains[item.id]"
+              v-model="formData.domains[`${item.id}`]"
               :placeholder="`请输入${item.fieldName}`"
+              maxlength="256"
             />
           </view>
         </uni-forms-item>
@@ -84,6 +85,7 @@ const fieldList = computed<ActivityField[]>(() => {
       id: 'name',
       fieldName: '昵称',
       requiredFlag: '1',
+      type: '0',
       rules: [
         {
           required: true,
@@ -95,6 +97,7 @@ const fieldList = computed<ActivityField[]>(() => {
       id: 'mobile',
       fieldName: '手机号',
       requiredFlag: '1',
+      type: '0',
       rules: [
         {
           required: true,

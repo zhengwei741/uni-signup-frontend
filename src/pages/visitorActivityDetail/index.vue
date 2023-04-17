@@ -13,6 +13,7 @@
             <text class="g-title list-title">我的报名</text>
             <uni-list>
               <uni-list-item
+                showArrow
                 @tap="showApply(apply)"
                 v-for="(apply, index) in myApplyList"
                 :title="`${index + 1}、${apply.name}`"

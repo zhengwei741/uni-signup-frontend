@@ -9,6 +9,12 @@
   },
   "pages": [
     {
+      "path": "pages/editSelect/index",
+      "style": {
+        "navigationBarTitleText": "编辑下拉框"
+      }
+    },
+    {
       "path": "pages/hot/index",
       "style": {
         "navigationBarTitleText": "热门活动"
