@@ -7,7 +7,8 @@ const TxvVideo = function (vm) {
 }
 
 // #ifdef MP-WEIXIN || MP-QQ
-const TxvContext = requirePlugin('tencentvideo')
+// const TxvContext = requirePlugin('tencentvideo')
+const TxvContext = {}
 
 TxvVideo.prototype.onUpdate = function (_, config) {
   config.trustTags['txv-video'] = true

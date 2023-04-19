@@ -103,10 +103,10 @@
     "navigationBarTextStyle": "black",
     "navigationBarTitleText": "uni-app",
     "navigationBarBackgroundColor": "#F8F8F8",
-    "backgroundColor": "#F8F8F8",
-    "usingComponents": {
-      "txv-video": "plugin://tencentvideo/video"
-    }
+    "backgroundColor": "#F8F8F8"
+    // "usingComponents": {
+    //   "txv-video": "plugin://tencentvideo/video"
+    // }
   },
   "tabBar": {
     "color": "#6a6a6a",

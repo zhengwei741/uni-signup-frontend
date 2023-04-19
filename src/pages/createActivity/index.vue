@@ -130,17 +130,17 @@
               <uni-col :span="12">
                 <button
                   :style="{
-                    visibility: field.type === '1' ? 'visible' : 'hidden'
+                    visibility: field.fieldType === '1' ? 'visible' : 'hidden'
                   }"
                   size="mini"
-                  @click="editSelectField"
+                  @click="editSelectField(field, index)"
                 >
                   编辑
                 </button>
               </uni-col>
               <uni-col :span="12">
                 <uni-data-select
-                  v-model="field.type"
+                  v-model="field.fieldType"
                   :localdata="[
                     { value: '0', text: '单行文本' },
                     { value: '1', text: '下拉框' }
@@ -216,7 +216,8 @@ const addActivityField = () => {
     id: getMockID(),
     fieldName: '',
     requiredFlag: '1',
-    type: '0'
+    fieldType: '0',
+    activityId: activityId.value
   })
 }
 // 活动组别
@@ -407,7 +408,10 @@ const delField = (id: any, index: number) => {
 // 修改必选
 const onSwitchChagne = (requiredFlag: any, field: ActivityField) => {
   if (!isMockId(field.id)) {
-    modifyField(field.id, activityId.value, requiredFlag)
+    modifyField({
+      ...field,
+      requiredFlag
+    })
   }
 }
 // 提交编辑
@@ -455,22 +459,16 @@ const edit = async () => {
 }
 
 // 编辑下拉
-const editSelectField = () => {
+const editSelectField = (field: ActivityField, index: number) => {
   uni.navigateTo({
     url: `/pages/editSelect/index?activityId=${activityId.value}`,
     events: {
-      onSelectSave: function (data: ActivityField[] = []) {
-        const saveData = data.map((group) => group)
-        activityFields.value = saveData
-        // 重新获取引用
-        activityFormData.value.fieldList = activityFields.value
+      onSelectSave: function (data: ActivityField) {
+        activityFields.value[index] = JSON.parse(JSON.stringify(data))
       }
     },
     success: function (res) {
-      res.eventChannel.emit(
-        'onSelectOpen',
-        JSON.parse(JSON.stringify(activityFields.value))
-      )
+      res.eventChannel.emit('onSelectOpen', JSON.parse(JSON.stringify(field)))
     }
   })
 }

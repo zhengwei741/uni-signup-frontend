@@ -1,12 +1,14 @@
 <template>
   <view class="bg">
-    <view class="row" v-for="(item, index) in activityFields">
+    <view class="row" v-for="(item, index) in selectItems">
       <view class="input">
         <uni-easyinput
-          v-model="dynamicFormData.domains[`${item.id}`]"
+          :errorMessage="errorMessageMap[`${item.id}`]"
+          v-model="item.value"
           required
           :rules="[{ required: true, errorMessage: '选项名称必填' }]"
           placeholder="请输入选项名称"
+          @blur="() => validateInput(item.id, item.value)"
         />
       </view>
       <view class="btn">
@@ -28,18 +30,22 @@
   </view>
 </template>
 <script setup lang="ts">
-import { ref, nextTick } from 'vue'
+import { ref, nextTick, reactive, computed } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import { useEventChannel } from '@/hooks/useEventChannel'
 import type { ActivityField } from '@/typings/activity'
 import { getMockID, isMockId } from '@/utils'
-import { deleteField } from '@/apis/activity'
+import { deleteField, modifyField } from '@/apis/activity'
 
-const activityFields = ref<ActivityField[]>([])
+const activityField = ref<ActivityField>()
+
+const selectItems = ref<{ value: string; id: string }[]>([])
 
 const activityId = ref('')
 const isEdit = ref(false)
 let { eventChannel } = useEventChannel()
+
+const errorMessageMap = reactive<Record<string, boolean>>({})
 
 onLoad(async (option: any) => {
   activityId.value = option.activityId
@@ -47,26 +53,64 @@ onLoad(async (option: any) => {
 
   await nextTick()
 
-  // eventChannel.value.on('onSelectOpen', function (data: ActivityField[]) {
-  //   activityFields.value = data
+  // eventChannel.value.on('onSelectOpen', function (data: ActivityField) {
+  //   activityField.value = data
+  //   if (data.valueRange) {
+  //     selectItems.value = data.valueRange.split('#@').map((item) => ({
+  //       value: item,
+  //       id: getMockID()
+  //     }))
+  //   }
   // })
 })
 
-const dynamicFormData = ref<{ domains: Record<string, any> }>({
-  // domains 字段下会有多个结果
-  domains: {}
-})
-
 const addSelectItem = () => {
-  activityFields.value.push({
-    id: getMockID(),
-    fieldName: '',
-    requiredFlag: '1',
-    type: '1'
+  selectItems.value.push({
+    value: '',
+    id: getMockID()
   })
 }
 
-const saveSelectHandel = () => {}
+const validateInput = (id: string, value: string) =>
+  (errorMessageMap[id] = !value)
+
+const validate = () => {
+  selectItems.value.forEach((item) => validateInput(item.id, item.value))
+  if (Object.values(errorMessageMap).some((value) => value)) {
+    throw new Error('校验不通过')
+  }
+}
+
+const saveSelectHandel = async () => {
+  try {
+    // 校验
+    validate()
+
+    if (!activityField.value) return
+
+    const valueRange = selectItems.value.reduce(
+      (previousValue, currentValue) => {
+        previousValue += `#@${currentValue.value}`
+        return previousValue
+      },
+      ''
+    )
+
+    activityField.value.valueRange = valueRange
+
+    // 编辑调用编辑接口
+    if (isEdit.value) {
+      modifyField(activityField.value)
+    }
+    // 返回上一个页面
+    if (eventChannel.value) {
+      eventChannel.value.emit('onSelectSave', activityField.value)
+    }
+    uni.navigateBack()
+  } catch (e) {
+    console.error(e)
+  }
+}
 
 const delSelectItem = (id: string, index: number) => {
   if (isEdit.value && !isMockId(id)) {
@@ -76,13 +120,13 @@ const delSelectItem = (id: string, index: number) => {
       success: (res) => {
         if (res.confirm) {
           deleteField(id, activityId.value).then((ret) => {
-            activityFields.value.splice(index, 1)
+            selectItems.value.splice(index, 1)
           })
         }
       }
     })
   } else {
-    activityFields.value.splice(index, 1)
+    selectItems.value.splice(index, 1)
   }
 }
 </script>

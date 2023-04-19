@@ -38,7 +38,9 @@ export interface ActivityField {
   rules?: any[] // 前台校验用
 
   // 前台用
-  type: '0' | '1' // 0单行文本 1 下拉框
+  fieldType: '0' | '1' // 0单行文本 1 下拉框
+  // 下拉框选项
+  valueRange?: string
 }
 
 export interface ActivityGroup {

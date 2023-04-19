@@ -21,12 +21,20 @@
           :rules="item.rules"
           :name="'domains[' + item.id + ']'"
         >
-          <view>
+          <view v-if="item.fieldType === '0'">
             <uni-easyinput
               v-model="formData.domains[`${item.id}`]"
               :placeholder="`请输入${item.fieldName}`"
               maxlength="256"
             />
+          </view>
+          <view v-else>
+            <picker
+              :value="formData.domains[`${item.id}`]"
+              :range="getRange(item)"
+            >
+              <view class="uni-input">xxxx</view>
+            </picker>
           </view>
         </uni-forms-item>
       </uni-forms>
@@ -61,7 +69,7 @@ import { usePay } from '@/hooks/usePay'
 // 表单
 const formData = reactive<{
   groupId: string
-  domains: Record<string, unknown>
+  domains: Record<string, any>
 }>({
   groupId: '',
   domains: {}
@@ -85,7 +93,7 @@ const fieldList = computed<ActivityField[]>(() => {
       id: 'name',
       fieldName: '昵称',
       requiredFlag: '1',
-      type: '0',
+      fieldType: '0',
       rules: [
         {
           required: true,
@@ -97,7 +105,7 @@ const fieldList = computed<ActivityField[]>(() => {
       id: 'mobile',
       fieldName: '手机号',
       requiredFlag: '1',
-      type: '0',
+      fieldType: '0',
       rules: [
         {
           required: true,
@@ -213,6 +221,15 @@ onLoad((option: any) => {
     orgGroupList.value = data.groupList
   })
 })
+
+// 自定义下拉框
+const getRange = (field: ActivityField) => {
+  const { valueRange } = field
+  if (valueRange) {
+    return valueRange?.split('#@')
+  }
+  return []
+}
 </script>
 <style scoped lang="scss">
 .singup-page {
