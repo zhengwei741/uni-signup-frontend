@@ -24,7 +24,7 @@
     </view>
 
     <view style="text-align: center">
-      <button @tap="addSelectItem" size="mini">添加组别</button>
+      <button @tap="addSelectItem" size="mini">添加选项</button>
     </view>
     <button @tap="saveSelectHandel">保存</button>
   </view>
