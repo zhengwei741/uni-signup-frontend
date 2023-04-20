@@ -34,12 +34,17 @@ import { ref, nextTick, reactive, computed } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import { useEventChannel } from '@/hooks/useEventChannel'
 import type { ActivityField } from '@/typings/activity'
-import { getMockID, isMockId } from '@/utils'
-import { deleteField, modifyField } from '@/apis/activity'
+import { getMockID } from '@/utils'
+import { modifyField } from '@/apis/activity'
 
 const activityField = ref<ActivityField>()
 
-const selectItems = ref<{ value: string; id: string }[]>([])
+const selectItems = ref<{ value: string; id: string }[]>([
+  {
+    value: '',
+    id: getMockID()
+  }
+])
 
 const activityId = ref('')
 const isEdit = ref(false)
@@ -53,15 +58,15 @@ onLoad(async (option: any) => {
 
   await nextTick()
 
-  // eventChannel.value.on('onSelectOpen', function (data: ActivityField) {
-  //   activityField.value = data
-  //   if (data.valueRange) {
-  //     selectItems.value = data.valueRange.split('#@').map((item) => ({
-  //       value: item,
-  //       id: getMockID()
-  //     }))
-  //   }
-  // })
+  eventChannel.value.on('onSelectOpen', function (data: ActivityField) {
+    activityField.value = data
+    if (data.valueRange) {
+      selectItems.value = data.valueRange.split('#@').map((item) => ({
+        value: item,
+        id: getMockID()
+      }))
+    }
+  })
 })
 
 const addSelectItem = () => {
@@ -90,7 +95,11 @@ const saveSelectHandel = async () => {
 
     const valueRange = selectItems.value.reduce(
       (previousValue, currentValue) => {
-        previousValue += `#@${currentValue.value}`
+        if (previousValue === '') {
+          previousValue = currentValue.value
+        } else {
+          previousValue += `#@${currentValue.value}`
+        }
         return previousValue
       },
       ''
@@ -100,7 +109,14 @@ const saveSelectHandel = async () => {
 
     // 编辑调用编辑接口
     if (isEdit.value) {
-      modifyField(activityField.value)
+      modifyField({
+        id: activityField.value.id,
+        activityId: activityId.value,
+        requiredFlag: activityField.value.requiredFlag,
+        fieldType: activityField.value.fieldType,
+        valueRange: activityField.value.valueRange,
+        fieldName: activityField.value.fieldName
+      })
     }
     // 返回上一个页面
     if (eventChannel.value) {
@@ -113,21 +129,14 @@ const saveSelectHandel = async () => {
 }
 
 const delSelectItem = (id: string, index: number) => {
-  if (isEdit.value && !isMockId(id)) {
-    uni.showModal({
-      title: '确认',
-      content: '删除立即生效，是否确认删除操作？',
-      success: (res) => {
-        if (res.confirm) {
-          deleteField(id, activityId.value).then((ret) => {
-            selectItems.value.splice(index, 1)
-          })
-        }
-      }
+  if (selectItems.value.length === 1) {
+    uni.showToast({
+      title: '至少保留一个选项',
+      icon: 'none'
     })
-  } else {
-    selectItems.value.splice(index, 1)
+    return
   }
+  selectItems.value.splice(index, 1)
 }
 </script>
 

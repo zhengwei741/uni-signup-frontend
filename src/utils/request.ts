@@ -44,38 +44,42 @@ export const request: RequestMethod = (options: UniApp.RequestOptions) => {
   return new Promise((resolve, reject) => {
     showLoading(options.url)
 
-    login().then(() => {
-      uni.request({
-        ...options,
-        success: (ret) => {
-          // @ts-ignore
-          const { code, msg } = ret.data
-          if (code !== SUCCESS_CODE) {
+    login()
+      .then(() => {
+        uni.request({
+          ...options,
+          success: (ret) => {
+            // @ts-ignore
+            const { code, msg } = ret.data
+            if (code !== SUCCESS_CODE) {
+              hideLoading()
+              uni.showToast({ title: msg, icon: 'none' })
+              reject(ret.data)
+              return
+            }
+            // token超时
+            if (code === TIME_OUT_CODE) {
+              const { setToken } = useCommonStore()
+              setToken('')
+              uni.switchTab({
+                url: '/pages/hot/index'
+              })
+              hideLoading()
+              reject(ret.data)
+              return
+            }
             hideLoading()
-            uni.showToast({ title: msg, icon: 'none' })
-            reject(ret.data)
-            return
-          }
-          // token超时
-          if (code === TIME_OUT_CODE) {
-            const { setToken } = useCommonStore()
-            setToken('')
-            uni.switchTab({
-              url: '/pages/hot/index'
-            })
+            // @ts-ignore
+            resolve(ret.data)
+          },
+          fail(ret) {
             hideLoading()
-            reject(ret.data)
-            return
+            reject(ret)
           }
-          hideLoading()
-          // @ts-ignore
-          resolve(ret.data)
-        },
-        fail(ret) {
-          hideLoading()
-          reject(ret)
-        }
+        })
       })
-    })
+      .catch(() => {
+        hideLoading()
+      })
   })
 }

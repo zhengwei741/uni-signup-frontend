@@ -53,6 +53,6 @@ export const login = async (): Promise<string> => {
     return await loginByCode(code)
   } catch (error) {
     console.log(error)
-    return ''
+    throw error
   }
 }

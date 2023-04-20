@@ -296,10 +296,15 @@ const removeMockId = () => {
   activityGroups.value.forEach(remove)
 }
 const validateFields = async () => {
-  const ret = activityFields.value.some((field) => field.fieldName === '')
-  if (ret) {
-    uni.showToast({ title: '自定义字段名称不能为空', icon: 'none' })
-    throw new Error('自定义字段名称不能为空')
+  for (const field of activityFields.value) {
+    if (field.fieldName === '') {
+      uni.showToast({ title: '自定义字段名称不能为空', icon: 'none' })
+      throw new Error('自定义字段名称不能为空')
+    }
+    if (field.fieldType === '1' && !field.valueRange) {
+      uni.showToast({ title: '下拉框至少保留一个选项', icon: 'none' })
+      throw new Error('下拉框至少保留一个选项')
+    }
   }
 }
 const publish = async () => {
@@ -409,8 +414,12 @@ const delField = (id: any, index: number) => {
 const onSwitchChagne = (requiredFlag: any, field: ActivityField) => {
   if (!isMockId(field.id)) {
     modifyField({
-      ...field,
-      requiredFlag
+      id: field.id,
+      activityId: activityId.value,
+      requiredFlag,
+      fieldType: field.fieldType,
+      valueRange: field.valueRange,
+      fieldName: field.fieldName
     })
   }
 }
@@ -421,12 +430,12 @@ const edit = async () => {
 
   const { refs } = instance
   // @ts-ignore
-  await refs.activityForm.validate()
-
-  removeMockId()
+  const ret = await refs.activityForm.validate()
 
   // 校验自定义字段
   await validateFields()
+
+  removeMockId()
 
   const modifyAct: Activity = {
     id: activityFormData.value.id,

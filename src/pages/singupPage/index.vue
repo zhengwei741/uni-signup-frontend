@@ -29,12 +29,10 @@
             />
           </view>
           <view v-else>
-            <picker
-              :value="formData.domains[`${item.id}`]"
-              :range="getRange(item)"
-            >
-              <view class="uni-input">xxxx</view>
-            </picker>
+            <uni-data-select
+              v-model="formData.domains[`${item.id}`]"
+              :localdata="getRange(item)"
+            ></uni-data-select>
           </view>
         </uni-forms-item>
       </uni-forms>
@@ -226,7 +224,10 @@ onLoad((option: any) => {
 const getRange = (field: ActivityField) => {
   const { valueRange } = field
   if (valueRange) {
-    return valueRange?.split('#@')
+    return valueRange?.split('#@').map((item) => ({
+      value: item,
+      text: item
+    }))
   }
   return []
 }
