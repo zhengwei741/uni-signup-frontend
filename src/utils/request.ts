@@ -78,8 +78,9 @@ export const request: RequestMethod = (options: UniApp.RequestOptions) => {
           }
         })
       })
-      .catch(() => {
+      .catch((ret) => {
         hideLoading()
+        uni.showToast({ title: ret.msg, icon: 'none' })
       })
   })
 }
