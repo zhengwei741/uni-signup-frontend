@@ -11,8 +11,14 @@
       </view>
 
       <view class="section">
-        <view class="sub-title">报名开始：{{ pageActivity.startTime }}</view>
-        <view class="sub-title">报名结束：{{ pageActivity.endTime }}</view>
+        <view class="sub-title"
+          >报名开始：{{ pageActivity.startTime }}
+          <uni-icons type="calendar" size="25" color="#3498db"></uni-icons>
+        </view>
+        <view class="sub-title"
+          >报名结束：{{ pageActivity.endTime }}
+          <uni-icons type="calendar" size="25" color="#3498db"></uni-icons>
+        </view>
       </view>
 
       <view class="section org-info">
@@ -84,8 +90,9 @@ const pageOrgName = computed<string>(() => props.organizationName)
 </script>
 <style scoped lang="scss">
 .sub-title {
-  color: #c5c5c5;
+  color: black;
   font-size: 13px;
+  display: flex;
 }
 .section {
   margin-bottom: 5px;

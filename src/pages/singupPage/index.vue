@@ -28,11 +28,20 @@
               maxlength="256"
             />
           </view>
-          <view v-else>
-            <uni-data-select
+          <view v-else class="select-warpper">
+            <!-- <uni-data-select
               v-model="formData.domains[`${item.id}`]"
               :localdata="getRange(item)"
-            ></uni-data-select>
+            ></uni-data-select> -->
+            <picker
+              @change="(e: any) => bindPickerChange(e.detail.value, item.id || '')"
+              :value="formData.domains[`${item.id}`]"
+              :range="getRange(item)"
+            >
+              <view class="uni-input"
+                >当前选择：{{ formData.domains[`${item.id}`] }}</view
+              >
+            </picker>
           </view>
         </uni-forms-item>
       </uni-forms>
@@ -224,16 +233,32 @@ onLoad((option: any) => {
 const getRange = (field: ActivityField) => {
   const { valueRange } = field
   if (valueRange) {
-    return valueRange?.split('#@').map((item) => ({
-      value: item,
-      text: item
-    }))
+    return valueRange?.split('#@').map((item) => item)
   }
   return []
+}
+const bindPickerChange = (value: string, id: string) => {
+  formData.domains[id] = value
 }
 </script>
 <style scoped lang="scss">
 .singup-page {
   padding: 10px;
+}
+.select-warpper {
+  height: 100%;
+  display: flex;
+  align-items: center;
+
+  border: 1px solid #dcdfe6;
+  padding: 0 10px;
+  font-size: 13px;
+  color: #9c9c9c;
+  border-radius: 4px;
+  picker {
+    height: 100%;
+    width: 100%;
+    line-height: 34px;
+  }
 }
 </style>

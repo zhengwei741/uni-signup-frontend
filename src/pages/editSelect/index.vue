@@ -136,6 +136,7 @@ const delSelectItem = (id: string, index: number) => {
     })
     return
   }
+  delete errorMessageMap[id]
   selectItems.value.splice(index, 1)
 }
 </script>
