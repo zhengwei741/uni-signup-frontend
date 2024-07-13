@@ -1,5 +1,5 @@
 <template>
-  <view class="light-background-color">
+  <view>
     <uni-card
       :margin="props.margin"
       :padding="props.padding"
