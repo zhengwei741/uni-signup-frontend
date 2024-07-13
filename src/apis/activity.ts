@@ -116,22 +116,17 @@ export const deleteField = (id: any, activityId: string) => {
 }
 
 /**
- * 编辑自定义字段是否必填
+ * 编辑自定义字段
  * @param id
  * @returns
  */
-export const modifyField = (
-  id: any,
-  activityId: string,
-  requiredFlag: string
-) => {
+// ActivityField
+export const modifyField = (activityField: ActivityField) => {
   return request<API.Result>({
     url: '/activity/mini/modifyField',
     method: 'POST',
     data: {
-      id,
-      activityId,
-      requiredFlag
+      ...activityField
     }
   })
 }
@@ -179,9 +174,11 @@ export const updateGroup = (group: ActivityGroup) => {
  * 分页查询指定创建人的活动
  * @returns
  */
-export const queryActivityByCreater = (params: API.Pagination<{
-  creater: string
-}>) => {
+export const queryActivityByCreater = (
+  params: API.Pagination<{
+    creater: string
+  }>
+) => {
   return request<API.Result>({
     url: '/activity/mini/queryActivityByCreater',
     method: 'POST',

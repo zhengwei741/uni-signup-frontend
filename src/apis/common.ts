@@ -1,5 +1,6 @@
 import { useCommonStore } from '@/store/common'
 import { uuid } from '@/utils'
+import { SUCCESS_CODE } from '@/const'
 
 // 获取临时登录凭证 code 使用 code 换取 openid 和 session_key 等信息
 export const getCode = (): Promise<string> => {
@@ -30,11 +31,18 @@ export const loginByCode = async (code: string): Promise<string> => {
         requestId: uuid()
       },
       success: (ret) => {
+        // @ts-ignore
+        if (ret.data.code !== SUCCESS_CODE) {
+          reject(ret)
+          return
+        }
         // 存入缓存
         const store = useCommonStore()
         // @ts-ignore
-        const { token } = ret.data.data
+        const { token, userId, gzhOpenidFlag } = ret.data.data
         store.setToken(token)
+        store.setUserId(userId)
+        store.setgzhOpenidFlag(gzhOpenidFlag)
         resolve(token)
       },
       fail: reject
@@ -53,6 +61,6 @@ export const login = async (): Promise<string> => {
     return await loginByCode(code)
   } catch (error) {
     console.log(error)
-    return ''
+    throw error
   }
 }

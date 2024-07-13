@@ -4,13 +4,8 @@
       <uni-forms
         :modelValue="group"
         :label-width="130"
-        :ref="`${index}_group`"
-        :rules="{
-          groupName: {
-            rules: [{ required: true, errorMessage: '组别不能为空' }]
-          },
-          money: { rules: [{ required: true, errorMessage: '金额不能为空' }] }
-        }"
+        :ref="(el: any, index: number) => refs.push(el)"
+        :rules="rules"
       >
         <uni-forms-item label="组别名称" required name="groupName">
           <uni-easyinput
@@ -61,7 +56,7 @@
         <button
           v-if="isEdit && !isMockId(group.id)"
           size="mini"
-          @tap="() => updateOneGroup(group)"
+          @tap="() => updateOneGroup(group, true, index)"
         >
           保存
         </button>
@@ -117,6 +112,9 @@ const getActiveText = (group: ActivityGroup) => {
   const { applicantNumber = 0 } = group
   return applicantNumber ? `限制人数(${applicantNumber}人已报名)` : '限制人数'
 }
+
+// 所有表单ref
+const refs = ref<any>([])
 
 // 限制人数不可编辑
 const inputDisabled = (limit: boolean | undefined) => !!!limit
@@ -194,10 +192,13 @@ const saveGroupHandel = async () => {
   }
 }
 
+const MAX_MONEY = 50000
+
 // 更新组别
-const updateOneGroup = (
+const updateOneGroup = async (
   group: ActivityGroup,
-  showTip = true
+  showTip = true,
+  index?: number
 ): Promise<unknown> => {
   const { peopleNumber, applicantNumber = 0, limit } = group
   if (limit && peopleNumber < applicantNumber) {
@@ -208,8 +209,20 @@ const updateOneGroup = (
     })
     return Promise.reject(title)
   }
-  if (group.money > 5000) {
-    const title = '最大金额不能超过5000'
+
+  if (index !== undefined) {
+    const ref = refs.value[index]
+    if (ref) {
+      try {
+        await ref.validate()
+      } catch(e) {
+        return Promise.reject('')
+      }
+    }
+  }
+
+  if (group.money > MAX_MONEY) {
+    const title = `最大金额不能超过${MAX_MONEY}`
     uni.showToast({ title, icon: 'none' })
     return Promise.reject(title)
   }
@@ -236,12 +249,35 @@ const onGroupChange = (group: ActivityGroup) => {
 }
 const saveChangeGroup = async () => {
   const promises: Promise<unknown>[] = []
-  activityGroups.value.forEach((group) => {
+  activityGroups.value.forEach((group, index) => {
     if (chagneIds.has(group.id)) {
-      promises.push(updateOneGroup(group, false))
+      promises.push(updateOneGroup(group, false, index))
     }
   })
   return Promise.all(promises)
+}
+
+const rules = {
+  groupName: {
+    rules: [{ required: true, errorMessage: '组别不能为空' }]
+  },
+  money: {
+    rules: [
+      { required: true, errorMessage: '金额不能为空' },
+      {
+        validateFunction: function (rule: any, value: any, data: any, callback: any) {
+          const num = Number(value)
+          if (isNaN(num)) {
+            callback('请输入正确数字')
+          }
+          if (num > MAX_MONEY) {
+            callback(`最大金额不能超过${MAX_MONEY}`)
+          }
+          return true
+        }
+      },
+    ]
+  }
 }
 </script>
 <style scoped lang="scss">

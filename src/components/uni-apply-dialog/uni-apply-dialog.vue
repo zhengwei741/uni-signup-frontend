@@ -64,6 +64,13 @@
         >
           <text class="dialog-button-text button-color">取消报名</text>
         </view>
+        <view
+          class="dialog-button border-left"
+          @tap="applyOfCancel"
+          v-if="showApplyOfCancel"
+        >
+          <text class="dialog-button-text button-color">申请取消报名</text>
+        </view>
       </view>
     </template>
   </uni-dialog>
@@ -76,9 +83,14 @@ import type { ApplyInfo } from '@/typings/apply'
 
 // props
 const props = withDefaults(
-  defineProps<{ applyInfo: ApplyInfo; showCancelApply: boolean }>(),
+  defineProps<{
+    applyInfo: ApplyInfo
+    showCancelApply: boolean
+    showApplyOfCancel: boolean
+  }>(),
   {
-    showCancelApply: true
+    showCancelApply: true,
+    showApplyOfCancel: false
   }
 )
 
@@ -88,6 +100,7 @@ const applyInfo = computed(() => props.applyInfo)
 const emits = defineEmits<{
   (e: 'cancelApplyAndRawback', close: () => void): void
   (e: 'cancelApply', close: () => void): void
+  (e: 'applyOfCancel', close: () => void): void
 }>()
 
 const instance = getCurrentInstance() as ComponentInternalInstance
@@ -95,8 +108,10 @@ const close = () => {
   // @ts-ignore
   instance.refs.dialogRef.close()
 }
+
 const cancelApplyAndRawback = () => emits('cancelApplyAndRawback', close)
 const cancelApply = () => emits('cancelApply', close)
+const applyOfCancel = () => emits('applyOfCancel', close)
 </script>
 <style lang="scss" scoped>
 .container {

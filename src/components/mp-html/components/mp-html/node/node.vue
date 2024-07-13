@@ -355,6 +355,8 @@
         :id="n.attrs.vid"
         :class="n.attrs.class"
         :style="n.attrs.style"
+        :poster="true"
+        :usePoster="true"
         controls
         :data-i="i"
         @play="play"

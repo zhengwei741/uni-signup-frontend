@@ -181,7 +181,7 @@ const shareToggle = () => {
 
 onShareAppMessage((res) => {
   return {
-    title: `${bizInfo.value.userName}的主页`,
+    title: `${bizInfo.value.organizationName}`,
     path: `/pages/bizHomePage/index?creater=${bizInfo.value.id}`
   }
 })

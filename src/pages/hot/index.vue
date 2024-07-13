@@ -57,7 +57,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watchEffect } from 'vue'
 import useSafeScrollHeight from '@/hooks/useSafeScrollHeight'
 import { queryHotActivity } from '@/apis/activity'
 import type { HotActivity } from '@/typings/activity'
@@ -65,6 +65,7 @@ import { usePagination } from '@/hooks/usePagination'
 import { getStatusStyle } from '@/utils'
 import { URL } from '@/const'
 import { onShareAppMessage } from '@dcloudio/uni-app'
+import { useAssociationGZH } from '@/hooks/useAssociationGZH'
 
 // height 56是searchBar高度
 const scrollHeight = useSafeScrollHeight() - 56
@@ -91,7 +92,7 @@ const { next, refresh, isLastPage } = usePagination({
   }
 })
 // 列表相关
-let activeList = ref<HotActivity[]>([])
+const activeList = ref<HotActivity[]>([])
 // 是否是超管
 const isAdmin = ref(false)
 // 上拉加载
@@ -136,10 +137,14 @@ const gotoDetail = (id: string) => {
     })
   }
 }
+
 // 初始化
 onMounted(() => {
   refresh()
 })
+
+// 公众号关联
+useAssociationGZH()
 
 onShareAppMessage((res) => {
   return {

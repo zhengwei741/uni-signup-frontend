@@ -29,7 +29,8 @@ export const useActivityDetail = (
     groupList: [],
     showFlag: '1', // 1 显示 0 不显示
     id: '',
-    creater: ''
+    creater: '',
+    hotFlag: '1'
   })
   // 组织机构
   const organizationName = ref<string>('')

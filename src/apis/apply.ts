@@ -115,3 +115,16 @@ export const exportPersonXlsx = (activityId: string) => {
     method: 'GET'
   })
 }
+
+/**
+ * 0308-申请取消报名
+ */
+export const applyForCancel = (id: string) => {
+  return request<API.Result>({
+    url: `/apply/mini/applyForCancel`,
+    method: 'POST',
+    data: {
+      id
+    }
+  })
+}

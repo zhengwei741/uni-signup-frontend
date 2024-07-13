@@ -19,6 +19,8 @@ export interface ApplyInfo {
   updateTime: string
   updater: string
   statusDesc?: string
+  // 广告是否显示的字段（1-显示，0-不显示）
+  applyCancelShowAD: '1' | '0'
 }
 
 export type PayRet = {

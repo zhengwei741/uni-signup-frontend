@@ -8,6 +8,13 @@
         :is-full="true"
         @onTapHomeLink="onTapHomeLink"
       >
+        <template #ad>
+          <!-- 信息流广告 start -->
+          <view class="ad-view">
+            <ad adpid="1909799316"></ad>
+          </view>
+          <!-- 信息流广告 end -->
+        </template>
         <template #myApply>
           <view class="section" v-if="myApplyList.length">
             <text class="g-title list-title">我的报名</text>
@@ -37,6 +44,7 @@
           </view>
         </template>
       </uni-activityDetail>
+
       <view class="actions">
         <view class="sign-up">
           <view class="cell" @tap="goToHome">
@@ -76,8 +84,27 @@
     <uni-shard ref="shareRef"></uni-shard>
 
     <uni-popup ref="popupRef" type="dialog">
-      <uni-apply-dialog :applyInfo="applyInfo"></uni-apply-dialog>
+      <uni-apply-dialog
+        ref="applyDialogRef"
+        :applyInfo="applyInfo"
+        :showApplyOfCancel="true"
+        @applyOfCancel="applyOfCancel"
+      ></uni-apply-dialog>
     </uni-popup>
+
+    <ad-rewarded-video
+      ref="adRewardedVideo"
+      adpid="1727926414"
+      :preload="false"
+      :loadnext="false"
+      :disabled="true"
+      v-slot:default="{ loading, error }"
+      @load="onadload"
+      @close="onadclose"
+      @error="onaderror"
+    >
+      <view class="ad-error" v-if="error">{{ error }}</view>
+    </ad-rewarded-video>
   </uni-container>
 </template>
 <script setup lang="ts">
@@ -85,7 +112,7 @@ import { ref, getCurrentInstance, computed } from 'vue'
 import type { ComponentInternalInstance } from 'vue'
 import { onShareAppMessage } from '@dcloudio/uni-app'
 import { useActivityDetail } from '@/hooks/useActivityDetail'
-import { queryApplyDetail } from '@/apis/apply'
+import { queryApplyDetail, applyForCancel } from '@/apis/apply'
 import type { Apply, ApplyInfo } from '@/typings/apply'
 import { toFront } from '@/utils'
 
@@ -140,9 +167,69 @@ const showApply = (apply: Apply) => {
       ...ret.data,
       money: toFront(ret.data.money)
     }
-    // @ts-ignore
-    instance.refs.popupRef.open('center')
+    if (applyInfo.value.applyCancelShowAD === '1') {
+      // @ts-ignore
+      instance.refs.popupRef.open('center')
+    } else {
+      applyForCancel(applyInfo.value?.id || '').then((ret) => {
+        uni.showToast({
+          title: '申请成功',
+          icon: 'none'
+        })
+        // @ts-ignore
+        instance.refs.popupRef.close()
+      })
+    }
   })
+}
+// 申请取消报名  激励视频广告
+const isLoading = ref(false)
+const applyOfCancel = () => {
+  if (isLoading.value) {
+    return
+  }
+  // @ts-ignore
+  instance.refs.adRewardedVideo.show()
+  // uni.showModal({
+  //   title: '提示',
+  //   content: '观看广告完成后可取消报名是否继续？',
+  //   success: function (res) {
+  //     if (res.confirm) {
+  //       // @ts-ignore
+  //       instance.refs.adRewardedVideo.show()
+  //     } else if (res.cancel) {
+  //       console.log('用户点击取消')
+  //     }
+  //   }
+  // })
+}
+const onadload = () => {
+  isLoading.value = false
+  console.log('广告数据加载成功')
+}
+const onadclose = (e: any) => {
+  const detail = e.detail
+  // 用户点击了【关闭广告】按钮
+  if (detail && detail.isEnded) {
+    // 正常播放结束
+    console.log('onClose ' + detail.isEnded)
+    applyForCancel(applyInfo.value?.id || '').then((ret) => {
+      uni.showToast({
+        title: '申请成功',
+        icon: 'none'
+      })
+      // @ts-ignore
+      instance.refs.popupRef.close()
+    })
+  } else {
+    // 播放中途退出
+    console.log('onClose ' + detail.isEnded)
+  }
+}
+const onaderror = (e: any) => {
+  // 广告加载失败
+  console.log(e)
+  isLoading.value = false
 }
 </script>
 <style scoped lang="scss">
@@ -189,5 +276,10 @@ const showApply = (apply: Apply) => {
 .list-title {
   margin-bottom: 5px;
   display: inline-block;
+}
+
+.ad-view {
+  background-color: #ffffff;
+  margin-bottom: 10px;
 }
 </style>

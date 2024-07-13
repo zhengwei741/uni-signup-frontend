@@ -6,7 +6,12 @@
       :key="video.vedioVid"
       :title="video.vedioName"
     >
-      <txv-video :playerid="video.vedioVid" :vid="video.vedioVid"></txv-video>
+      <txv-video
+        :playerid="video.vedioVid"
+        :vid="video.vedioVid"
+        :poster="true"
+        :usePoster="true"
+      ></txv-video>
     </uni-card>
   </view>
 </template>

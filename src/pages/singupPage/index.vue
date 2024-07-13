@@ -2,11 +2,33 @@
   <uni-container>
     <view class="singup-page forms-cls">
       <uni-forms ref="singupForm" :rules="fieldRules" :modelValue="formData">
-        <uni-forms-item label="组别" required name="groupId">
-          <uni-data-select
+        <uni-forms-item
+          label="组别"
+          :rules="[
+            {
+              required: true,
+              errorMessage: `组别不能为空`
+            }
+          ]"
+          required
+          :name="'domains[__groupName__]'"
+        >
+          <!-- <uni-data-select
             v-model="formData.groupId"
             :localdata="groupRange"
-          ></uni-data-select>
+          ></uni-data-select> -->
+          <view class="select-warpper">
+            <picker
+              @change="(e: any) => bindGroupNameChange(Number(e.detail.value))"
+              :value="formData['domains']['__groupName__']"
+              :range="groupRange"
+              range-key="text"
+            >
+              <view class="uni-input"
+                >当前选择：{{ formData.domains['__groupName__'] }}</view
+              >
+            </picker>
+          </view>
         </uni-forms-item>
 
         <uni-forms-item label="费用(￥)">
@@ -21,12 +43,27 @@
           :rules="item.rules"
           :name="'domains[' + item.id + ']'"
         >
-          <view>
+          <view v-if="item.fieldType === '0'">
             <uni-easyinput
               v-model="formData.domains[`${item.id}`]"
               :placeholder="`请输入${item.fieldName}`"
               maxlength="256"
             />
+          </view>
+          <view v-else class="select-warpper">
+            <!-- <uni-data-select
+              v-model="formData.domains[`${item.id}`]"
+              :localdata="getRange(item)"
+            ></uni-data-select> -->
+            <picker
+              @change="(e: any) => bindPickerChange(item, Number(e.detail.value), item.id || '')"
+              :value="formData.domains[`${item.id}`]"
+              :range="getRange(item)"
+            >
+              <view class="uni-input"
+                >当前选择：{{ formData.domains[`${item.id}`] }}</view
+              >
+            </picker>
           </view>
         </uni-forms-item>
       </uni-forms>
@@ -61,7 +98,7 @@ import { usePay } from '@/hooks/usePay'
 // 表单
 const formData = reactive<{
   groupId: string
-  domains: Record<string, unknown>
+  domains: Record<string, any>
 }>({
   groupId: '',
   domains: {}
@@ -85,7 +122,7 @@ const fieldList = computed<ActivityField[]>(() => {
       id: 'name',
       fieldName: '昵称',
       requiredFlag: '1',
-      type: '0',
+      fieldType: '0',
       rules: [
         {
           required: true,
@@ -97,7 +134,7 @@ const fieldList = computed<ActivityField[]>(() => {
       id: 'mobile',
       fieldName: '手机号',
       requiredFlag: '1',
-      type: '0',
+      fieldType: '0',
       rules: [
         {
           required: true,
@@ -135,10 +172,13 @@ const fieldList = computed<ActivityField[]>(() => {
 const orgGroupList = ref<ActivityGroup[]>([])
 // 组别
 const groupRange = computed<{ value: string; text: string }[]>(() =>
-  orgGroupList.value.map((item) => ({
-    value: item.id || '',
-    text: item.groupName
-  }))
+  orgGroupList.value.map((item) => {
+    const { status } = item
+    return {
+      value: item.id || '',
+      text: status === '1' ? `${item.groupName}(已满)` : item.groupName
+    }
+  })
 )
 // 费用
 const cost = computed(() => {
@@ -166,10 +206,12 @@ const submit = async (fromName: string = 'singupForm') => {
       groupId,
       name,
       mobile,
-      fieldList: Object.keys(domains).map((key) => ({
-        fieldId: key,
-        fieldValue: domains[key]
-      }))
+      fieldList: Object.keys(domains)
+        .filter((key) => key !== '__groupName__')
+        .map((key) => ({
+          fieldId: key,
+          fieldValue: domains[key]
+        }))
     }
 
     loading.value = true
@@ -193,10 +235,12 @@ const submit = async (fromName: string = 'singupForm') => {
     if (msg) {
       title = msg
     }
-    uni.showToast({
-      title,
-      icon: 'error'
-    })
+    if (title) {
+      uni.showToast({
+        title,
+        icon: 'error'
+      })
+    }
   } finally {
     loading.value = false
   }
@@ -213,9 +257,43 @@ onLoad((option: any) => {
     orgGroupList.value = data.groupList
   })
 })
+
+// 自定义下拉框
+const getRange = (field: ActivityField) => {
+  const { valueRange } = field
+  if (valueRange) {
+    return valueRange?.split('#@').map((item) => item)
+  }
+  return []
+}
+const bindPickerChange = (item: ActivityField, index: number, id: string) => {
+  const range = getRange(item)
+  formData.domains[id] = range[index]
+}
+
+const bindGroupNameChange = (index: number) => {
+  formData.domains['__groupName__'] = groupRange.value[index].text
+  formData.groupId = groupRange.value[index].value
+}
 </script>
 <style scoped lang="scss">
 .singup-page {
   padding: 10px;
+}
+.select-warpper {
+  height: 100%;
+  display: flex;
+  align-items: center;
+
+  border: 1px solid #dcdfe6;
+  padding: 0 10px;
+  font-size: 13px;
+  color: #9c9c9c;
+  border-radius: 4px;
+  picker {
+    height: 100%;
+    width: 100%;
+    line-height: 34px;
+  }
 }
 </style>
